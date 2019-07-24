@@ -1,0 +1,7 @@
+language: java
+jdk: openjdk11
+script: mvn clean verify -B -Dmaven.javadoc.skip=false
+cache:
+  directories:
+    - "~/.m2/repository"
+#after_success: ".travis/deploy_to_maven_central.sh"

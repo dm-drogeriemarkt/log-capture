@@ -7,17 +7,18 @@ Helper for Unit/Integration tests with JUnit 4 to test if something has been log
 
 Because this is a library, Checkstyle is used to make sure all public classes/methods have appropriate Javadoc.
 
-* [Usage:](#usage)
-  * [Examples:](#examples)
-    * [Unit Test Example:](#unit-test-example)
-    * [Integration Test Example:](#integration-test-example)
-    * [Example with MDC](#example-with-mdc)
-* [Usage with non-JUnit Runner](#usage-with-non-junit-runner)
-  * [Cucumber example](#cucumber-example)
-    * [Cucumber feature file](#cucumber-feature-file)
-    * [Cucumber stepdefs](#cucumber-stepdefs)
-    * [Cucumber DTOs](#cucumber-dtos)
-* [To Dos](#to-dos)
+## Table of Contents
+
+* [Usage:](#Usage)
+  * [Examples:](#Examples)
+    * [Unit Test Example:](#Unit-Test-Example)
+    * [Integration Test Example:](#Integration-Test-Example)
+    * [Example with MDC](#Example-with-MDC)
+* [Usage with non-JUnit Runner](#Usage-with-non-JUnit-Runner)
+  * [Cucumber example](#Cucumber-example)
+    * [Cucumber feature file](#Cucumber-feature-file)
+    * [Cucumber stepdefs](#Cucumber-stepdefs)
+    * [Cucumber DTOs](#Cucumber-DTOs)
 
 ## Usage:
 
