@@ -8,7 +8,7 @@ env:
 jdk: openjdk11
 install: mvn install -P !build-extras -DskipTests=true -Dmaven.javadoc.skip=true -B
   -V
-script: mvn test -P !build-extras -B
+script: mvn verify -P !build-extras -B
 cache:
   directories:
     - "~/.m2/repository"
