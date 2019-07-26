@@ -5,9 +5,9 @@
 
     <groupId>de.dm.infrastructure</groupId>
     <artifactId>log-capture</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
 
-    <name>structured-logging</name>
+    <name>Log Capture</name>
     <description>Makes it possible to capture logs and assert if things have been logged</description>
     <url>https://github.com/dm-drogeriemarkt/log-capture</url>
 
