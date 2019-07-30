@@ -9,8 +9,9 @@ Because this is a library, Checkstyle is used to make sure all public classes/me
 
 ## Table of Contents
 
-* [Usage:](#Usage)
-  * [Examples:](#Examples)
+* [Usage](#Usage)
+  * [Maven](#Maven)
+  * [Examples](#Examples)
     * [Unit Test Example:](#Unit-Test-Example)
     * [Integration Test Example:](#Integration-Test-Example)
     * [Example with MDC](#Example-with-MDC)
@@ -20,9 +21,22 @@ Because this is a library, Checkstyle is used to make sure all public classes/me
     * [Cucumber stepdefs](#Cucumber-stepdefs)
     * [Cucumber DTOs](#Cucumber-DTOs)
 
-## Usage:
+## Usage
 
-### Examples:
+### Maven
+
+Add log-capture as a test dependency to your project. If you use Maven, add this to your pom.xml:
+
+```pom.xml
+<dependency>
+    <groupId>de.dm.infrastructure</groupId>
+    <artifactId>log-capture</artifactId>
+    <version>1.0.2</version>
+    <scope>test</scope>
+</dependency>
+```
+
+### Examples
 
 #### Unit Test Example:
 
