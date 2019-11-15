@@ -23,6 +23,13 @@ Because this is a library, Checkstyle is used to make sure all public classes/me
 
 ## Usage
 
+### Updating from Version 1.x.x to 2.x.x
+
+* `LogCapture.forUnitTest()` has been replaced with `LogCapture.forCurrentPackage()`
+* `LogCapture.forIntegrationTest(...)` has been replaced with `LogCapture.forPackages(...)`
+* `logCapture.addAppender()` has been replaced with `logCapture.addAppenderAndSetLogLevelToDebug()`
+* `logCapture.removeAppender()` has been replaced with `logCapture.removeAppenderAndResetLogLevel()`
+
 ### Maven
 
 Add log-capture as a test dependency to your project. If you use Maven, add this to your pom.xml:
