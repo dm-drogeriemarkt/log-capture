@@ -23,6 +23,13 @@ Because this is a library, Checkstyle is used to make sure all public classes/me
 
 ## Usage
 
+### Updating from Version 1.x.x to 2.x.x
+
+* `LogCapture.forUnitTest()` has been replaced with `LogCapture.forCurrentPackage()`
+* `LogCapture.forIntegrationTest(...)` has been replaced with `LogCapture.forPackages(...)`
+* `logCapture.addAppender()` has been replaced with `logCapture.addAppenderAndSetLogLevelToDebug()`
+* `logCapture.removeAppender()` has been replaced with `logCapture.removeAppenderAndResetLogLevel()`
+
 ### Maven
 
 Add log-capture as a test dependency to your project. If you use Maven, add this to your pom.xml:
@@ -43,16 +50,15 @@ Add log-capture as a test dependency to your project. If you use Maven, add this
 ```java
 package my.company.application;
 
+import de.dm.infrastructure.logcapture.LogCapture;
 ...
 
 public class MyUnitTest {
     
     Logger logger = LoggerFactory.getLogger(MyUnitTest.class);
 
-    // captures logs from any packages, but only if the log event's call stack 
-    // indicates that it has been caused by the test
     @Rule
-    public LogCapture logCapture = LogCapture.forUnitTest();
+    public LogCapture logCapture = LogCapture.forCurrentPackage();
 
     @Test
     public void twoLogMessagesInOrder() {
@@ -73,6 +79,7 @@ package my.company.application;
 
 import utility.that.logs.Tool;
 import irrelevant.utility.Irrelevant;
+import de.dm.infrastructure.logcapture.LogCapture;
 ...
 
 public class MyIntegrationTest {
@@ -81,7 +88,7 @@ public class MyIntegrationTest {
 
     // captures only logs from my.company and utility.that.logs and sub-packages
     @Rule
-    public LogCapture logCapture = LogCapture.forIntegrationTest("my.company", "utility.that.logs");
+    public LogCapture logCapture = LogCapture.forPackages("my.company", "utility.that.logs");
 
     @Test
     public void twoLogMessagesInOrder() {
@@ -114,7 +121,7 @@ public class MyUnitTest {
     Logger logger = LoggerFactory.getLogger(MyUnitTest.class);
 
     @Rule
-    public LogCapture logCapture = LogCapture.forUnitTest();
+    public LogCapture logCapture = LogCapture.forCurrentPackage();
 
     @Test
     public void logMessageWithMdcInformation() {
@@ -160,7 +167,7 @@ java.lang.AssertionError: Expected log message has occurred, but never with the 
 
 ## Usage with non-JUnit Runner
 
-If you intend to use LogCapture outside of a JUnit test, you cannot rely on JUnit's `@Rule` annotation and must call LocCapture's `addAppender()` and `removeAppender()` methods manually.
+If you intend to use LogCapture outside of a JUnit test, you cannot rely on JUnit's `@Rule` annotation and must call LocCapture's `addAppenderAndSetLogLevelToDebug()` and `removeAppenderAndResetLogLevel()` methods manually.
 
 Be aware that this will still cause JUnit to be a dependency.
 
@@ -173,10 +180,11 @@ Here's an Example that shows how to use LogCapture with Cucumber 4:
 ```cucumber
 And with MDC logging context
   | contextId      | contentRegex                    |
-  | verkaufsbon_vo | ^MDC_JSON_VALUE:.*2401219817317 |
-* the following messages where logged
+  | mdc_key | ^some mdc value |
+* the following messages were logged
   | level | messageRegex   |
-  | INFO  | ^Received bon$ |
+  | INFO  | ^Something happened$ |
+  | INFO  | ^Something else happened with the same mdc context$ |
 ```
 
 #### Cucumber stepdefs
@@ -187,11 +195,16 @@ You can create these stepdefs in your project to use log-capture in feature file
 public class LoggingStepdefs {
     private ExpectedMdcEntry[] expectedMdcEntries;
 
-    public LogCapture logCapture = LogCapture.forIntegrationTest("my.company.app");
+    public LogCapture logCapture = LogCapture.forPackages("my.company.app");
 
     @Before
     public void setupLogCapture() {
-        logCapture.addAppender();
+        logCapture.addAppenderAndSetLogLevelToDebug();
+    }
+    
+    @After
+    public void stopLogCapture() {
+        logCapture.removeAppenderAndResetLogLevel();
     }
 
     @And("with MDC logging context")

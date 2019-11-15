@@ -5,7 +5,7 @@
 
     <groupId>de.dm.infrastructure</groupId>
     <artifactId>log-capture</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
 
     <name>Log Capture</name>
     <description>Makes it possible to capture logs and assert if things have been logged</description>
@@ -30,13 +30,14 @@
 
     <properties>
         <java.version>1.8</java.version>
-        <lombok.version>1.18.4</lombok.version>
+        <lombok.version>1.18.10</lombok.version>
         <logback.version>1.2.3</logback.version>
         <junit.version>4.12</junit.version>
         <encoding>UTF-8</encoding>
 
-        <checkstyle.version>8.22</checkstyle.version>
-        <jacoco.version>0.8.4</jacoco.version>
+        <assertj-core.version>3.14.0</assertj-core.version>
+        <checkstyle.version>8.26</checkstyle.version>
+        <jacoco.version>0.8.5</jacoco.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <maven-checkstyle-plugin.version>3.1.0</maven-checkstyle-plugin.version>
         <maven-source-plugin.version>3.1.0</maven-source-plugin.version>
@@ -63,6 +64,12 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj-core.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
