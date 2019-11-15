@@ -11,30 +11,26 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
 class CapturingAppender extends ContextAwareBase implements Appender<ILoggingEvent> {
 
     List<LoggedEvent> loggedEvents = new ArrayList<>();
-    final List<String> capturedPackages;
+    final Set<String> capturedPackages;
 
     private String name;
     private boolean started;
-    private final boolean captureStackTrace;
 
-    CapturingAppender(LoggerContext loggerContext, boolean captureStackTrace, List<String> capturedPackages) {
+    CapturingAppender(LoggerContext loggerContext, Set<String> capturedPackages) {
         this.capturedPackages = capturedPackages;
         setName("CAPTURE-" + Thread.currentThread().getId());
         setContext(loggerContext);
-        this.captureStackTrace = captureStackTrace;
     }
 
     @Override
@@ -44,16 +40,12 @@ class CapturingAppender extends ContextAwareBase implements Appender<ILoggingEve
                     new LoggedEvent(
                             loggingEvent.getLevel(),
                             loggingEvent.getFormattedMessage(),
-                            captureStackTrace ? getMethodsInCallStack(loggingEvent) : null,
                             loggingEvent.getMDCPropertyMap()
                     ));
         }
     }
 
     private boolean eventIsRelevant(ILoggingEvent loggingEvent) {
-        if (capturedPackages.size() == 0) {
-            return true;
-        }
         for (String packageName : capturedPackages) {
             if (loggingEvent.getLoggerName().startsWith(packageName)) {
                 return true;
@@ -62,22 +54,12 @@ class CapturingAppender extends ContextAwareBase implements Appender<ILoggingEve
         return false;
     }
 
-    private static Set<String> getMethodsInCallStack(ILoggingEvent loggingEvent) {
-        return Arrays.stream(loggingEvent.getCallerData())
-                .map(CapturingAppender::toMethodName)
-                .collect(Collectors.toSet());
-    }
-
-    private static String toMethodName(StackTraceElement callerData) {
-        return String.format("%s.%s", callerData.getClassName(), callerData.getMethodName());
-    }
-
-    Integer whenCapturedNext(Level level, String regex, int startIndex, StackTraceElement caller, ExpectedMdcEntry... expectedMdcEntries) {
+    Integer whenCapturedNext(Level level, String regex, int startIndex, ExpectedMdcEntry... expectedMdcEntries) {
         Pattern pattern = Pattern.compile(".*" + regex + ".*");
         LoggedEvent eventWithWrongMdcContents = null;
         for (int i = startIndex; i < loggedEvents.size(); i++) {
             LoggedEvent event = loggedEvents.get(i);
-            if (eventMatchesWithoutMdc(event, level, pattern, caller)) {
+            if (eventMatchesWithoutMdc(event, level, pattern)) {
                 if (containsMdcEntries(event.getMdcData(), expectedMdcEntries)) {
                     return i;
                 }
@@ -90,10 +72,8 @@ class CapturingAppender extends ContextAwareBase implements Appender<ILoggingEve
         throw new AssertionError(String.format("Expected log message has not occurred: Level: %s, Regex: \"%s\"", level, regex));
     }
 
-    private boolean eventMatchesWithoutMdc(LoggedEvent event, Level level, Pattern pattern, StackTraceElement caller) {
-        return eventHasLevel(event, level)
-                && eventMatchesPattern(event, pattern)
-                && eventIsRelevantToTest(event, caller);
+    private boolean eventMatchesWithoutMdc(LoggedEvent event, Level level, Pattern pattern) {
+        return eventHasLevel(event, level) && eventMatchesPattern(event, pattern);
     }
 
     private void throwAssertionForFoundMessageWithWrongMdcContents(Level level, String regex, LoggedEvent eventWithWrongMdcContents) {
@@ -107,11 +87,6 @@ class CapturingAppender extends ContextAwareBase implements Appender<ILoggingEve
             assertionMessage.append(String.format("    %s: \"%s\"", entry.getKey(), entry.getValue()));
         }
         throw new AssertionError(assertionMessage.toString());
-    }
-
-    // if the call stack is null, it's an integration test where filtering is done via logger name instead of the call stack
-    private boolean eventIsRelevantToTest(LoggedEvent event, StackTraceElement caller) {
-        return event.getMethodsInCallStack() == null || event.getMethodsInCallStack().contains(toMethodName(caller));
     }
 
     private boolean eventMatchesPattern(LoggedEvent event, Pattern pattern) {
