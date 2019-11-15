@@ -160,7 +160,7 @@ java.lang.AssertionError: Expected log message has occurred, but never with the 
 
 ## Usage with non-JUnit Runner
 
-If you intend to use LogCapture outside of a JUnit test, you cannot rely on JUnit's `@Rule` annotation and must call LocCapture's `addAppender()` and `removeAppender()` methods manually.
+If you intend to use LogCapture outside of a JUnit test, you cannot rely on JUnit's `@Rule` annotation and must call LocCapture's `addAppenderAndSetLogLevelToDebug()` and `removeAppenderAndResetLogLevel()` methods manually.
 
 Be aware that this will still cause JUnit to be a dependency.
 
@@ -192,7 +192,12 @@ public class LoggingStepdefs {
 
     @Before
     public void setupLogCapture() {
-        logCapture.addAppender();
+        logCapture.addAppenderAndSetLogLevelToDebug();
+    }
+    
+    @After
+    public void stopLogCapture() {
+        logCapture.removeAppenderAndResetLogLevel();
     }
 
     @And("with MDC logging context")

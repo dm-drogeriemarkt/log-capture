@@ -3,8 +3,6 @@ package de.dm.infrastructure.logcapture;
 import ch.qos.logback.classic.Level;
 import com.example.app.LogCaptureCreatorInOtherPackage;
 import lombok.extern.slf4j.Slf4j;
-import org.assertj.core.api.Assertions;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -12,10 +10,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
+import static ch.qos.logback.classic.Level.DEBUG;
+import static ch.qos.logback.classic.Level.INFO;
 import static de.dm.infrastructure.logcapture.ExpectedMdcEntry.withMdc;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
-public class LogCaptureInIntegrationTest {
+public class LogCaptureTest {
 
     @Rule
     public LogCapture logCapture = LogCapture.forPackages("de.dm");
@@ -52,7 +53,7 @@ public class LogCaptureInIntegrationTest {
             logCapture.assertLogged(Level.INFO, "something that has not been logged");
         } catch (AssertionError e) {
             String expectedMessage = "Expected log message has not occurred: Level: INFO, Regex: \"something that has not been logged\"";
-            Assert.assertEquals(expectedMessage, e.getMessage());
+            assertThat(e.getMessage()).isEqualTo(expectedMessage);
             assertionErrorThrown = true;
         }
         if (!assertionErrorThrown) {
@@ -63,7 +64,7 @@ public class LogCaptureInIntegrationTest {
     @Test
     public void filterOutIrrelevantLogMessagesInIntegrationTest() {
         ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
-        rootLogger.getLoggerContext().getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME).setLevel(Level.DEBUG);
+        rootLogger.getLoggerContext().getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME).setLevel(DEBUG);
         Logger logger = LoggerFactory.getLogger("com.acme.whatever");
         logger.info("something from another package");
         exception.expect(AssertionError.class);
@@ -99,7 +100,7 @@ public class LogCaptureInIntegrationTest {
                     + System.lineSeparator() + "  Captured MDC values:"
                     + System.lineSeparator() + "    " + MDC_KEY + ": \"" + actualMdcValue + "\"";
 
-            Assert.assertEquals(expectedMessage, e.getMessage());
+            assertThat(e.getMessage()).isEqualTo(expectedMessage);
             assertionErrorThrown = true;
         }
         if (!assertionErrorThrown) {
@@ -110,6 +111,32 @@ public class LogCaptureInIntegrationTest {
     @Test
     public void fromCurrentPackageWorks() {
         LogCapture logCapture = LogCaptureCreatorInOtherPackage.getLogCapturaFromCurrentPackage();
-        Assertions.assertThat(logCapture.capturedPackages).containsExactly(LogCaptureCreatorInOtherPackage.class.getPackage().getName());
+        assertThat(logCapture.capturedPackages).containsExactly(LogCaptureCreatorInOtherPackage.class.getPackage().getName());
+    }
+
+    @Test
+    public void logLevelIsResetToInfo() {
+        logLevelIsResetTo(INFO);
+    }
+
+    @Test
+    public void logLevelIsResetToNull() {
+        logLevelIsResetTo(null);
+    }
+
+    private void logLevelIsResetTo(Level originalLevel) {
+        final ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
+        final ch.qos.logback.classic.Logger comExampleLogger = rootLogger.getLoggerContext().getLogger("com.example");
+
+        comExampleLogger.setLevel(originalLevel);
+
+        LogCapture logCapture = LogCapture.forPackages("com.example");
+        logCapture.addAppenderAndSetLogLevelToDebug();
+
+        assertThat(comExampleLogger.getLevel()).isEqualTo(DEBUG);
+
+        logCapture.removeAppenderAndResetLogLevel();
+
+        assertThat(comExampleLogger.getLevel()).isEqualTo(originalLevel);
     }
 }

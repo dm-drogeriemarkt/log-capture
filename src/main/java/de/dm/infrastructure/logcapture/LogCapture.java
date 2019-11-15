@@ -9,6 +9,7 @@ import org.junit.runners.model.Statement;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,6 +21,7 @@ public final class LogCapture implements TestRule { //should implement AfterEach
     final Set<String> capturedPackages;
     private CapturingAppender capturingAppender;
     private Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+    private HashMap<String, Level> originalLogLevels = null;
 
     /**
      * Instantiate LogCapture with some packages (for example "de.dm") to define which logs should
@@ -61,11 +63,11 @@ public final class LogCapture implements TestRule { //should implement AfterEach
         return new Statement() {
             @Override
             public void evaluate() throws Throwable {
-                addAppender();
+                addAppenderAndSetLogLevelToDebug();
                 try {
                     base.evaluate();
                 } finally {
-                    removeAppender();
+                    removeAppenderAndResetLogLevel();
                 }
             }
         };
@@ -75,14 +77,35 @@ public final class LogCapture implements TestRule { //should implement AfterEach
      * Use this if you are not using LogCapture via JUnit's @Rule
      * <p>
      * For example, this may be used in a Method that is annotated with Cucumber's @Before annotation to start capturing.
-     * In this case, make sure you also call {@link LogCapture#removeAppender()} in an @After method
+     * In this case, make sure you also call {@link LogCapture#removeAppenderAndResetLogLevel()} in an @After method
      */
-    public void addAppender() {
+    public void addAppenderAndSetLogLevelToDebug() {
         capturingAppender = new CapturingAppender(rootLogger.getLoggerContext(), capturedPackages);
-        capturedPackages.forEach(packageName ->
-                rootLogger.getLoggerContext().getLogger(packageName).setLevel(Level.DEBUG)
-        );
         rootLogger.addAppender(capturingAppender);
+        setLogLevelToDebug();
+    }
+
+    private void setLogLevelToDebug() {
+        if (originalLogLevels != null) {
+            throw new IllegalStateException("LogCapture.addAppenderAndSetLogLevelToDebug() should not be called only once or after calling removeAppenderAndResetLogLevel() again.");
+        }
+        originalLogLevels = new HashMap<>();
+        capturedPackages.forEach(packageName -> {
+                    Logger packageLogger = rootLogger.getLoggerContext().getLogger(packageName);
+                    originalLogLevels.put(packageName, packageLogger.getLevel());
+                    rootLogger.getLoggerContext().getLogger(packageName).setLevel(Level.DEBUG);
+                }
+        );
+    }
+
+    private void resetLogLevel() {
+        if (originalLogLevels == null) {
+            throw new IllegalStateException("LogCapture.resetLogLevel() should only be called after calling addAppenderAndSetLogLevelToDebug()");
+        }
+        capturedPackages.forEach(packageName ->
+                rootLogger.getLoggerContext().getLogger(packageName).setLevel(originalLogLevels.get(packageName))
+        );
+        originalLogLevels = null;
     }
 
     /**
@@ -90,8 +113,9 @@ public final class LogCapture implements TestRule { //should implement AfterEach
      * <p>
      * For example, this may be used in a Method that is annotated with Cucumber's @After annotation to start capturing.
      */
-    public void removeAppender() {
+    public void removeAppenderAndResetLogLevel() {
         rootLogger.detachAppender(capturingAppender);
+        resetLogLevel();
     }
 
     /**
@@ -109,7 +133,7 @@ public final class LogCapture implements TestRule { //should implement AfterEach
 
     private LastCapturedLogEvent assertLogged(Level level, String regex, int index, ExpectedMdcEntry... expectedMdcEntries) {
         if (capturingAppender == null) {
-            throw new IllegalStateException("capuringAppender is null. Please make sure that either LogCapture is used with a @Rule annotation or that addAppender is called manually.");
+            throw new IllegalStateException("capuringAppender is null. Please make sure that either LogCapture is used with a @Rule annotation or that addAppenderAndSetLogLevelToDebug is called manually.");
         }
         Integer foundAtIndex = capturingAppender.whenCapturedNext(level, regex, index, expectedMdcEntries);
         return new LastCapturedLogEvent(foundAtIndex);
