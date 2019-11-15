@@ -38,7 +38,7 @@ Add log-capture as a test dependency to your project. If you use Maven, add this
 <dependency>
     <groupId>de.dm.infrastructure</groupId>
     <artifactId>log-capture</artifactId>
-    <version>1.0.2</version>
+    <version>2.0.0</version>
     <scope>test</scope>
 </dependency>
 ```
