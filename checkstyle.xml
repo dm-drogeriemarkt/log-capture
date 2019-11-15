@@ -154,12 +154,12 @@
         <module name="JavadocType">
             <property name="scope" value="public"/>
         </module>
+        <module name="MissingJavadocMethod"><!-- enable this for a library, disable for an application -->
+            <property name="scope" value="protected"/>
+        </module>
         <module name="JavadocMethod">
             <property name="allowedAnnotations" value="Override, Test"/>
             <property name="validateThrows" value="true"/>
-            <property name="scope" value="protected"/>
-            <property name="allowMissingJavadoc"
-                      value="false"/><!-- set this to false for a library, true for an application -->
             <property name="allowUndeclaredRTE" value="true"/>
         </module>
         <module name="MethodName">
@@ -184,11 +184,6 @@
             <property name="allowedAbbreviationLength" value="32"/>
         </module>
         <module name="CatchParameterName"/>
-        <module name="LineLength">
-            <property name="severity" value="info"/>
-            <property name="max" value="200"/>
-            <property name="tabWidth" value="4"/>
-        </module>
         <module name="TodoComment">
             <property name="severity" value="warning"/>
             <property name="format" value="TODO|FIXME.*"/>
@@ -234,4 +229,9 @@
     <module name="FileLength"/>
     <module name="Translation"/>
     <module name="UniqueProperties"/>
+    <module name="LineLength">
+        <property name="severity" value="info"/>
+        <property name="max" value="200"/>
+        <property name="tabWidth" value="4"/>
+    </module>
 </module>
