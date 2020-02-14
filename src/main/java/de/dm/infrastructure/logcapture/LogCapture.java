@@ -30,20 +30,20 @@ public final class LogCapture implements TestRule { //should implement AfterEach
      * <p>
      * e.g. if you define "de.dm" as the captured package, messages from "de.dm.foo.bar" will also ve captured
      *
-     * @param capturedPackages packages whose logs should be captured at DEBUG level
+     * @param capturedPackage package whose logs should be captured at DEBUG level
+     * @param capturedPackages more packages whose logs should be captured at DEBUG level
      *
      * @return LogCapture instance to be used in test
      */
-    public static LogCapture forPackages(String... capturedPackages) {
-        if (capturedPackages.length == 0) {
-            throw new IllegalArgumentException("LogCapture must capture at least one package.");
-        }
-        return new LogCapture(new HashSet<>(Arrays.asList(capturedPackages)));
+    public static LogCapture forPackages(String capturedPackage, String... capturedPackages) {
+        HashSet<String> capturedPackageSet = new HashSet<>(Arrays.asList(capturedPackages));
+        capturedPackageSet.add(capturedPackage);
+        return new LogCapture(capturedPackageSet);
     }
 
     /**
      * Instantiate LogCapture with the current test's package for capturing. Sub-packages' messages
-     * will also be captured as in {@link LogCapture#forPackages(String...)}.
+     * will also be captured as in {@link LogCapture#forPackages(String, String...)}.
      *
      * @return LogCapture instance to be used in test
      */
