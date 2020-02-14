@@ -35,6 +35,13 @@ public class LogCaptureTest {
     }
 
     @Test
+    public void captureMultilineMessages() {
+        log.info("something interesting\nwith something else in other lines, for example exception details");
+
+        logCapture.assertLogged(Level.INFO, "something interesting");
+    }
+
+    @Test
     public void captureLogsForMultiplePackages() {
         log.info("something interesting");
         log.error("something terrible");
