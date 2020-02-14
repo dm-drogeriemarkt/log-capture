@@ -122,7 +122,7 @@ public final class LogCapture implements TestRule { //should implement AfterEach
      * assert that some message has been logged
      *
      * @param level expected log level
-     * @param regex regex to match formatted log message
+     * @param regex regex to match formatted log message (with Pattern.DOTALL and Pattern.MULTILINE)
      * @param expectedMdcEntries expected MDC entries, see @{@link ExpectedMdcEntry}
      *
      * @return a LastCapturedLogEvent from which .thenLogged(...) can be called to assert if things have been logged in a specific order

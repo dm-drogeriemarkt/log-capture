@@ -21,7 +21,12 @@ Because this is a library, Checkstyle is used to make sure all public classes/me
     * [Cucumber stepdefs](#Cucumber-stepdefs)
     * [Cucumber DTOs](#Cucumber-DTOs)
 
-## Usage
+
+## Changes
+
+### 2.0.1
+
+Fixed a bug where multiline log messages (for example Messages that contain a stack trace) could not be matched.
 
 ### Updating from Version 1.x.x to 2.x.x
 
@@ -29,6 +34,8 @@ Because this is a library, Checkstyle is used to make sure all public classes/me
 * `LogCapture.forIntegrationTest(...)` has been replaced with `LogCapture.forPackages(...)`
 * `logCapture.addAppender()` has been replaced with `logCapture.addAppenderAndSetLogLevelToDebug()`
 * `logCapture.removeAppender()` has been replaced with `logCapture.removeAppenderAndResetLogLevel()`
+
+## Usage
 
 ### Maven
 
