@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class LogCaptureTest {
 
     @Rule
-    public LogCapture logCapture = LogCapture.forPackages("de.dm");
+    public LogCapture logCapture = LogCapture.forPackages("de.dm", "com.capture");
 
     @Rule //to be replaced with Assertions.assertThrows() in JUnit 5
     public final ExpectedException exception = ExpectedException.none();
@@ -32,6 +32,20 @@ public class LogCaptureTest {
         logCapture
                 .assertLogged(Level.INFO, "^something interesting")
                 .thenLogged(Level.ERROR, "terrible");
+    }
+
+    @Test
+    public void captureLogsForMultiplePackages() {
+        log.info("something interesting");
+        log.error("something terrible");
+
+        final Logger comCaptureLogger = LoggerFactory.getLogger("com.capture.foo.bar");
+        comCaptureLogger.info("some info");
+
+        logCapture
+                .assertLogged(Level.INFO, "^something interesting")
+                .thenLogged(Level.ERROR, "terrible")
+                .thenLogged(Level.INFO, "some info");
     }
 
     @Test
@@ -110,7 +124,7 @@ public class LogCaptureTest {
 
     @Test
     public void fromCurrentPackageWorks() {
-        LogCapture logCapture = LogCaptureCreatorInOtherPackage.getLogCapturaFromCurrentPackage();
+        LogCapture logCapture = LogCaptureCreatorInOtherPackage.getLogCaptureFromCurrentPackage();
         assertThat(logCapture.capturedPackages).containsExactly(LogCaptureCreatorInOtherPackage.class.getPackage().getName());
     }
 

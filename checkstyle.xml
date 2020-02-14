@@ -123,10 +123,6 @@
         </module>
         <module name="OverloadMethodsDeclarationOrder"/>
         <module name="VariableDeclarationUsageDistance"/>
-        <module name="CustomImportOrder">
-            <property name="customImportOrderRules" value="STATIC###THIRD_PARTY_PACKAGE"/>
-            <property name="sortImportsInGroupAlphabetically" value="false"/>
-        </module>
         <module name="MethodParamPad"/>
         <module name="ParenPad"/>
         <module name="OperatorWrap">
@@ -160,7 +156,6 @@
         <module name="JavadocMethod">
             <property name="allowedAnnotations" value="Override, Test"/>
             <property name="validateThrows" value="true"/>
-            <property name="allowUndeclaredRTE" value="true"/>
         </module>
         <module name="MethodName">
             <property name="format" value="^[a-z][a-z0-9][a-zA-Z0-9_]*$"/>
