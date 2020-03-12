@@ -3,9 +3,9 @@ package de.dm.infrastructure.logcapture;
 import ch.qos.logback.classic.Level;
 import com.example.app.LogCaptureCreatorInOtherPackage;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -18,11 +18,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 public class LogCaptureTest {
 
-    @Rule
+    @RegisterExtension
     public LogCapture logCapture = LogCapture.forPackages("de.dm", "com.capture");
-
-    @Rule //to be replaced with Assertions.assertThrows() in JUnit 5
-    public final ExpectedException exception = ExpectedException.none();
 
     @Test
     public void twoLogMessagesInOrder() {
@@ -57,14 +54,14 @@ public class LogCaptureTest {
 
     @Test
     public void twoLogMessagesOutOfOrder() {
-        log.error("something terrible");
-        log.info("something interesting");
+        Assertions.assertThrows(AssertionError.class, () -> {
+            log.error("something terrible");
+            log.info("something interesting");
 
-        exception.expect(AssertionError.class);
-
-        logCapture
-                .assertLogged(Level.INFO, "^something interesting")
-                .thenLogged(Level.ERROR, "terrible");
+            logCapture
+                    .assertLogged(Level.INFO, "^something interesting")
+                    .thenLogged(Level.ERROR, "terrible");
+        });
     }
 
     @Test
@@ -84,12 +81,13 @@ public class LogCaptureTest {
 
     @Test
     public void filterOutIrrelevantLogMessagesInIntegrationTest() {
-        ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
-        rootLogger.getLoggerContext().getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME).setLevel(DEBUG);
-        Logger logger = LoggerFactory.getLogger("com.acme.whatever");
-        logger.info("something from another package");
-        exception.expect(AssertionError.class);
-        logCapture.assertLogged(Level.INFO, "something from another package");
+        Assertions.assertThrows(AssertionError.class, () -> {
+            ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
+            rootLogger.getLoggerContext().getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME).setLevel(DEBUG);
+            Logger logger = LoggerFactory.getLogger("com.acme.whatever");
+            logger.info("something from another package");
+            logCapture.assertLogged(Level.INFO, "something from another package");
+        });
     }
 
     @Test

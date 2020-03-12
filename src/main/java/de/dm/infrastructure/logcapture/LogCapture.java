@@ -3,9 +3,9 @@ package de.dm.infrastructure.logcapture;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import lombok.RequiredArgsConstructor;
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * a JUnit 4 @Rule that can be used to capture log output. Use the appropriate constructor for unit/integration tests.
  */
-public final class LogCapture implements TestRule { //should implement AfterEachCallback, BeforeEachCallback in JUnit 5
+public final class LogCapture implements BeforeEachCallback, AfterEachCallback { //should implement AfterEachCallback, BeforeEachCallback in JUnit 5
 
     final Set<String> capturedPackages;
     private CapturingAppender capturingAppender;
@@ -59,18 +59,13 @@ public final class LogCapture implements TestRule { //should implement AfterEach
     }
 
     @Override
-    public Statement apply(Statement base, Description description) {
-        return new Statement() {
-            @Override
-            public void evaluate() throws Throwable {
-                addAppenderAndSetLogLevelToDebug();
-                try {
-                    base.evaluate();
-                } finally {
-                    removeAppenderAndResetLogLevel();
-                }
-            }
-        };
+    public void beforeEach(ExtensionContext context) {
+        addAppenderAndSetLogLevelToDebug();
+    }
+
+    @Override
+    public void afterEach(ExtensionContext context) {
+        removeAppenderAndResetLogLevel();
     }
 
     /**

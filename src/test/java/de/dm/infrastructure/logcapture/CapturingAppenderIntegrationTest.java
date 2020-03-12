@@ -1,7 +1,7 @@
 package de.dm.infrastructure.logcapture;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,12 +21,12 @@ public class CapturingAppenderIntegrationTest {
         mdcContents.put(TEST_KEY, "this is a test value, cool!");
         mdcContents.put(OTHER_KEY, "this is a good value, cool!");
 
-        Assert.assertTrue(CapturingAppender.containsMdcEntries(mdcContents, expectedMdcEntries));
+        Assertions.assertTrue(CapturingAppender.containsMdcEntries(mdcContents, expectedMdcEntries));
     }
 
     @Test
     public void nullEntriesShouldNotThrowNullPointerException() {
         Map<String, String> mdcContents = new HashMap<>();
-        Assert.assertTrue(CapturingAppender.containsMdcEntries(mdcContents, null));
+        Assertions.assertTrue(CapturingAppender.containsMdcEntries(mdcContents, null));
     }
 }
