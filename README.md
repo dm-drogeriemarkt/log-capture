@@ -3,7 +3,7 @@
 [<img src="https://opensourcelogos.aws.dmtech.cloud/dmTECH_opensource_logo.svg" height="20" width="130">](https://dmtech.de/)
 [![Build Status](https://travis-ci.org/dm-drogeriemarkt/log-capture.svg?branch=master)](https://travis-ci.org/dm-drogeriemarkt/log-capture)
 
-Helper for Unit/Integration tests with JUnit 4 to test if something has been logged.
+Helper for Unit/Integration tests with JUnit 4/5 to test if something has been logged.
 
 Because this is a library, Checkstyle is used to make sure all public classes/methods have appropriate Javadoc.
 
@@ -24,6 +24,15 @@ Because this is a library, Checkstyle is used to make sure all public classes/me
 
 ## Changes
 
+### 3.0.0
+
+Updated from JUnit 4 to JUnit 5.
+
+Tu update from 2.x.x to 3.x.x:
+
+* Use JUnit 5 instead of JUnit 4
+* Replace `@Rule` in logging tests with `@RegisterExtension`
+
 ### 2.0.1
 
 Fixed a bug where multiline log messages (for example Messages that contain a stack trace) could not be matched.
@@ -37,6 +46,12 @@ Fixed a bug where multiline log messages (for example Messages that contain a st
 
 ## Usage
 
+### Junit 4 vs 5
+
+If you still use Junit 4, you need to use LogCapture 2.x.x
+
+There is no guarantee, however, if and how long 2.x.x will be maintained. We plan to maintain it as long as it is needed, though.
+
 ### Maven
 
 Add log-capture as a test dependency to your project. If you use Maven, add this to your pom.xml:
@@ -45,7 +60,7 @@ Add log-capture as a test dependency to your project. If you use Maven, add this
 <dependency>
     <groupId>de.dm.infrastructure</groupId>
     <artifactId>log-capture</artifactId>
-    <version>2.0.1</version>
+    <version>3.0.0</version>
     <scope>test</scope>
 </dependency>
 ```
@@ -64,7 +79,7 @@ public class MyUnitTest {
     
     Logger logger = LoggerFactory.getLogger(MyUnitTest.class);
 
-    @Rule
+    @RegisterExtension //use @Rule for LogCapture 2/JUnit 4
     public LogCapture logCapture = LogCapture.forCurrentPackage();
 
     @Test
@@ -94,7 +109,7 @@ public class MyIntegrationTest {
     Logger logger = LoggerFactory.getLogger(MyIntegrationTest.class);
 
     // captures only logs from my.company and utility.that.logs and sub-packages
-    @Rule
+    @RegisterExtension //use @Rule for LogCapture 2/JUnit 4
     public LogCapture logCapture = LogCapture.forPackages("my.company", "utility.that.logs");
 
     @Test
@@ -127,7 +142,7 @@ import static de.dm.prom.logcapture.ExpectedMdcEntry.withMdc;
 public class MyUnitTest {
     Logger logger = LoggerFactory.getLogger(MyUnitTest.class);
 
-    @Rule
+    @RegisterExtension
     public LogCapture logCapture = LogCapture.forCurrentPackage();
 
     @Test
