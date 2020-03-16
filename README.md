@@ -7,9 +7,8 @@ Helper for Unit/Integration tests with JUnit 4/5 to test if something has been l
 
 Because this is a library, Checkstyle is used to make sure all public classes/methods have appropriate Javadoc.
 
-## Table of Contents
+**Table of Contents**
 
-* [Table of Contents](#table-of-contents)
 * [Changes](#changes)
   * [3.0.0](#300)
   * [2.0.1](#201)
