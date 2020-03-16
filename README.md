@@ -28,7 +28,7 @@ Because this is a library, Checkstyle is used to make sure all public classes/me
 
 Updated from JUnit 4 to JUnit 5.
 
-Tu update from 2.x.x to 3.x.x:
+To update from 2.x.x to 3.x.x:
 
 * Use JUnit 5 instead of JUnit 4
 * Replace `@Rule` in logging tests with `@RegisterExtension`
