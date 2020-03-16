@@ -9,17 +9,23 @@ Because this is a library, Checkstyle is used to make sure all public classes/me
 
 ## Table of Contents
 
-* [Usage](#Usage)
-  * [Maven](#Maven)
-  * [Examples](#Examples)
-    * [Unit Test Example:](#Unit-Test-Example)
-    * [Integration Test Example:](#Integration-Test-Example)
-    * [Example with MDC](#Example-with-MDC)
-* [Usage with non-JUnit Runner](#Usage-with-non-JUnit-Runner)
-  * [Cucumber example](#Cucumber-example)
-    * [Cucumber feature file](#Cucumber-feature-file)
-    * [Cucumber stepdefs](#Cucumber-stepdefs)
-    * [Cucumber DTOs](#Cucumber-DTOs)
+* [Table of Contents](#table-of-contents)
+* [Changes](#changes)
+  * [3.0.0](#300)
+  * [2.0.1](#201)
+  * [Updating from Version 1.x.x to 2.x.x](#updating-from-version-1xx-to-2xx)
+* [Usage](#usage)
+  * [Junit 4 vs 5](#junit-4-vs-5)
+  * [Maven](#maven)
+  * [Examples](#examples)
+    * [Unit Test Example:](#unit-test-example)
+    * [Integration Test Example:](#integration-test-example)
+    * [Example with MDC](#example-with-mdc)
+* [Usage with non-JUnit Runner](#usage-with-non-junit-runner)
+  * [Cucumber example](#cucumber-example)
+    * [Cucumber feature file](#cucumber-feature-file)
+    * [Cucumber stepdefs](#cucumber-stepdefs)
+    * [Cucumber DTOs](#cucumber-dtos)
 
 
 ## Changes
