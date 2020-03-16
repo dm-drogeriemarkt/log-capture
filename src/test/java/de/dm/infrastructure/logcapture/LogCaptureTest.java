@@ -21,6 +21,9 @@ public class LogCaptureTest {
     @RegisterExtension
     public LogCapture logCapture = LogCapture.forPackages("de.dm", "com.capture");
 
+    @RegisterExtension
+    public LogCapture logCaptureForCurrentPackage = LogCapture.forCurrentPackage();
+
     @Test
     public void twoLogMessagesInOrder() {
         log.info("something interesting");
@@ -36,6 +39,21 @@ public class LogCaptureTest {
         log.info("something interesting\nwith something else in other lines, for example exception details");
 
         logCapture.assertLogged(Level.INFO, "something interesting");
+    }
+
+    @Test
+    public void captureLogsForCurrentPackage() {
+        log.info("Hello from logcapture");
+
+        final Logger acmeLogger = LoggerFactory.getLogger("com.acme");
+        acmeLogger.info("Hello from com.acme");
+
+        logCaptureForCurrentPackage
+                .assertLogged(INFO, "^Hello from logcapture$");
+
+        Assertions.assertThrows(AssertionError.class, () -> {
+            logCaptureForCurrentPackage.assertLogged(INFO, "Hello from com.acme");
+        });
     }
 
     @Test
