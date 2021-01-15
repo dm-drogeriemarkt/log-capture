@@ -123,6 +123,8 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
      * @param expectedMdcEntries expected MDC entries, see @{@link ExpectedMdcEntry}
      *
      * @return a LastCapturedLogEvent from which .thenLogged(...) can be called to assert if things have been logged in a specific order
+     *
+     * @throws AssertionError if the expected log message has not been logged
      */
     public LastCapturedLogEvent assertLogged(Level level, String regex, ExpectedMdcEntry... expectedMdcEntries) {
         return assertLogged(level, regex, null, expectedMdcEntries);
@@ -158,6 +160,8 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
          * @param expectedMdcEntries expected MDC entries, see @{@link ExpectedMdcEntry}
          *
          * @return another LastCapturedLogEvent - for obvious reasons
+         *
+         * @throws AssertionError if the expected log message has not been logged
          */
         public LastCapturedLogEvent thenLogged(Level level, String regex, ExpectedMdcEntry... expectedMdcEntries) {
             return assertLogged(level, regex, this, expectedMdcEntries);
@@ -165,6 +169,8 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
 
         /**
          * assert that nothing else has been logged except for the asserted log messages
+         *
+         * @throws AssertionError if something else has been logged
          */
         public void assertNothingElseLogged() {
             if (capturingAppender.getNumberOfLoggedMessages() > assertedLogMessages) {
