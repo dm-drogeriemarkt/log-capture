@@ -16,7 +16,7 @@ import static de.dm.infrastructure.logcapture.ExpectedMdcEntry.withMdc;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
-public class LogCaptureTest {
+class LogCaptureTest {
 
     @RegisterExtension
     public LogCapture logCapture = LogCapture.forPackages("de.dm", "com.capture");
@@ -25,7 +25,7 @@ public class LogCaptureTest {
     public LogCapture logCaptureForCurrentPackage = LogCapture.forCurrentPackage();
 
     @Test
-    public void twoLogMessagesInOrder() {
+    void twoLogMessagesInOrder() {
         log.info("something interesting");
         log.error("something terrible");
 
@@ -35,14 +35,14 @@ public class LogCaptureTest {
     }
 
     @Test
-    public void captureMultilineMessages() {
+    void captureMultilineMessages() {
         log.info("something interesting\nwith something else in other lines, for example exception details");
 
         logCapture.assertLogged(Level.INFO, "something interesting");
     }
 
     @Test
-    public void captureLogsForCurrentPackage() {
+    void captureLogsForCurrentPackage() {
         log.info("Hello from logcapture");
 
         final Logger acmeLogger = LoggerFactory.getLogger("com.acme");
@@ -57,7 +57,7 @@ public class LogCaptureTest {
     }
 
     @Test
-    public void captureLogsForMultiplePackages() {
+    void captureLogsForMultiplePackages() {
         log.info("something interesting");
         log.error("something terrible");
 
@@ -71,9 +71,9 @@ public class LogCaptureTest {
     }
 
     @Test
-    public void twoLogMessagesOutOfOrder() {
+    void twoLogMessagesOutOfOrder() {
         Assertions.assertThrows(AssertionError.class, () -> {
-            log.error("something terrible");
+            log.error("sqomething terrible");
             log.info("something interesting");
 
             logCapture
@@ -83,7 +83,7 @@ public class LogCaptureTest {
     }
 
     @Test
-    public void catchMissingLogMessage() {
+    void catchMissingLogMessage() {
         boolean assertionErrorThrown = false;
         try {
             logCapture.assertLogged(Level.INFO, "something that has not been logged");
@@ -98,7 +98,7 @@ public class LogCaptureTest {
     }
 
     @Test
-    public void filterOutIrrelevantLogMessagesInIntegrationTest() {
+    void filterOutIrrelevantLogMessagesInIntegrationTest() {
         Assertions.assertThrows(AssertionError.class, () -> {
             ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
             rootLogger.getLoggerContext().getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME).setLevel(DEBUG);
@@ -109,7 +109,7 @@ public class LogCaptureTest {
     }
 
     @Test
-    public void logMessagesWithMdc() {
+    void logMessagesWithMdc() {
         final String MDC_KEY = "mdc_key";
 
         MDC.put(MDC_KEY, "an mdc value here");
@@ -120,7 +120,7 @@ public class LogCaptureTest {
     }
 
     @Test
-    public void correctLogMessagesWithMissingMdc() {
+    void correctLogMessagesWithMissingMdc() {
         final String MDC_KEY = "mdc_key";
         final String actualMdcValue = "a wrong value here";
 
@@ -146,18 +146,18 @@ public class LogCaptureTest {
     }
 
     @Test
-    public void fromCurrentPackageWorks() {
+    void fromCurrentPackageWorks() {
         LogCapture logCapture = LogCaptureCreatorInOtherPackage.getLogCaptureFromCurrentPackage();
         assertThat(logCapture.capturedPackages).containsExactly(LogCaptureCreatorInOtherPackage.class.getPackage().getName());
     }
 
     @Test
-    public void logLevelIsResetToInfo() {
+    void logLevelIsResetToInfo() {
         logLevelIsResetTo(INFO);
     }
 
     @Test
-    public void logLevelIsResetToNull() {
+    void logLevelIsResetToNull() {
         logLevelIsResetTo(null);
     }
 
