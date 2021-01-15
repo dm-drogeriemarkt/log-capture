@@ -130,7 +130,8 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
 
     private LastCapturedLogEvent assertLogged(Level level, String regex, int index, ExpectedMdcEntry... expectedMdcEntries) {
         if (capturingAppender == null) {
-            throw new IllegalStateException("capuringAppender is null. Please make sure that either LogCapture is used with a @Rule annotation or that addAppenderAndSetLogLevelToDebug is called manually.");
+            throw new IllegalStateException("capuringAppender is null. " +
+                    "Please make sure that either LogCapture is used with a @Rule annotation or that addAppenderAndSetLogLevelToDebug is called manually.");
         }
         Integer foundAtIndex = capturingAppender.whenCapturedNext(level, regex, index, expectedMdcEntries);
         return new LastCapturedLogEvent(foundAtIndex);
