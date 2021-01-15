@@ -10,6 +10,7 @@ Because this is a library, Checkstyle is used to make sure all public classes/me
 **Table of Contents**
 
 * [Changes](#changes)
+  * [3.1.0](#310)
   * [3.0.0](#300)
   * [2.0.1](#201)
   * [Updating from Version 1.x.x to 2.x.x](#updating-from-version-1xx-to-2xx)
@@ -28,6 +29,10 @@ Because this is a library, Checkstyle is used to make sure all public classes/me
 
 
 ## Changes
+
+### 3.1.0
+
+Added `assertNothingElseLogged()`
 
 ### 3.0.0
 
@@ -94,7 +99,8 @@ public class MyUnitTest {
 
         logCapture
                 .assertLogged(Level.INFO, "^something interesting$") //second parameter is a regular expression
-                .thenLogged(Level.ERROR, "terrible");
+                .thenLogged(Level.ERROR, "terrible")
+                .assertNothingElseLogged();
     }
 }
 ```
@@ -190,7 +196,6 @@ java.lang.AssertionError: Expected log message has occurred, but never with the 
     my_mdc_key: "this is the wrong MDC value"
     other_mdc_key: "this is the other MDC value"
 ```
-
 
 ## Usage with non-JUnit Runner
 
