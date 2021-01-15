@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.slf4j.Logger.ROOT_LOGGER_NAME;
+
 /**
  * a JUnit 4 @Rule that can be used to capture log output. Use the appropriate constructor for unit/integration tests.
  */
@@ -20,7 +22,7 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
 
     final Set<String> capturedPackages;
     private CapturingAppender capturingAppender;
-    private Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+    private Logger rootLogger = (Logger) LoggerFactory.getLogger(ROOT_LOGGER_NAME);
     private HashMap<String, Level> originalLogLevels = null;
 
     /**
