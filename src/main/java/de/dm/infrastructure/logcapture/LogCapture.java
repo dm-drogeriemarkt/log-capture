@@ -125,16 +125,21 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
      * @return a LastCapturedLogEvent from which .thenLogged(...) can be called to assert if things have been logged in a specific order
      */
     public LastCapturedLogEvent assertLogged(Level level, String regex, ExpectedMdcEntry... expectedMdcEntries) {
-        return assertLogged(level, regex, 0, expectedMdcEntries);
+        return assertLogged(level, regex, null, expectedMdcEntries);
     }
 
-    private LastCapturedLogEvent assertLogged(Level level, String regex, int index, ExpectedMdcEntry... expectedMdcEntries) {
+    private LastCapturedLogEvent assertLogged(Level level, String regex, LastCapturedLogEvent lastCapturedLogEvent, ExpectedMdcEntry... expectedMdcEntries) {
         if (capturingAppender == null) {
             throw new IllegalStateException("capuringAppender is null. " +
                     "Please make sure that either LogCapture is used with a @Rule annotation or that addAppenderAndSetLogLevelToDebug is called manually.");
         }
-        Integer foundAtIndex = capturingAppender.whenCapturedNext(level, regex, index, expectedMdcEntries);
-        return new LastCapturedLogEvent(foundAtIndex);
+
+        Integer startIndex = lastCapturedLogEvent == null ? 0 : lastCapturedLogEvent.index + 1;
+        int assertedLogMessages = lastCapturedLogEvent == null ? 1 : lastCapturedLogEvent.assertedLogMessages + 1;
+
+        Integer foundAtIndex = capturingAppender.whenCapturedNext(level, regex, startIndex, expectedMdcEntries);
+
+        return new LastCapturedLogEvent(foundAtIndex, assertedLogMessages);
     }
 
     /**
@@ -143,6 +148,7 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
     @RequiredArgsConstructor
     public class LastCapturedLogEvent {
         private final int index;
+        private final int assertedLogMessages;
 
         /**
          * assert that something has been logged after this event
@@ -154,7 +160,16 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
          * @return another LastCapturedLogEvent - for obvious reasons
          */
         public LastCapturedLogEvent thenLogged(Level level, String regex, ExpectedMdcEntry... expectedMdcEntries) {
-            return assertLogged(level, regex, index + 1, expectedMdcEntries);
+            return assertLogged(level, regex, this, expectedMdcEntries);
+        }
+
+        /**
+         * assert that nothing else has been logged except for the asserted log messages
+         */
+        public void assertNothingElseLogged() {
+            if (capturingAppender.getNumberOfLoggedMessages() > assertedLogMessages) {
+                throw new AssertionError("There have been other log messages than the asserted ones.");
+            }
         }
     }
 

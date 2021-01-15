@@ -26,13 +26,31 @@ class LogCaptureTest {
     public LogCapture logCaptureForCurrentPackage = LogCapture.forCurrentPackage();
 
     @Test
-    void twoLogMessagesInOrder() {
+    void twoLogMessagesInOrderAndNothingElse() {
         log.info("something interesting");
         log.error("something terrible");
 
         logCapture
                 .assertLogged(Level.INFO, "^something interesting")
+                .thenLogged(Level.ERROR, "terrible")
+                .assertNothingElseLogged();
+    }
+
+    @Test
+    void twoLogMessagesInOrderAndSomethingElseFails() {
+        log.info("something interesting");
+        log.info("something unexpected");
+        log.error("something terrible");
+
+        LastCapturedLogEvent lastCapturedLogEvent = logCapture
+                .assertLogged(INFO, "^something interesting")
                 .thenLogged(Level.ERROR, "terrible");
+
+        AssertionError assertionError = assertThrows(AssertionError.class, () -> {
+            lastCapturedLogEvent.assertNothingElseLogged();
+        });
+
+        assertThat(assertionError).hasMessage("There have been other log messages than the asserted ones.");
     }
 
     @Test
@@ -52,9 +70,11 @@ class LogCaptureTest {
         logCaptureForCurrentPackage
                 .assertLogged(INFO, "^Hello from logcapture$");
 
-        assertThrows(AssertionError.class, () -> {
+        AssertionError assertionError = assertThrows(AssertionError.class, () -> {
             logCaptureForCurrentPackage.assertLogged(INFO, "Hello from com.acme");
         });
+
+        assertThat(assertionError).hasMessage("Expected log message has not occurred: Level: INFO, Regex: \"Hello from com.acme\"");
     }
 
     @Test
@@ -73,14 +93,16 @@ class LogCaptureTest {
 
     @Test
     void twoLogMessagesOutOfOrder() {
-        log.error("sqomething terrible");
+        log.error("something terrible");
         log.info("something interesting");
         LastCapturedLogEvent lastCapturedLogEvent = logCapture
                 .assertLogged(INFO, "^something interesting");
 
-        assertThrows(AssertionError.class, () -> {
+        AssertionError assertionError = assertThrows(AssertionError.class, () -> {
             lastCapturedLogEvent.thenLogged(Level.ERROR, "terrible");
         });
+
+        assertThat(assertionError).hasMessage("Expected log message has not occurred: Level: ERROR, Regex: \"terrible\"");
     }
 
     @Test
@@ -104,10 +126,12 @@ class LogCaptureTest {
         rootLogger.getLoggerContext().getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME).setLevel(DEBUG);
         Logger logger = LoggerFactory.getLogger("com.acme.whatever");
         logger.info("something from another package");
-        
-        assertThrows(AssertionError.class, () -> {
-            logCapture.assertLogged(Level.INFO, "something from another package");
+
+        AssertionError assertionError = assertThrows(AssertionError.class, () -> {
+            logCapture.assertLogged(INFO, "something from another package");
         });
+
+        assertThat(assertionError).hasMessage("Expected log message has not occurred: Level: INFO, Regex: \"something from another package\"");
     }
 
     @Test
