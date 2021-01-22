@@ -6,13 +6,13 @@ import org.junit.jupiter.api.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CapturingAppenderIntegrationTest {
+class CapturingAppenderIntegrationTest {
 
     private final String TEST_KEY = "test_key";
     private final String OTHER_KEY = "test_key_2";
 
     @Test
-    public void containsMdcEntries() {
+    void containsMdcEntries() {
         ExpectedMdcEntry expectedMdcEntry1 = ExpectedMdcEntry.withMdc(TEST_KEY, "test value");
         ExpectedMdcEntry expectedMdcEntry2 = ExpectedMdcEntry.withMdc(OTHER_KEY, "good value");
         ExpectedMdcEntry[] expectedMdcEntries = new ExpectedMdcEntry[]{expectedMdcEntry1, expectedMdcEntry2};
@@ -25,7 +25,7 @@ public class CapturingAppenderIntegrationTest {
     }
 
     @Test
-    public void nullEntriesShouldNotThrowNullPointerException() {
+    void nullEntriesShouldNotThrowNullPointerException() {
         Map<String, String> mdcContents = new HashMap<>();
         Assertions.assertTrue(CapturingAppender.containsMdcEntries(mdcContents, null));
     }

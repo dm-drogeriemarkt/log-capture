@@ -6,12 +6,12 @@ import org.junit.jupiter.api.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ExpectedMdcEntryUnitTest {
+class ExpectedMdcEntryUnitTest {
 
     private static final String TEST_KEY = "test_key";
 
     @Test
-    public void isContainedIn() {
+    void isContainedIn() {
         ExpectedMdcEntry expectedMdcEntry = ExpectedMdcEntry.withMdc(TEST_KEY, "test value");
         Map<String, String> mdcContents = new HashMap<>();
         mdcContents.put(TEST_KEY, "this is a test value, cool!");
@@ -19,7 +19,7 @@ public class ExpectedMdcEntryUnitTest {
     }
 
     @Test
-    public void isNotContainedIn() {
+    void isNotContainedIn() {
         ExpectedMdcEntry expectedMdcEntry = ExpectedMdcEntry.withMdc(TEST_KEY, "test value");
         Map<String, String> mdcContents = new HashMap<>();
         mdcContents.put(TEST_KEY, "this is a value, cool!");

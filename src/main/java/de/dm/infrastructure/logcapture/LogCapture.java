@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.slf4j.Logger.ROOT_LOGGER_NAME;
+
 /**
  * a JUnit 4 @Rule that can be used to capture log output. Use the appropriate constructor for unit/integration tests.
  */
@@ -20,7 +22,7 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
 
     final Set<String> capturedPackages;
     private CapturingAppender capturingAppender;
-    private Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+    private Logger rootLogger = (Logger) LoggerFactory.getLogger(ROOT_LOGGER_NAME);
     private HashMap<String, Level> originalLogLevels = null;
 
     /**
@@ -121,17 +123,25 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
      * @param expectedMdcEntries expected MDC entries, see @{@link ExpectedMdcEntry}
      *
      * @return a LastCapturedLogEvent from which .thenLogged(...) can be called to assert if things have been logged in a specific order
+     *
+     * @throws AssertionError if the expected log message has not been logged
      */
     public LastCapturedLogEvent assertLogged(Level level, String regex, ExpectedMdcEntry... expectedMdcEntries) {
-        return assertLogged(level, regex, 0, expectedMdcEntries);
+        return assertLogged(level, regex, null, expectedMdcEntries);
     }
 
-    private LastCapturedLogEvent assertLogged(Level level, String regex, int index, ExpectedMdcEntry... expectedMdcEntries) {
+    private LastCapturedLogEvent assertLogged(Level level, String regex, LastCapturedLogEvent lastCapturedLogEvent, ExpectedMdcEntry... expectedMdcEntries) {
         if (capturingAppender == null) {
-            throw new IllegalStateException("capuringAppender is null. Please make sure that either LogCapture is used with a @Rule annotation or that addAppenderAndSetLogLevelToDebug is called manually.");
+            throw new IllegalStateException("capuringAppender is null. " +
+                    "Please make sure that either LogCapture is used with a @Rule annotation or that addAppenderAndSetLogLevelToDebug is called manually.");
         }
-        Integer foundAtIndex = capturingAppender.whenCapturedNext(level, regex, index, expectedMdcEntries);
-        return new LastCapturedLogEvent(foundAtIndex);
+
+        Integer startIndex = lastCapturedLogEvent == null ? 0 : lastCapturedLogEvent.index + 1;
+        int assertedLogMessages = lastCapturedLogEvent == null ? 1 : lastCapturedLogEvent.assertedLogMessages + 1;
+
+        Integer foundAtIndex = capturingAppender.whenCapturedNext(level, regex, startIndex, expectedMdcEntries);
+
+        return new LastCapturedLogEvent(foundAtIndex, assertedLogMessages);
     }
 
     /**
@@ -140,6 +150,7 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
     @RequiredArgsConstructor
     public class LastCapturedLogEvent {
         private final int index;
+        private final int assertedLogMessages;
 
         /**
          * assert that something has been logged after this event
@@ -149,9 +160,22 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
          * @param expectedMdcEntries expected MDC entries, see @{@link ExpectedMdcEntry}
          *
          * @return another LastCapturedLogEvent - for obvious reasons
+         *
+         * @throws AssertionError if the expected log message has not been logged
          */
         public LastCapturedLogEvent thenLogged(Level level, String regex, ExpectedMdcEntry... expectedMdcEntries) {
-            return assertLogged(level, regex, index + 1, expectedMdcEntries);
+            return assertLogged(level, regex, this, expectedMdcEntries);
+        }
+
+        /**
+         * assert that nothing else has been logged except for the asserted log messages
+         *
+         * @throws AssertionError if something else has been logged
+         */
+        public void assertNothingElseLogged() {
+            if (capturingAppender.getNumberOfLoggedMessages() > assertedLogMessages) {
+                throw new AssertionError("There have been other log messages than the asserted ones.");
+            }
         }
     }
 

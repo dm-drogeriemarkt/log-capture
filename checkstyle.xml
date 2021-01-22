@@ -126,7 +126,7 @@
         <module name="MethodParamPad"/>
         <module name="ParenPad"/>
         <module name="OperatorWrap">
-            <property name="option" value="NL"/>
+            <property name="option" value="EOL"/>
             <property name="tokens"
                       value="BAND, BOR, BSR, BXOR, DIV, EQUAL, GE, GT, LAND, LE, LITERAL_INSTANCEOF, LOR, LT, MINUS, MOD, NOT_EQUAL, PLUS, QUESTION, SL, SR, STAR, METHOD_REF "/>
         </module>
@@ -187,7 +187,6 @@
         <module name="ConstantName">
             <property name="applyToPrivate" value="false"/>
         </module>
-        <module name="AvoidStaticImport"/>
         <module name="RedundantImport"/>
         <module name="UnusedImports"/>
         <module name="AnonInnerLength"/>

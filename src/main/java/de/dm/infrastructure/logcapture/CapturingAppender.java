@@ -21,8 +21,8 @@ import java.util.regex.Pattern;
 @Setter
 class CapturingAppender extends ContextAwareBase implements Appender<ILoggingEvent> {
 
-    List<LoggedEvent> loggedEvents = new ArrayList<>();
-    final Set<String> capturedPackages;
+    private List<LoggedEvent> loggedEvents = new ArrayList<>();
+    private final Set<String> capturedPackages;
 
     private String name;
     private boolean started;
@@ -70,6 +70,10 @@ class CapturingAppender extends ContextAwareBase implements Appender<ILoggingEve
             throwAssertionForFoundMessageWithWrongMdcContents(level, regex, eventWithWrongMdcContents);
         }
         throw new AssertionError(String.format("Expected log message has not occurred: Level: %s, Regex: \"%s\"", level, regex));
+    }
+
+    int getNumberOfLoggedMessages() {
+        return loggedEvents.size();
     }
 
     private boolean eventMatchesWithoutMdc(LoggedEvent event, Level level, Pattern pattern) {
