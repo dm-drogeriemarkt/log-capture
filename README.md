@@ -3,7 +3,7 @@
 [<img src="https://opensourcelogos.aws.dmtech.cloud/dmTECH_opensource_logo.svg" height="20" width="130">](https://dmtech.de/)
 [![Build Status](https://travis-ci.org/dm-drogeriemarkt/log-capture.svg?branch=master)](https://travis-ci.org/dm-drogeriemarkt/log-capture)
 
-Helper for Unit/Integration tests with JUnit 4/5 to test if something has been logged.
+Helper for Unit/Integration tests with JUnit 4/5 to test if something has been logged. See [Examples](#examples).
 
 Because this is a library, Checkstyle is used to make sure all public classes/methods have appropriate Javadoc.
 
