@@ -194,9 +194,9 @@ class LogCaptureTest {
         comExampleLogger.setLevel(originalLevel);
 
         LogCapture logCapture = LogCapture.forPackages("com.example");
-        logCapture.addAppenderAndSetLogLevelToDebug();
+        logCapture.addAppenderAndSetLogLevelToTrace();
 
-        assertThat(comExampleLogger.getLevel()).isEqualTo(DEBUG);
+        assertThat(comExampleLogger.getLevel()).isEqualTo(TRACE);
 
         logCapture.removeAppenderAndResetLogLevel();
 

@@ -51,7 +51,7 @@ Fixed a bug where multiline log messages (for example Messages that contain a st
 
 * `LogCapture.forUnitTest()` has been replaced with `LogCapture.forCurrentPackage()`
 * `LogCapture.forIntegrationTest(...)` has been replaced with `LogCapture.forPackages(...)`
-* `logCapture.addAppender()` has been replaced with `logCapture.addAppenderAndSetLogLevelToDebug()`
+* `logCapture.addAppender()` has been replaced with `logCapture.addAppenderAndSetLogLevelToTrace()`
 * `logCapture.removeAppender()` has been replaced with `logCapture.removeAppenderAndResetLogLevel()`
 
 ## Usage
@@ -199,7 +199,7 @@ java.lang.AssertionError: Expected log message has occurred, but never with the 
 
 ## Usage with non-JUnit Runner
 
-If you intend to use LogCapture outside of a JUnit test, you cannot rely on JUnit's `@Rule` annotation and must call LocCapture's `addAppenderAndSetLogLevelToDebug()` and `removeAppenderAndResetLogLevel()` methods manually.
+If you intend to use LogCapture outside of a JUnit test, you cannot rely on JUnit's `@Rule` annotation and must call LocCapture's `addAppenderAndSetLogLevelToTrace()` and `removeAppenderAndResetLogLevel()` methods manually.
 
 Be aware that this will still cause JUnit to be a dependency.
 
@@ -231,7 +231,7 @@ public class LoggingStepdefs {
 
     @Before
     public void setupLogCapture() {
-        logCapture.addAppenderAndSetLogLevelToDebug();
+        logCapture.addAppenderAndSetLogLevelToTrace();
     }
     
     @After
