@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.slf4j.Logger.ROOT_LOGGER_NAME;
@@ -179,4 +180,33 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
         }
     }
 
+    public FluentLogAssertion withMdcForAll(String key, String regex) {
+        return new FluentLogAssertion(this, Optional.empty())
+                .withMdcForAll(key, regex);
+    }
+
+    public FluentLogAssertion.ConfiguredLogAssertion error() {
+        return new FluentLogAssertion(this, Optional.empty())
+                .error();
+    }
+
+    public FluentLogAssertion.ConfiguredLogAssertion warn() {
+        return new FluentLogAssertion(this, Optional.empty())
+                .warn();
+    }
+
+    public FluentLogAssertion.ConfiguredLogAssertion info() {
+        return new FluentLogAssertion(this, Optional.empty())
+                .info();
+    }
+
+    public FluentLogAssertion.ConfiguredLogAssertion debug() {
+        return new FluentLogAssertion(this, Optional.empty())
+                .debug();
+    }
+
+    public FluentLogAssertion.ConfiguredLogAssertion trace() {
+        return new FluentLogAssertion(this, Optional.empty())
+                .trace();
+    }
 }
