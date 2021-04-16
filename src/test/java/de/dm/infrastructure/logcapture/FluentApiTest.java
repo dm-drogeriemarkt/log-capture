@@ -1,10 +1,11 @@
-package de.dm.infrastructure.logcapture.fluent;
+package de.dm.infrastructure.logcapture;
 
-import de.dm.infrastructure.logcapture.LogCapture;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.slf4j.MDC;
+
+import java.util.Optional;
 
 import static java.lang.System.lineSeparator;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,7 +21,7 @@ class FluentApiTest {
     void basicFluentApi() {
         log.info("hello world");
 
-        logCapture.info().assertMessage("hello world");
+        logCapture.info().assertLogged("hello world");
     }
 
     @Test
@@ -29,8 +30,8 @@ class FluentApiTest {
         log.warn("bye world");
 
         logCapture
-                .info().assertMessage("hello world")
-                .warn().assertMessage("bye world");
+                .info().assertLogged("hello world")
+                .warn().assertLogged("bye world");
     }
 
     @Test
@@ -40,10 +41,43 @@ class FluentApiTest {
 
         AssertionError assertionError = assertThrows(AssertionError.class, () ->
                 logCapture
-                        .info().assertMessage("hello world")
-                        .warn().assertMessage("bye world"));
+                        .info().assertLogged("hello world")
+                        .warn().assertLogged("bye world"));
 
         assertThat(assertionError).hasMessage("Expected log message has not occurred: Level: WARN, Regex: \"bye world\"");
+    }
+
+    @Test
+    void nothingElseLoggedSucceeds() {
+        log.info("hello world");
+
+        logCapture
+                .info().assertLogged("hello world")
+                .assertNothingElseLogged();
+    }
+
+    @Test
+    void nothingElseLoggedFails() {
+        log.info("hello world");
+        log.info("hello universe");
+
+
+        AssertionError assertionError = assertThrows(AssertionError.class, () ->
+                logCapture
+                        .info().assertLogged("hello world")
+                        .assertNothingElseLogged());
+
+        assertThat(assertionError).hasMessage("There have been other log messages than the asserted ones.");
+    }
+
+    @Test
+    void wrongUsageThrowsIllegalState() {
+        // this constructor is package private, so it should be effectively impossible to actually cause this IllegalStateException
+        FluentLogAssertion fluentLogAssertion = new FluentLogAssertion(null, Optional.empty());
+
+        IllegalStateException illegalStateException = assertThrows(IllegalStateException.class, () -> fluentLogAssertion.assertNothingElseLogged());
+
+        assertThat(illegalStateException).hasMessage("assertNothingElseLogged() must be called with a previous log assertion");
     }
 
     @Test
@@ -54,8 +88,8 @@ class FluentApiTest {
         MDC.clear();
 
         logCapture
-                .info().assertMessage("hello world")
-                .warn().withMdc("key", "value").assertMessage("bye world");
+                .info().assertLogged("hello world")
+                .warn().withMdc("key", "value").assertLogged("bye world");
     }
 
     @Test
@@ -67,8 +101,8 @@ class FluentApiTest {
 
         AssertionError assertionError = assertThrows(AssertionError.class, () ->
                 logCapture
-                        .info().assertMessage("hello world")
-                        .warn().withMdc("key", "value").assertMessage("bye world"));
+                        .info().assertLogged("hello world")
+                        .warn().withMdc("key", "value").assertLogged("bye world"));
 
         assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected MDC value: Level: WARN, Regex: \"bye world\"" +
                 lineSeparator() + "  Captured message: \"bye world\"" +
@@ -85,8 +119,8 @@ class FluentApiTest {
         AssertionError assertionError = assertThrows(AssertionError.class, () ->
                 logCapture
                         .withMdcForAll("key", "value")
-                        .info().assertMessage("hello world")
-                        .warn().assertMessage("bye world"));
+                        .info().assertLogged("hello world")
+                        .warn().assertLogged("bye world"));
 
         assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected MDC value: Level: WARN, Regex: \"bye world\"" +
                 lineSeparator() + "  Captured message: \"bye world\"" +
@@ -102,8 +136,8 @@ class FluentApiTest {
 
         logCapture
                 .withMdcForAll("key", "value")
-                .info().assertMessage("hello world")
-                .warn().assertMessage("bye world");
+                .info().assertLogged("hello world")
+                .warn().assertLogged("bye world");
     }
 
     @Test
@@ -118,8 +152,8 @@ class FluentApiTest {
         AssertionError assertionError = assertThrows(AssertionError.class, () -> {
             logCapture
                     .withMdcForAll("key", "value")
-                    .info().assertMessage("hello world")
-                    .warn().withMdc("another_key", "another_value").assertMessage("bye world");
+                    .info().assertLogged("hello world")
+                    .warn().withMdc("another_key", "another_value").assertLogged("bye world");
         });
 
         assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected MDC value: Level: WARN, Regex: \"bye world\""
@@ -140,9 +174,9 @@ class FluentApiTest {
 
         logCapture
                 .withMdcForAll("key", "value")
-                .info().assertMessage("hello world")
-                .warn().withMdc("another_key", "another_value").assertMessage("bye world")
-                .error().assertMessage("hello again");
+                .info().assertLogged("hello world")
+                .warn().withMdc("another_key", "another_value").assertLogged("bye world")
+                .error().assertLogged("hello again");
     }
 
     @Test
@@ -159,19 +193,19 @@ class FluentApiTest {
         log.trace("second trace");
 
         logCapture
-                .error().assertMessage("first error")
-                .error().assertMessage("second error");
+                .error().assertLogged("first error")
+                .error().assertLogged("second error");
         logCapture
-                .warn().assertMessage("first warn")
-                .warn().assertMessage("second warn");
+                .warn().assertLogged("first warn")
+                .warn().assertLogged("second warn");
         logCapture
-                .info().assertMessage("first info")
-                .info().assertMessage("second info");
+                .info().assertLogged("first info")
+                .info().assertLogged("second info");
         logCapture
-                .debug().assertMessage("first debug")
-                .debug().assertMessage("second debug");
+                .debug().assertLogged("first debug")
+                .debug().assertLogged("second debug");
         logCapture
-                .trace().assertMessage("first trace")
-                .trace().assertMessage("second trace");
+                .trace().assertLogged("first trace")
+                .trace().assertLogged("second trace");
     }
 }
