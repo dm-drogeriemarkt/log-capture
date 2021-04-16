@@ -10,9 +10,9 @@ class LogCaptureWrongUsageTest {
 
     @Test
     void doubleInitializationFails() {
-        logCapture.addAppenderAndSetLogLevelToDebug();
+        logCapture.addAppenderAndSetLogLevelToTrace();
 
-        assertThrows(IllegalStateException.class, () -> logCapture.addAppenderAndSetLogLevelToDebug());
+        assertThrows(IllegalStateException.class, () -> logCapture.addAppenderAndSetLogLevelToTrace());
     }
 
     @Test

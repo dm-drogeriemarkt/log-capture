@@ -12,6 +12,7 @@ import org.slf4j.MDC;
 
 import static ch.qos.logback.classic.Level.DEBUG;
 import static ch.qos.logback.classic.Level.INFO;
+import static ch.qos.logback.classic.Level.TRACE;
 import static de.dm.infrastructure.logcapture.ExpectedMdcEntry.withMdc;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -107,17 +108,9 @@ class LogCaptureTest {
 
     @Test
     void catchMissingLogMessage() {
-        boolean assertionErrorThrown = false;
-        try {
-            logCapture.assertLogged(Level.INFO, "something that has not been logged");
-        } catch (AssertionError e) {
-            String expectedMessage = "Expected log message has not occurred: Level: INFO, Regex: \"something that has not been logged\"";
-            assertThat(e.getMessage()).isEqualTo(expectedMessage);
-            assertionErrorThrown = true;
-        }
-        if (!assertionErrorThrown) {
-            throw new AssertionError("Assertion Error has not been thrown for missing log message.");
-        }
+        AssertionError assertionError = assertThrows(AssertionError.class, () -> logCapture.assertLogged(INFO, "something that has not been logged"));
+
+        assertThat(assertionError).hasMessage("Expected log message has not occurred: Level: INFO, Regex: \"something that has not been logged\"");
     }
 
     @Test
@@ -153,22 +146,13 @@ class LogCaptureTest {
         MDC.put(MDC_KEY, actualMdcValue);
         log.info("some message");
 
-        boolean assertionErrorThrown = false;
-        try {
-            logCapture
-                    .assertLogged(Level.INFO, "some message", withMdc(MDC_KEY, "mdc value"));
-        } catch (AssertionError e) {
-            String expectedMessage = "Expected log message has occurred, but never with the expected MDC value: Level: INFO, Regex: \"some message\""
-                    + System.lineSeparator() + "  Captured message: \"some message\""
-                    + System.lineSeparator() + "  Captured MDC values:"
-                    + System.lineSeparator() + "    " + MDC_KEY + ": \"" + actualMdcValue + "\"";
+        AssertionError assertionError = assertThrows(AssertionError.class, () ->
+                logCapture.assertLogged(INFO, "some message", withMdc(MDC_KEY, "mdc value")));
 
-            assertThat(e.getMessage()).isEqualTo(expectedMessage);
-            assertionErrorThrown = true;
-        }
-        if (!assertionErrorThrown) {
-            throw new AssertionError("Assertion Error has not been thrown for missing log message.");
-        }
+        assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected MDC value: Level: INFO, Regex: \"some message\""
+                + System.lineSeparator() + "  Captured message: \"some message\""
+                + System.lineSeparator() + "  Captured MDC values:"
+                + System.lineSeparator() + "    " + MDC_KEY + ": \"" + actualMdcValue + "\"");
     }
 
     @Test
@@ -194,9 +178,9 @@ class LogCaptureTest {
         comExampleLogger.setLevel(originalLevel);
 
         LogCapture logCapture = LogCapture.forPackages("com.example");
-        logCapture.addAppenderAndSetLogLevelToDebug();
+        logCapture.addAppenderAndSetLogLevelToTrace();
 
-        assertThat(comExampleLogger.getLevel()).isEqualTo(DEBUG);
+        assertThat(comExampleLogger.getLevel()).isEqualTo(TRACE);
 
         logCapture.removeAppenderAndResetLogLevel();
 

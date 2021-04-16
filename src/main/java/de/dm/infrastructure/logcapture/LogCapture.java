@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.slf4j.Logger.ROOT_LOGGER_NAME;
@@ -62,7 +63,7 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
 
     @Override
     public void beforeEach(ExtensionContext context) {
-        addAppenderAndSetLogLevelToDebug();
+        addAppenderAndSetLogLevelToTrace();
     }
 
     @Override
@@ -76,28 +77,28 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
      * For example, this may be used in a Method that is annotated with Cucumber's @Before annotation to start capturing.
      * In this case, make sure you also call {@link LogCapture#removeAppenderAndResetLogLevel()} in an @After method
      */
-    public void addAppenderAndSetLogLevelToDebug() {
+    public void addAppenderAndSetLogLevelToTrace() {
         capturingAppender = new CapturingAppender(rootLogger.getLoggerContext(), capturedPackages);
         rootLogger.addAppender(capturingAppender);
-        setLogLevelToDebug();
+        setLogLevelToTrace();
     }
 
-    private void setLogLevelToDebug() {
+    private void setLogLevelToTrace() {
         if (originalLogLevels != null) {
-            throw new IllegalStateException("LogCapture.addAppenderAndSetLogLevelToDebug() should not be called only once or after calling removeAppenderAndResetLogLevel() again.");
+            throw new IllegalStateException("LogCapture.addAppenderAndSetLogLevelToTrace() should not be called only once or after calling removeAppenderAndResetLogLevel() again.");
         }
         originalLogLevels = new HashMap<>();
         capturedPackages.forEach(packageName -> {
                     Logger packageLogger = rootLogger.getLoggerContext().getLogger(packageName);
                     originalLogLevels.put(packageName, packageLogger.getLevel());
-                    rootLogger.getLoggerContext().getLogger(packageName).setLevel(Level.DEBUG);
+                    rootLogger.getLoggerContext().getLogger(packageName).setLevel(Level.TRACE);
                 }
         );
     }
 
     private void resetLogLevel() {
         if (originalLogLevels == null) {
-            throw new IllegalStateException("LogCapture.resetLogLevel() should only be called after calling addAppenderAndSetLogLevelToDebug()");
+            throw new IllegalStateException("LogCapture.resetLogLevel() should only be called after calling addAppenderAndSetLogLevelToTrace()");
         }
         capturedPackages.forEach(packageName ->
                 rootLogger.getLoggerContext().getLogger(packageName).setLevel(originalLogLevels.get(packageName))
@@ -133,7 +134,7 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
     private LastCapturedLogEvent assertLogged(Level level, String regex, LastCapturedLogEvent lastCapturedLogEvent, ExpectedMdcEntry... expectedMdcEntries) {
         if (capturingAppender == null) {
             throw new IllegalStateException("capuringAppender is null. " +
-                    "Please make sure that either LogCapture is used with a @Rule annotation or that addAppenderAndSetLogLevelToDebug is called manually.");
+                    "Please make sure that either LogCapture is used with a @Rule annotation or that addAppenderAndSetLogLevelToTrace is called manually.");
         }
 
         Integer startIndex = lastCapturedLogEvent == null ? 0 : lastCapturedLogEvent.index + 1;
@@ -179,4 +180,104 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
         }
     }
 
+    /**
+     * prepare the assertion of log messages with MDC contents
+     *
+     * @param key MDC key
+     * @param regex regular expression describing the MDC value
+     *
+     * <p>Example:
+     * <pre>{@code
+     * logCapture
+     *     .withMdcForAll("key", "value")
+     *     .info().assertLogged("hello world")
+     *     .warn().assertLogged("bye world"));
+     * }</pre>
+     *
+     * @return FluentLogAssertion to assert the messages with MDC
+     */
+    public FluentLogAssertion withMdcForAll(String key, String regex) {
+        return new FluentLogAssertion(this, Optional.empty())
+                .withMdcForAll(key, regex);
+    }
+
+    /**
+     * prepare the assertion of a logged error message
+     *
+     * <p>Example:
+     * <pre>{@code
+     * logCapture
+     *     .error().assertLogged("hello world")
+     * }</pre>
+     *
+     * @return FluentLogAssertion to assert an error message
+     */
+    public FluentLogAssertion.ConfiguredLogAssertion error() {
+        return new FluentLogAssertion(this, Optional.empty())
+                .error();
+    }
+
+    /**
+     * prepare the assertion of a logged warn message
+     *
+     * <p>Example:
+     * <pre>{@code
+     * logCapture
+     *     .warn().assertLogged("hello world")
+     * }</pre>
+     *
+     * @return FluentLogAssertion to assert an warn message
+     */
+    public FluentLogAssertion.ConfiguredLogAssertion warn() {
+        return new FluentLogAssertion(this, Optional.empty())
+                .warn();
+    }
+
+    /**
+     * prepare the assertion of a logged info message
+     *
+     * <p>Example:
+     * <pre>{@code
+     * logCapture
+     *     .info().assertLogged("hello world")
+     * }</pre>
+     *
+     * @return FluentLogAssertion to assert an info message
+     */
+    public FluentLogAssertion.ConfiguredLogAssertion info() {
+        return new FluentLogAssertion(this, Optional.empty())
+                .info();
+    }
+
+    /**
+     * prepare the assertion of a logged debug message
+     *
+     * <p>Example:
+     * <pre>{@code
+     * logCapture
+     *     .debug().assertLogged("hello world")
+     * }</pre>
+     *
+     * @return FluentLogAssertion to assert an debug message
+     */
+    public FluentLogAssertion.ConfiguredLogAssertion debug() {
+        return new FluentLogAssertion(this, Optional.empty())
+                .debug();
+    }
+
+    /**
+     * prepare the assertion of a logged trace message
+     *
+     * <p>Example:
+     * <pre>{@code
+     * logCapture
+     *     .trace().assertLogged("hello world")
+     * }</pre>
+     *
+     * @return FluentLogAssertion to assert an trace message
+     */
+    public FluentLogAssertion.ConfiguredLogAssertion trace() {
+        return new FluentLogAssertion(this, Optional.empty())
+                .trace();
+    }
 }

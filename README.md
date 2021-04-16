@@ -3,70 +3,41 @@
 [<img src="https://opensourcelogos.aws.dmtech.cloud/dmTECH_opensource_logo.svg" height="20" width="130">](https://dmtech.de/)
 [![Build Status](https://travis-ci.org/dm-drogeriemarkt/log-capture.svg?branch=master)](https://travis-ci.org/dm-drogeriemarkt/log-capture)
 
-Helper for Unit/Integration tests with JUnit 4/5 to test if something has been logged. See [Examples](#examples).
+Simple assertions for log messages. See [Examples](#examples).
 
-Because this is a library, Checkstyle is used to make sure all public classes/methods have appropriate Javadoc.
+```java
+logCapture
+        .info().assertLogged("hello world")
+        .warn().assertLogged("bye world");
+```
 
 **Table of Contents**
 
-* [Changes](#changes)
-  * [3.1.0](#310)
-  * [3.0.0](#300)
-  * [2.0.1](#201)
-  * [Updating from Version 1.x.x to 2.x.x](#updating-from-version-1xx-to-2xx)
 * [Usage](#usage)
-  * [Junit 4 vs 5](#junit-4-vs-5)
   * [Maven](#maven)
   * [Examples](#examples)
     * [Unit Test Example:](#unit-test-example)
     * [Integration Test Example:](#integration-test-example)
     * [Example with MDC](#example-with-mdc)
-* [Usage with non-JUnit Runner](#usage-with-non-junit-runner)
+* [Usage outside of JUnit 5 (Cucumber example)](#usage-outside-of-junit-5-cucumber-example)
   * [Cucumber example](#cucumber-example)
     * [Cucumber feature file](#cucumber-feature-file)
     * [Cucumber stepdefs](#cucumber-stepdefs)
     * [Cucumber DTOs](#cucumber-dtos)
-
-
-## Changes
-
-### 3.1.0
-
-Added `assertNothingElseLogged()`
-
-### 3.0.0
-
-Updated from JUnit 4 to JUnit 5.
-
-To update from 2.x.x to 3.x.x:
-
-* Use JUnit 5 instead of JUnit 4
-* Replace `@Rule` in logging tests with `@RegisterExtension`
-
-### 2.0.1
-
-Fixed a bug where multiline log messages (for example Messages that contain a stack trace) could not be matched.
-
-### Updating from Version 1.x.x to 2.x.x
-
-* `LogCapture.forUnitTest()` has been replaced with `LogCapture.forCurrentPackage()`
-* `LogCapture.forIntegrationTest(...)` has been replaced with `LogCapture.forPackages(...)`
-* `logCapture.addAppender()` has been replaced with `logCapture.addAppenderAndSetLogLevelToDebug()`
-* `logCapture.removeAppender()` has been replaced with `logCapture.removeAppenderAndResetLogLevel()`
+* [Changes](#changes)
+  * [3.2.0](#320)
+  * [3.1.0](#310)
+  * [3.0.0](#300)
+  * [2.0.1](#201)
+  * [Updating from Version 1.x.x to 2.x.x](#updating-from-version-1xx-to-2xx)
 
 ## Usage
-
-### Junit 4 vs 5
-
-If you still use Junit 4, you need to use LogCapture 2.x.x
-
-There is no guarantee, however, if and how long 2.x.x will be maintained. We plan to maintain it as long as it is needed, though.
 
 ### Maven
 
 Add log-capture as a test dependency to your project. If you use Maven, add this to your pom.xml:
 
-```pom.xml
+```xml
 <dependency>
     <groupId>de.dm.infrastructure</groupId>
     <artifactId>log-capture</artifactId>
@@ -97,6 +68,13 @@ public class MyUnitTest {
         log.info("something interesting"); 
         log.error("something terrible");
 
+        //assert that the messages have been logged
+        //expected log message is a regular expression
+        logCapture
+                .info().assertLogged("^something interesting$")
+                .error().assertLogged("terrible")
+
+        // alterative using the old, non-fluent API
         logCapture
                 .assertLogged(Level.INFO, "^something interesting$") //second parameter is a regular expression
                 .thenLogged(Level.ERROR, "terrible")
@@ -132,8 +110,14 @@ public class MyIntegrationTest {
         log.error("something terrible");
 
         logCapture
+                .info().assertLogged("^something interesting$")
+                .info().assertLogged("^start of info from utility.that.logs") // no $ at the end to only match the start of the message
+                .error().("terrible");
+
+        // alterative using the old, non-fluent API
+        logCapture
                 .assertLogged(Level.INFO, "^something interesting")
-                .assertLogged(Level.INFO, "^info from utility.that.logs")
+                .assertLogged(Level.INFO, "^start of info from utility.that.logs")
                 .thenLogged(Level.ERROR, "terrible");
     }
 }
@@ -161,7 +145,22 @@ public class MyUnitTest {
         MDC.put("my_mdc_key", "this is the MDC value");
         MDC.put("other_mdc_key", "this is the other MDC value");
         log.info("this message has some MDC information attached");
+        log.info("this message has some MDC information attached, too");
 
+        logCapture
+                .info()
+                .withMdc("my_mdc_key", "^this is the MDC value$")
+                .withMdc("other_mdc_key", "^this is the other MDC value$")
+                .assertLogged("information attached")
+
+        // to assert MDC content in both messages
+        logCapture
+                .withMdcForAll("my_mdc_key", "^this is the MDC value$")
+                .withMdcForAll("other_mdc_key", "^this is the other MDC value$")
+                .info().assertLogged("information attached")
+                .info().assertLogged("information attached, too")
+
+        // non-fluent API (no equivalent to withMdcForAll here)
         logCapture
             .assertLogged(Level.INFO, "information attached", 
                 withMdc("my_mdc_key", "^this is the MDC value$"),
@@ -197,9 +196,9 @@ java.lang.AssertionError: Expected log message has occurred, but never with the 
     other_mdc_key: "this is the other MDC value"
 ```
 
-## Usage with non-JUnit Runner
+## Usage outside of JUnit 5 (Cucumber example)
 
-If you intend to use LogCapture outside of a JUnit test, you cannot rely on JUnit's `@Rule` annotation and must call LocCapture's `addAppenderAndSetLogLevelToDebug()` and `removeAppenderAndResetLogLevel()` methods manually.
+If you intend to use LogCapture outside of a JUnit test, you cannot rely on JUnit's `@Rule` annotation and must call LocCapture's `addAppenderAndSetLogLevelToTrace()` and `removeAppenderAndResetLogLevel()` methods manually.
 
 Be aware that this will still cause JUnit to be a dependency.
 
@@ -231,7 +230,7 @@ public class LoggingStepdefs {
 
     @Before
     public void setupLogCapture() {
-        logCapture.addAppenderAndSetLogLevelToDebug();
+        logCapture.addAppenderAndSetLogLevelToTrace();
     }
     
     @After
@@ -281,3 +280,34 @@ public class LogEntry {
     private String messageRegex;
 }
 ```
+
+## Changes
+
+### 3.2.0
+
+Added fluent API
+
+### 3.1.0
+
+Added `assertNothingElseLogged()`
+
+### 3.0.0
+
+Updated from JUnit 4 to JUnit 5.
+
+To update from 2.x.x to 3.x.x:
+
+* Use JUnit 5 instead of JUnit 4
+* Replace `@Rule` in logging tests with `@RegisterExtension`
+
+### 2.0.1
+
+Fixed a bug where multiline log messages (for example Messages that contain a stack trace) could not be matched.
+
+### Updating from Version 1.x.x to 2.x.x
+
+* `LogCapture.forUnitTest()` has been replaced with `LogCapture.forCurrentPackage()`
+* `LogCapture.forIntegrationTest(...)` has been replaced with `LogCapture.forPackages(...)`
+* `logCapture.addAppender()` has been replaced with `logCapture.addAppenderAndSetLogLevelToTrace()`
+* `logCapture.removeAppender()` has been replaced with `logCapture.removeAppenderAndResetLogLevel()`
+
