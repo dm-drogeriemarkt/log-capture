@@ -24,4 +24,11 @@ class LogCaptureWrongUsageTest {
     void assertionWithoutInitializationFails() {
         assertThrows(IllegalStateException.class, () -> logCapture.assertLogged(INFO, "something"));
     }
+
+    @Test
+    void deprecatedAddAppenderDelegates() {
+        logCapture.addAppenderAndSetLogLevelToDebug();
+
+        assertThrows(IllegalStateException.class, () -> logCapture.addAppenderAndSetLogLevelToDebug());
+    }
 }

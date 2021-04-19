@@ -186,4 +186,20 @@ class LogCaptureTest {
 
         assertThat(comExampleLogger.getLevel()).isEqualTo(originalLevel);
     }
+
+    private void logLevelIsResetWithDeprecatedMedhod() {
+        final ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
+        final ch.qos.logback.classic.Logger comExampleLogger = rootLogger.getLoggerContext().getLogger("com.example");
+
+        comExampleLogger.setLevel(INFO);
+
+        LogCapture logCapture = LogCapture.forPackages("com.example");
+        logCapture.addAppenderAndSetLogLevelToDebug();
+
+        assertThat(comExampleLogger.getLevel()).isEqualTo(TRACE);
+
+        logCapture.removeAppenderAndResetLogLevel();
+
+        assertThat(comExampleLogger.getLevel()).isEqualTo(INFO);
+    }
 }

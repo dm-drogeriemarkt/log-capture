@@ -5,7 +5,7 @@
 
     <groupId>de.dm.infrastructure</groupId>
     <artifactId>log-capture</artifactId>
-    <version>3.1.0-SNAPSHOT</version>
+    <version>3.2.1-SNAPSHOT</version>
 
     <name>Log Capture</name>
     <description>Makes it possible to capture logs and assert if things have been logged</description>
