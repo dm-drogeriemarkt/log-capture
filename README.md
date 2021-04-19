@@ -25,6 +25,7 @@ logCapture
     * [Cucumber stepdefs](#cucumber-stepdefs)
     * [Cucumber DTOs](#cucumber-dtos)
 * [Changes](#changes)
+  * [3.2.1](#321)
   * [3.2.0](#320)
   * [3.1.0](#310)
   * [3.0.0](#300)
@@ -41,7 +42,7 @@ Add log-capture as a test dependency to your project. If you use Maven, add this
 <dependency>
     <groupId>de.dm.infrastructure</groupId>
     <artifactId>log-capture</artifactId>
-    <version>3.2.0</version>
+    <version>3.2.1</version>
     <scope>test</scope>
 </dependency>
 ```
@@ -282,6 +283,10 @@ public class LogEntry {
 ```
 
 ## Changes
+
+### 3.2.1
+
+Added deprecated `addAppenderAndSetLogLevelToDebug()` again for compatibility
 
 ### 3.2.0
 
