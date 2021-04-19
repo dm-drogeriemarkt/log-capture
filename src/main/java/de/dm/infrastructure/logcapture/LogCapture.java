@@ -83,14 +83,22 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
         setLogLevelToTrace();
     }
 
+    /**
+     * delegates to {@link LogCapture#addAppenderAndSetLogLevelToTrace()} for compatibility
+     */
+    @Deprecated
+    public void addAppenderAndSetLogLevelToDebug() {
+        addAppenderAndSetLogLevelToTrace();
+    }
+
     private void setLogLevelToTrace() {
         if (originalLogLevels != null) {
             throw new IllegalStateException("LogCapture.addAppenderAndSetLogLevelToTrace() should not be called only once or after calling removeAppenderAndResetLogLevel() again.");
         }
         originalLogLevels = new HashMap<>();
         capturedPackages.forEach(packageName -> {
-                    Logger packageLogger = rootLogger.getLoggerContext().getLogger(packageName);
-                    originalLogLevels.put(packageName, packageLogger.getLevel());
+            Logger packageLogger = rootLogger.getLoggerContext().getLogger(packageName);
+            originalLogLevels.put(packageName, packageLogger.getLevel());
                     rootLogger.getLoggerContext().getLogger(packageName).setLevel(Level.TRACE);
                 }
         );
