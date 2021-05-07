@@ -97,8 +97,8 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
         }
         originalLogLevels = new HashMap<>();
         capturedPackages.forEach(packageName -> {
-            Logger packageLogger = rootLogger.getLoggerContext().getLogger(packageName);
-            originalLogLevels.put(packageName, packageLogger.getLevel());
+                    Logger packageLogger = rootLogger.getLoggerContext().getLogger(packageName);
+                    originalLogLevels.put(packageName, packageLogger.getLevel());
                     rootLogger.getLoggerContext().getLogger(packageName).setLevel(Level.TRACE);
                 }
         );
@@ -145,12 +145,12 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
                     "Please make sure that either LogCapture is used with a @Rule annotation or that addAppenderAndSetLogLevelToTrace is called manually.");
         }
 
-        Integer startIndex = lastCapturedLogEvent == null ? 0 : lastCapturedLogEvent.index + 1;
-        int assertedLogMessages = lastCapturedLogEvent == null ? 1 : lastCapturedLogEvent.assertedLogMessages + 1;
+        Integer startIndex = lastCapturedLogEvent == null ? 0 : lastCapturedLogEvent.lastAssertedLogMessageIndex + 1;
+        int numberOfAssertedLogMessages = lastCapturedLogEvent == null ? 1 : lastCapturedLogEvent.numberOfAssertedLogMessages + 1;
 
         Integer foundAtIndex = capturingAppender.whenCapturedNext(level, regex, startIndex, expectedMdcEntries);
 
-        return new LastCapturedLogEvent(foundAtIndex, assertedLogMessages);
+        return new LastCapturedLogEvent(foundAtIndex, numberOfAssertedLogMessages);
     }
 
     /**
@@ -158,8 +158,8 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
      */
     @RequiredArgsConstructor
     public class LastCapturedLogEvent {
-        private final int index;
-        private final int assertedLogMessages;
+        private final int lastAssertedLogMessageIndex;
+        private final int numberOfAssertedLogMessages;
 
         /**
          * assert that something has been logged after this event
@@ -182,7 +182,7 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
          * @throws AssertionError if something else has been logged
          */
         public void assertNothingElseLogged() {
-            if (capturingAppender.getNumberOfLoggedMessages() > assertedLogMessages) {
+            if (capturingAppender.getNumberOfLoggedMessages() > numberOfAssertedLogMessages) {
                 throw new AssertionError("There have been other log messages than the asserted ones.");
             }
         }
