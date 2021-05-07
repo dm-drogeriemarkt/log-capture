@@ -84,6 +84,7 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
     }
 
     /**
+     * @deprecated (because log level actually needs to be set to TRACE, not DEBUG)
      * delegates to {@link LogCapture#addAppenderAndSetLogLevelToTrace()} for compatibility
      */
     @Deprecated
