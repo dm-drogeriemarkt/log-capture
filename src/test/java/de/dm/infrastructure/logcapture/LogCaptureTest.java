@@ -133,6 +133,7 @@ class LogCaptureTest {
 
         MDC.put(MDC_KEY, "an mdc value here");
         log.info("this should have an mdc value");
+        MDC.clear();
 
         logCapture
                 .assertLogged(Level.INFO, "mdc value", withMdc(MDC_KEY, "mdc value"));
@@ -145,6 +146,7 @@ class LogCaptureTest {
 
         MDC.put(MDC_KEY, actualMdcValue);
         log.info("some message");
+        MDC.clear();
 
         AssertionError assertionError = assertThrows(AssertionError.class, () ->
                 logCapture.assertLogged(INFO, "some message", withMdc(MDC_KEY, "mdc value")));
