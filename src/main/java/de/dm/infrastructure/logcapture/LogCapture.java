@@ -149,7 +149,7 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
         Integer startIndex = lastCapturedLogEvent == null ? 0 : lastCapturedLogEvent.lastAssertedLogMessageIndex + 1;
         int numberOfAssertedLogMessages = lastCapturedLogEvent == null ? 1 : lastCapturedLogEvent.numberOfAssertedLogMessages + 1;
 
-        Integer foundAtIndex = capturingAppender.whenCapturedNext(level, regex, startIndex, expectedMdcEntries);
+        Integer foundAtIndex = capturingAppender.assertCapturedNext(level, regex, startIndex, expectedMdcEntries);
 
         return new LastCapturedLogEvent(foundAtIndex, numberOfAssertedLogMessages);
     }

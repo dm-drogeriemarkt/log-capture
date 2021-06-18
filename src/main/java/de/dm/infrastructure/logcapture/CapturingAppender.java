@@ -54,7 +54,7 @@ class CapturingAppender extends ContextAwareBase implements Appender<ILoggingEve
         return false;
     }
 
-    Integer whenCapturedNext(Level level, String regex, int startIndex, ExpectedMdcEntry... expectedMdcEntries) {
+    Integer assertCapturedNext(Level level, String regex, int startIndex, ExpectedMdcEntry... expectedMdcEntries) {
         Pattern pattern = Pattern.compile(".*" + regex + ".*", Pattern.DOTALL + Pattern.MULTILINE);
         LoggedEvent eventWithWrongMdcContents = null;
         for (int i = startIndex; i < loggedEvents.size(); i++) {
