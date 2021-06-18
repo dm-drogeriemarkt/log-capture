@@ -7,7 +7,7 @@ import static lombok.AccessLevel.PRIVATE;
 
 @RequiredArgsConstructor(access = PRIVATE)
 @Getter
-public final class MatchingCondition {
+public final class MatchingCondition { //TODO: introcude an interface for matching Log Messages that can be used for mdc() as well as exception()
     private final ExpectedMdcEntry expectedMdcEntry;
 
     public static MatchingCondition mdc(String key, String valueRegex) {
