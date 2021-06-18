@@ -170,7 +170,7 @@ class ReadableApiTest {
         log.info("hello universe");
 
         logCapture
-                .assertLoggedInOrder(
+                .assertLogged(
                         info("hello universe"),
                         info("hello world"))
                 .assertNothingElseLogged();
@@ -184,7 +184,7 @@ class ReadableApiTest {
 
         AssertionError assertionError = assertThrows(AssertionError.class, () ->
                 logCapture
-                        .assertLoggedInOrder(
+                        .assertLogged(
                                 info("hello universe"),
                                 info("hello world"))
                         .assertNothingElseLogged());
