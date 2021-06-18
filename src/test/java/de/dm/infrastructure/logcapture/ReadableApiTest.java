@@ -56,6 +56,9 @@ class ReadableApiTest {
     }
 
     @Test
+        // this behavior is necessary because
+        // 1. otherwise nothingElseLogged() would be a lot more complicated
+        // 2. is is reasonable to assume that is it not the user's intention to verify the same message twice
     void assertionWithoutOrderMatchingSameMessageFails() {
         log.info("hello 1");
         log.info("hello 3");

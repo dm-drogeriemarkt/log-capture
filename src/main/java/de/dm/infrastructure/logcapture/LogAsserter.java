@@ -4,8 +4,10 @@ import ch.qos.logback.classic.Level;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -21,8 +23,19 @@ public class LogAsserter {
         logAssertions.add(logAssertion);
         logAssertions.addAll(Arrays.asList(moreLogAssertions));
 
+        Map<Integer, LogAssertion> matches = new HashMap<>();
+
         for (LogAssertion assertion : logAssertions) {
-            assertLoggedMessage(assertion.level, assertion.regex, Optional.empty(), assertion.matchingConditions);
+            LastCapturedLogEvent lastCapturedLogEvent = assertLoggedMessage(assertion.level, assertion.regex, Optional.empty(), assertion.matchingConditions);
+            if (matches.containsKey(lastCapturedLogEvent.lastAssertedLogMessageIndex)) {
+                LogAssertion previousMatch = matches.get(lastCapturedLogEvent.lastAssertedLogMessageIndex);
+                throw new AssertionError(String.format(
+                        "Imprecise matching: Two log assertions have matched the same message. " +
+                                "Use more precise matching or in-order matching. " +
+                                "(First match: Level: %s, Regex: \"%s\" | Second match: Level: %s, Regex: \"%s\"",
+                        previousMatch.level, previousMatch.regex, assertion.level, assertion.regex));
+            }
+            matches.put(lastCapturedLogEvent.lastAssertedLogMessageIndex, assertion);
         }
 
         return new NothingElseLoggedAsserter(logAssertions.size());
