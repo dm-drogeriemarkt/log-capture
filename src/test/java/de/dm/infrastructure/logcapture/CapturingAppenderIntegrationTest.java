@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 class CapturingAppenderIntegrationTest {
@@ -15,7 +17,10 @@ class CapturingAppenderIntegrationTest {
     void containsMdcEntries() {
         ExpectedMdcEntry expectedMdcEntry1 = ExpectedMdcEntry.withMdc(TEST_KEY, "test value");
         ExpectedMdcEntry expectedMdcEntry2 = ExpectedMdcEntry.withMdc(OTHER_KEY, "good value");
-        ExpectedMdcEntry[] expectedMdcEntries = new ExpectedMdcEntry[]{expectedMdcEntry1, expectedMdcEntry2};
+        List<ExpectedMdcEntry> expectedMdcEntries = new LinkedList<>();
+
+        expectedMdcEntries.add(expectedMdcEntry1);
+        expectedMdcEntries.add(expectedMdcEntry2);
 
         Map<String, String> mdcContents = new HashMap<>();
         mdcContents.put(TEST_KEY, "this is a test value, cool!");

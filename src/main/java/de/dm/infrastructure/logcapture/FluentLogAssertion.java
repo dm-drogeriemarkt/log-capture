@@ -18,9 +18,12 @@ import static lombok.AccessLevel.PRIVATE;
 
 /**
  * Helper class for fluent log assertions. Use this via {@link LogCapture#info()} et al. or {@link LogCapture#withMdcForAll(String, String)}
+ *
+ * @deprecated in favor or the new assertion style
  */
 @RequiredArgsConstructor(access = PACKAGE)
-public class FluentLogAssertion {
+@Deprecated
+public final class FluentLogAssertion {
     private final LogCapture logCapture;
     private final Optional<LastCapturedLogEvent> lastCapturedLogEvent;
     private final List<ExpectedMdcEntry> expectedMdcEntries = new LinkedList<>();
@@ -97,7 +100,10 @@ public class FluentLogAssertion {
 
     /**
      * Helper class for fluent log assertions. Use this via {@link LogCapture#info()} et al. or {@link LogCapture#withMdcForAll(String, String)}
+     *
+     * @deprecated in favor of the new api
      */
+    @Deprecated
     @RequiredArgsConstructor(access = PRIVATE)
     public class ConfiguredLogAssertion {
         private final Level level;

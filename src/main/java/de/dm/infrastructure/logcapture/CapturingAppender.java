@@ -54,7 +54,7 @@ class CapturingAppender extends ContextAwareBase implements Appender<ILoggingEve
         return false;
     }
 
-    Integer assertCapturedNext(Level level, String regex, int startIndex, ExpectedMdcEntry... expectedMdcEntries) {
+    Integer assertCapturedNext(Level level, String regex, int startIndex, List<ExpectedMdcEntry> expectedMdcEntries) {
         Pattern pattern = Pattern.compile(".*" + regex + ".*", Pattern.DOTALL + Pattern.MULTILINE);
         LoggedEvent eventWithWrongMdcContents = null;
         for (int i = startIndex; i < loggedEvents.size(); i++) {
@@ -101,7 +101,7 @@ class CapturingAppender extends ContextAwareBase implements Appender<ILoggingEve
         return event.getLevel().equals(level);
     }
 
-    static boolean containsMdcEntries(Map<String, String> mdcData, ExpectedMdcEntry[] expectedMdcEntries) {
+    static boolean containsMdcEntries(Map<String, String> mdcData, List<ExpectedMdcEntry> expectedMdcEntries) {
         if (expectedMdcEntries == null) {
             return true;
         }
