@@ -24,7 +24,7 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
 
     final Set<String> capturedPackages;
     CapturingAppender capturingAppender;
-    private Logger rootLogger = (Logger) LoggerFactory.getLogger(ROOT_LOGGER_NAME);
+    private final Logger rootLogger = (Logger) LoggerFactory.getLogger(ROOT_LOGGER_NAME);
     private HashMap<String, Level> originalLogLevels = null;
 
     /**
@@ -146,11 +146,11 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
     @Deprecated
     private LastCapturedLogEvent assertLogged(Level level, String regex, LastCapturedLogEvent lastCapturedLogEvent, ExpectedMdcEntry... expectedMdcEntries) {
         if (capturingAppender == null) {
-            throw new IllegalStateException("capuringAppender is null. " +
+            throw new IllegalStateException("capturingAppender is null. " +
                     "Please make sure that either LogCapture is used with a @Rule annotation or that addAppenderAndSetLogLevelToTrace is called manually.");
         }
 
-        Integer startIndex = lastCapturedLogEvent == null ? 0 : lastCapturedLogEvent.lastAssertedLogMessageIndex + 1;
+        int startIndex = lastCapturedLogEvent == null ? 0 : lastCapturedLogEvent.lastAssertedLogMessageIndex + 1;
         int numberOfAssertedLogMessages = lastCapturedLogEvent == null ? 1 : lastCapturedLogEvent.numberOfAssertedLogMessages + 1;
 
         Integer foundAtIndex = capturingAppender.assertCapturedNext(level, regex, startIndex, Arrays.asList(expectedMdcEntries));

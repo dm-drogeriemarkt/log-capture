@@ -18,6 +18,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import static java.lang.String.format;
+import static java.lang.System.lineSeparator;
+
 @Getter
 @Setter
 class CapturingAppender extends ContextAwareBase implements Appender<ILoggingEvent> {
@@ -84,7 +87,7 @@ class CapturingAppender extends ContextAwareBase implements Appender<ILoggingEve
         if (eventMatchingWithoutAdditionalMatchers != null) {
             throwAssertionForPartiallyMatchingLoggedEvent(level, regex, eventMatchingWithoutAdditionalMatchers, logEventMatchers);
         }
-        throw new AssertionError(String.format("Expected log message has not occurred: Level: %s, Regex: \"%s\"", level, regex));
+        throw new AssertionError(format("Expected log message has not occurred: Level: %s, Regex: \"%s\"", level, regex));
     }
 
     int getNumberOfLoggedMessages() {
@@ -100,11 +103,11 @@ class CapturingAppender extends ContextAwareBase implements Appender<ILoggingEve
         StringBuilder assertionMessage = new StringBuilder();
 
         for (LogEventMatcher logEventMatcher : logEventMatchers) {
-            assertionMessage.append(String.format("Expected log message has occurred, but never with the expected %s: Level: %s, Regex: \"%s\"",
+            assertionMessage.append(format("Expected log message has occurred, but never with the expected %s: Level: %s, Regex: \"%s\"",
                     logEventMatcher.getMatcherDescription(), level, regex));
-            assertionMessage.append(System.lineSeparator());
+            assertionMessage.append(lineSeparator());
             assertionMessage.append(logEventMatcher.getNonMatchingErrorMessage(partiallyMatchingLoggedEvent));
-            assertionMessage.append(System.lineSeparator());
+            assertionMessage.append(lineSeparator());
         }
         throw new AssertionError(assertionMessage.toString());
     }

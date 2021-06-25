@@ -5,6 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import static java.lang.String.format;
+import static java.lang.System.lineSeparator;
+
 @Slf4j
 public class ExpectedException implements LogEventMatcher {
     private final Optional<String> expectedMessageRegex;
@@ -35,10 +38,9 @@ public class ExpectedException implements LogEventMatcher {
 
     @Override
     public String getNonMatchingErrorMessage(LoggedEvent loggedEvent) {
-        StringBuilder assertionMessage = new StringBuilder(String.format("  expected exception: %s", this));
-        assertionMessage.append(System.lineSeparator());
-        assertionMessage.append(String.format("  actual exception: %s", loggedExceptionToString(loggedEvent.getLoggedException())));
-        return assertionMessage.toString();
+        return format("  expected exception: %s", this) +
+                lineSeparator() +
+                format("  actual exception: %s", loggedExceptionToString(loggedEvent.getLoggedException()));
     }
 
     private static String loggedExceptionToString(Optional<LoggedEvent.LoggedException> optionalException) {
@@ -48,10 +50,10 @@ public class ExpectedException implements LogEventMatcher {
 
         LoggedEvent.LoggedException loggedException = optionalException.get();
 
-        return String.format("message: \"%s\", message: %s%s",
+        return format("message: \"%s\", message: %s%s",
                 loggedException.getMessage(),
                 loggedException.getType(),
-                loggedException.getCause().isPresent() ? String.format(", cause: (%s)", loggedExceptionToString(loggedException.getCause())) : ""
+                loggedException.getCause().isPresent() ? format(", cause: (%s)", loggedExceptionToString(loggedException.getCause())) : ""
         );
     }
 
@@ -95,10 +97,10 @@ public class ExpectedException implements LogEventMatcher {
 
     @Override
     public String toString() {
-        return String.format("%s%s%s",
-                expectedMessageRegex.isPresent() ? String.format("message (regex): \"%s\"", expectedMessageRegex.get()) : "",
-                expectedType.isPresent() ? " type: " + expectedType.get().getCanonicalName() : "",
-                expectedCause.isPresent() ? String.format(" cause: (%s)", expectedCause.get()) : ""
+        return format("%s%s%s",
+                expectedMessageRegex.isPresent() ? format("message (regex): \"%s\"", expectedMessageRegex.get()) : "",
+                expectedType.map(aClass -> " type: " + aClass.getCanonicalName()).orElse(""),
+                expectedCause.map(cause -> format(" cause: (%s)", cause)).orElse("")
         );
     }
 

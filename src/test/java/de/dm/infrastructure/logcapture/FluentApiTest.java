@@ -155,12 +155,12 @@ class FluentApiTest {
         log.warn("bye world");
         MDC.clear();
 
-        AssertionError assertionError = assertThrows(AssertionError.class, () -> {
-            logCapture
-                    .withMdcForAll("key", "value")
-                    .info().assertLogged("hello world")
-                    .warn().withMdc("another_key", "another_value").assertLogged("bye world");
-        });
+        AssertionError assertionError = assertThrows(AssertionError.class, () ->
+                logCapture
+                        .withMdcForAll("key", "value")
+                        .info().assertLogged("hello world")
+                        .warn().withMdc("another_key", "another_value").assertLogged("bye world")
+        );
 
         assertThat(assertionError).hasMessage(
                 "Expected log message has occurred, but never with the expected MDC value: Level: WARN, Regex: \"bye world\"" +

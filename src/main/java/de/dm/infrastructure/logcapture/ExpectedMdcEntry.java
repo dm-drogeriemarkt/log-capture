@@ -5,6 +5,9 @@ import lombok.RequiredArgsConstructor;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import static java.lang.String.format;
+import static java.lang.System.lineSeparator;
+
 /**
  * define expected MDC entries with this
  */
@@ -32,19 +35,19 @@ public final class ExpectedMdcEntry implements LogEventMatcher {
 
     @Override
     public String getNonMatchingErrorMessage(LoggedEvent loggedEvent) {
-        StringBuilder assertionMessage = new StringBuilder(String.format("  captured message: \"%s\"", loggedEvent.getFormattedMessage()));
-        assertionMessage.append(System.lineSeparator());
-        assertionMessage.append("  expected MDC key: " + key);
+        StringBuilder assertionMessage = new StringBuilder(format("  captured message: \"%s\"", loggedEvent.getFormattedMessage()));
+        assertionMessage.append(lineSeparator());
+        assertionMessage.append(format("  expected MDC key: %s", key));
         if (matcher instanceof PatternMatcher) {
             PatternMatcher patternMatcher = (PatternMatcher) matcher;
-            assertionMessage.append(System.lineSeparator());
-            assertionMessage.append(String.format("  expected MDC value: \"%s\"", patternMatcher.pattern));
+            assertionMessage.append(lineSeparator());
+            assertionMessage.append(format("  expected MDC value: \"%s\"", patternMatcher.pattern));
         }
-        assertionMessage.append(System.lineSeparator());
+        assertionMessage.append(lineSeparator());
         assertionMessage.append("  captured MDC values:");
         for (Map.Entry<String, String> entry : loggedEvent.getMdcData().entrySet()) {
-            assertionMessage.append(System.lineSeparator());
-            assertionMessage.append(String.format("    %s: \"%s\"", entry.getKey(), entry.getValue()));
+            assertionMessage.append(lineSeparator());
+            assertionMessage.append(format("    %s: \"%s\"", entry.getKey(), entry.getValue()));
         }
         return assertionMessage.toString();
     }

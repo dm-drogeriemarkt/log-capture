@@ -74,16 +74,16 @@ public class LogAsserter {
         }
     }
 
-    private LastCapturedLogEvent assertLoggedMessage(Level level, String regex, //TODO: format according to editorconfig
-                                                     Optional<LastCapturedLogEvent> lastCapturedLogEvent,
+    private LastCapturedLogEvent assertLoggedMessage(Level level, String regex,
+                                                     Optional<LastCapturedLogEvent> optionalLastCapturedLogEvent,
                                                      List<LogEventMatcher> localLogEventMatchers) {
         if (capturingAppender == null) {
-            throw new IllegalStateException("capuringAppender is null. " +
+            throw new IllegalStateException("capturingAppender is null. " +
                     "Please make sure that either LogCapture is used with a @Rule annotation or that addAppenderAndSetLogLevelToTrace is called manually.");
         }
 
-        Integer startIndex = lastCapturedLogEvent.isPresent() ? lastCapturedLogEvent.get().lastAssertedLogMessageIndex + 1 : 0;
-        int numberOfAssertedLogMessages = lastCapturedLogEvent.isPresent() ? lastCapturedLogEvent.get().numberOfAssertedLogMessages + 1 : 1;
+        int startIndex = optionalLastCapturedLogEvent.map(capturedLogEvent -> capturedLogEvent.lastAssertedLogMessageIndex + 1).orElse(0);
+        int numberOfAssertedLogMessages = optionalLastCapturedLogEvent.map(capturedLogEvent -> capturedLogEvent.numberOfAssertedLogMessages + 1).orElse(1);
 
         LinkedList<LogEventMatcher> logEventMatchers = new LinkedList<>();
         logEventMatchers.addAll(globalLogEventMatchers);
