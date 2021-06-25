@@ -119,7 +119,6 @@ public final class FluentLogAssertion {
          */
         public ConfiguredLogAssertion withMdc(String key, String regex) {
             ConfiguredLogAssertion newAssertion = new ConfiguredLogAssertion(level);
-            newAssertion.expectedMdcEntries.addAll(expectedMdcEntries);
             newAssertion.expectedMdcEntries.add(ExpectedMdcEntry.withMdc(key, regex));
 
             return newAssertion;

@@ -105,8 +105,11 @@ class FluentApiTest {
                         .warn().withMdc("key", "value").assertLogged("bye world"));
 
         assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected MDC value: Level: WARN, Regex: \"bye world\"" +
-                lineSeparator() + "  Captured message: \"bye world\"" +
-                lineSeparator() + "  Captured MDC values:");
+                lineSeparator() + "  captured message: \"bye world\"" +
+                lineSeparator() + "  expected MDC key: key" +
+                lineSeparator() + "  expected MDC value: \".*value.*\"" +
+                lineSeparator() + "  captured MDC values:" +
+                lineSeparator());
     }
 
     @Test
@@ -123,8 +126,11 @@ class FluentApiTest {
                         .warn().assertLogged("bye world"));
 
         assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected MDC value: Level: WARN, Regex: \"bye world\"" +
-                lineSeparator() + "  Captured message: \"bye world\"" +
-                lineSeparator() + "  Captured MDC values:");
+                lineSeparator() + "  captured message: \"bye world\"" +
+                lineSeparator() + "  expected MDC key: key" +
+                lineSeparator() + "  expected MDC value: \".*value.*\"" +
+                lineSeparator() + "  captured MDC values:" +
+                lineSeparator());
     }
 
     @Test
@@ -156,10 +162,20 @@ class FluentApiTest {
                     .warn().withMdc("another_key", "another_value").assertLogged("bye world");
         });
 
-        assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected MDC value: Level: WARN, Regex: \"bye world\""
-                + lineSeparator() + "  Captured message: \"bye world\""
-                + lineSeparator() + "  Captured MDC values:"
-                + lineSeparator() + "    key: \"value\"");
+        assertThat(assertionError).hasMessage(
+                "Expected log message has occurred, but never with the expected MDC value: Level: WARN, Regex: \"bye world\"" +
+                        lineSeparator() + "  captured message: \"bye world\"" +
+                        lineSeparator() + "  expected MDC key: key" +
+                        lineSeparator() + "  expected MDC value: \".*value.*\"" +
+                        lineSeparator() + "  captured MDC values:" +
+                        lineSeparator() + "    key: \"value\"" +
+                        lineSeparator() + "Expected log message has occurred, but never with the expected MDC value: Level: WARN, Regex: \"bye world\"" +
+                        lineSeparator() + "  captured message: \"bye world\"" +
+                        lineSeparator() + "  expected MDC key: another_key" +
+                        lineSeparator() + "  expected MDC value: \".*another_value.*\"" +
+                        lineSeparator() + "  captured MDC values:" +
+                        lineSeparator() + "    key: \"value\"" +
+                        lineSeparator());
     }
 
     @Test

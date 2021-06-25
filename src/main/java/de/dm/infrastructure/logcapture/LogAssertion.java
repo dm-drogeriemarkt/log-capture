@@ -9,32 +9,32 @@ import java.util.List;
 public final class LogAssertion {
     final Level level;
     final String regex;
-    final List<MatchingCondition> matchingConditions;
+    final List<LogEventMatcher> logEventMatchers;
 
-    private LogAssertion(Level level, String regex, MatchingCondition... matchingConditionsForThisMessage) {
+    private LogAssertion(Level level, String regex, LogEventMatcher... logEventMatchersForThisMessage) {
         this.level = level;
         this.regex = regex;
-        matchingConditions = Arrays.asList(matchingConditionsForThisMessage);
+        logEventMatchers = Arrays.asList(logEventMatchersForThisMessage);
     }
 
-    public static LogAssertion trace(String regex, MatchingCondition... matchingConditionsForThisMessage) {
-        return new LogAssertion(Level.TRACE, regex, matchingConditionsForThisMessage);
+    public static LogAssertion trace(String regex, LogEventMatcher... logEventMatchersForThisMessage) {
+        return new LogAssertion(Level.TRACE, regex, logEventMatchersForThisMessage);
     }
 
-    public static LogAssertion debug(String regex, MatchingCondition... matchingConditionsForThisMessage) {
-        return new LogAssertion(Level.DEBUG, regex, matchingConditionsForThisMessage);
+    public static LogAssertion debug(String regex, LogEventMatcher... logEventMatchersForThisMessage) {
+        return new LogAssertion(Level.DEBUG, regex, logEventMatchersForThisMessage);
     }
 
-    public static LogAssertion info(String regex, MatchingCondition... matchingConditionsForThisMessage) {
-        return new LogAssertion(Level.INFO, regex, matchingConditionsForThisMessage);
+    public static LogAssertion info(String regex, LogEventMatcher... logEventMatchersForThisMessage) {
+        return new LogAssertion(Level.INFO, regex, logEventMatchersForThisMessage);
     }
 
-    public static LogAssertion warn(String regex, MatchingCondition... matchingConditionsForThisMessage) {
-        return new LogAssertion(Level.WARN, regex, matchingConditionsForThisMessage);
+    public static LogAssertion warn(String regex, LogEventMatcher... logEventMatchersForThisMessage) {
+        return new LogAssertion(Level.WARN, regex, logEventMatchersForThisMessage);
     }
 
-    public static LogAssertion error(String regex, MatchingCondition... matchingConditionsForThisMessage) {
-        return new LogAssertion(Level.ERROR, regex, matchingConditionsForThisMessage);
+    public static LogAssertion error(String regex, LogEventMatcher... logEventMatchersForThisMessage) {
+        return new LogAssertion(Level.ERROR, regex, logEventMatchersForThisMessage);
     }
 
 }

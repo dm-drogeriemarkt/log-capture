@@ -14,6 +14,7 @@ import static ch.qos.logback.classic.Level.DEBUG;
 import static ch.qos.logback.classic.Level.INFO;
 import static ch.qos.logback.classic.Level.TRACE;
 import static de.dm.infrastructure.logcapture.ExpectedMdcEntry.withMdc;
+import static java.lang.System.lineSeparator;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -151,10 +152,13 @@ class LogCaptureTest {
         AssertionError assertionError = assertThrows(AssertionError.class, () ->
                 logCapture.assertLogged(INFO, "some message", withMdc(MDC_KEY, "mdc value")));
 
-        assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected MDC value: Level: INFO, Regex: \"some message\""
-                + System.lineSeparator() + "  Captured message: \"some message\""
-                + System.lineSeparator() + "  Captured MDC values:"
-                + System.lineSeparator() + "    " + MDC_KEY + ": \"" + actualMdcValue + "\"");
+        assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected MDC value: Level: INFO, Regex: \"some message\"" +
+                lineSeparator() + "  captured message: \"some message\"" +
+                lineSeparator() + "  expected MDC key: mdc_key" +
+                lineSeparator() + "  expected MDC value: \".*mdc value.*\"" +
+                lineSeparator() + "  captured MDC values:" +
+                lineSeparator() + "    " + MDC_KEY + ": \"" + actualMdcValue + "\"" +
+                lineSeparator());
     }
 
     @Test

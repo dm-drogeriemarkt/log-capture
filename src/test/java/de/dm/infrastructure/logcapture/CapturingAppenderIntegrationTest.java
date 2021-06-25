@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-class CapturingAppenderIntegrationTest {
+class CapturingAppenderIntegrationTest { //TODO: move this test to the right place/unit
 
     private final String TEST_KEY = "test_key";
     private final String OTHER_KEY = "test_key_2";
@@ -26,12 +26,21 @@ class CapturingAppenderIntegrationTest {
         mdcContents.put(TEST_KEY, "this is a test value, cool!");
         mdcContents.put(OTHER_KEY, "this is a good value, cool!");
 
-        Assertions.assertTrue(CapturingAppender.containsMdcEntries(mdcContents, expectedMdcEntries));
+        LoggedEvent loggedEvent = LoggedEvent.builder()
+                .mdcData(mdcContents)
+                .build();
+
+        Assertions.assertTrue(CapturingAppender.isMatchedByAll(loggedEvent, expectedMdcEntries));
     }
 
     @Test
     void nullEntriesShouldNotThrowNullPointerException() {
         Map<String, String> mdcContents = new HashMap<>();
-        Assertions.assertTrue(CapturingAppender.containsMdcEntries(mdcContents, null));
+
+        LoggedEvent loggedEvent = LoggedEvent.builder()
+                .mdcData(mdcContents)
+                .build();
+
+        Assertions.assertTrue(CapturingAppender.isMatchedByAll(loggedEvent, null));
     }
 }

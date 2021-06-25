@@ -3,6 +3,7 @@ package de.dm.infrastructure.logcapture;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.IThrowableProxy;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.filter.Filter;
 import ch.qos.logback.core.spi.ContextAwareBase;
@@ -13,7 +14,7 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -37,12 +38,26 @@ class CapturingAppender extends ContextAwareBase implements Appender<ILoggingEve
     public synchronized void doAppend(ILoggingEvent loggingEvent) {
         if (eventIsRelevant(loggingEvent)) {
             loggedEvents.add(
-                    new LoggedEvent(
-                            loggingEvent.getLevel(),
-                            loggingEvent.getFormattedMessage(),
-                            loggingEvent.getMDCPropertyMap()
-                    ));
+                    LoggedEvent.builder()
+                            .loggerName(loggingEvent.getLoggerName())
+                            .level(loggingEvent.getLevel())
+                            .formattedMessage(loggingEvent.getFormattedMessage())
+                            .mdcData(loggingEvent.getMDCPropertyMap())
+                            .loggedException(getLoggedException(loggingEvent.getThrowableProxy()))
+                            .build());
         }
+    }
+
+    private Optional<LoggedEvent.LoggedException> getLoggedException(IThrowableProxy throwableProxy) {
+        if (throwableProxy == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of(LoggedEvent.LoggedException.builder()
+                .type(throwableProxy.getClassName())
+                .message(throwableProxy.getMessage())
+                .cause(getLoggedException(throwableProxy.getCause()))
+                .build());
     }
 
     private boolean eventIsRelevant(ILoggingEvent loggingEvent) {
@@ -54,20 +69,20 @@ class CapturingAppender extends ContextAwareBase implements Appender<ILoggingEve
         return false;
     }
 
-    Integer assertCapturedNext(Level level, String regex, int startIndex, List<ExpectedMdcEntry> expectedMdcEntries) {
+    Integer assertCapturedNext(Level level, String regex, int startIndex, List<LogEventMatcher> logEventMatchers) {
         Pattern pattern = Pattern.compile(".*" + regex + ".*", Pattern.DOTALL + Pattern.MULTILINE);
-        LoggedEvent eventWithWrongMdcContents = null;
+        LoggedEvent eventMatchingWithoutAdditionalMatchers = null;
         for (int i = startIndex; i < loggedEvents.size(); i++) {
             LoggedEvent event = loggedEvents.get(i);
-            if (eventMatchesWithoutMdc(event, level, pattern)) {
-                if (containsMdcEntries(event.getMdcData(), expectedMdcEntries)) {
+            if (eventMatchesWithoutAdditionalMatchers(event, level, pattern)) {
+                if (isMatchedByAll(event, logEventMatchers)) {
                     return i;
                 }
-                eventWithWrongMdcContents = event;
+                eventMatchingWithoutAdditionalMatchers = event;
             }
         }
-        if (eventWithWrongMdcContents != null) {
-            throwAssertionForFoundMessageWithWrongMdcContents(level, regex, eventWithWrongMdcContents);
+        if (eventMatchingWithoutAdditionalMatchers != null) {
+            throwAssertionForPartiallyMatchingLoggedEvent(level, regex, eventMatchingWithoutAdditionalMatchers, logEventMatchers);
         }
         throw new AssertionError(String.format("Expected log message has not occurred: Level: %s, Regex: \"%s\"", level, regex));
     }
@@ -76,19 +91,20 @@ class CapturingAppender extends ContextAwareBase implements Appender<ILoggingEve
         return loggedEvents.size();
     }
 
-    private boolean eventMatchesWithoutMdc(LoggedEvent event, Level level, Pattern pattern) {
+    private boolean eventMatchesWithoutAdditionalMatchers(LoggedEvent event, Level level, Pattern pattern) {
         return eventHasLevel(event, level) && eventMatchesPattern(event, pattern);
     }
 
-    private void throwAssertionForFoundMessageWithWrongMdcContents(Level level, String regex, LoggedEvent eventWithWrongMdcContents) {
-        StringBuilder assertionMessage = new StringBuilder(String.format("Expected log message has occurred, but never with the expected MDC value: Level: %s, Regex: \"%s\"", level, regex));
-        assertionMessage.append(System.lineSeparator());
-        assertionMessage.append(String.format("  Captured message: \"%s\"", eventWithWrongMdcContents.getFormattedMessage()));
-        assertionMessage.append(System.lineSeparator());
-        assertionMessage.append("  Captured MDC values:");
-        for (Map.Entry<String, String> entry : eventWithWrongMdcContents.getMdcData().entrySet()) {
+    //TODO: cleanup (potentially) static methods like this - CapturingAppender is doing too much here
+    private static void throwAssertionForPartiallyMatchingLoggedEvent(Level level, String regex, LoggedEvent partiallyMatchingLoggedEvent, List<LogEventMatcher> logEventMatchers) {
+        StringBuilder assertionMessage = new StringBuilder();
+
+        for (LogEventMatcher logEventMatcher : logEventMatchers) {
+            assertionMessage.append(String.format("Expected log message has occurred, but never with the expected %s: Level: %s, Regex: \"%s\"",
+                    logEventMatcher.getMatcherDescription(), level, regex));
             assertionMessage.append(System.lineSeparator());
-            assertionMessage.append(String.format("    %s: \"%s\"", entry.getKey(), entry.getValue()));
+            assertionMessage.append(logEventMatcher.getNonMatchingErrorMessage(partiallyMatchingLoggedEvent));
+            assertionMessage.append(System.lineSeparator());
         }
         throw new AssertionError(assertionMessage.toString());
     }
@@ -101,16 +117,11 @@ class CapturingAppender extends ContextAwareBase implements Appender<ILoggingEve
         return event.getLevel().equals(level);
     }
 
-    static boolean containsMdcEntries(Map<String, String> mdcData, List<ExpectedMdcEntry> expectedMdcEntries) {
-        if (expectedMdcEntries == null) {
+    static boolean isMatchedByAll(LoggedEvent loggedEvent, List<? extends LogEventMatcher> logEventMatchers) {
+        if (logEventMatchers == null) {
             return true;
         }
-        for (ExpectedMdcEntry expectedMdcEntry : expectedMdcEntries) {
-            if (!expectedMdcEntry.isContainedIn(mdcData)) {
-                return false;
-            }
-        }
-        return true;
+        return logEventMatchers.stream().allMatch(matcher -> matcher.matches(loggedEvent));
     }
 
     @Override

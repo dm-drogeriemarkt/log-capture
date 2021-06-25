@@ -9,14 +9,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static lombok.AccessLevel.PACKAGE;
 
 @RequiredArgsConstructor(access = PACKAGE)
 public class LogAsserter {
     private final CapturingAppender capturingAppender;
-    private final List<MatchingCondition> globalMatchingConditions;
+    private final List<LogEventMatcher> globalLogEventMatchers;
 
     public NothingElseLoggedAsserter assertLoggedMessage(LogAssertion logAssertion, LogAssertion... moreLogAssertions) {
         LinkedList<LogAssertion> logAssertions = new LinkedList<>();
@@ -26,7 +25,7 @@ public class LogAsserter {
         Map<Integer, LogAssertion> matches = new HashMap<>();
 
         for (LogAssertion assertion : logAssertions) {
-            LastCapturedLogEvent lastCapturedLogEvent = assertLoggedMessage(assertion.level, assertion.regex, Optional.empty(), assertion.matchingConditions);
+            LastCapturedLogEvent lastCapturedLogEvent = assertLoggedMessage(assertion.level, assertion.regex, Optional.empty(), assertion.logEventMatchers);
             if (matches.containsKey(lastCapturedLogEvent.lastAssertedLogMessageIndex)) {
                 LogAssertion previousMatch = matches.get(lastCapturedLogEvent.lastAssertedLogMessageIndex);
                 throw new AssertionError(String.format(
@@ -49,7 +48,7 @@ public class LogAsserter {
 
         Optional<LastCapturedLogEvent> lastCapturedLogEvent = Optional.empty();
         for (LogAssertion assertion : logAssertions) {
-            lastCapturedLogEvent = Optional.of(assertLoggedMessage(assertion.level, assertion.regex, lastCapturedLogEvent, assertion.matchingConditions));
+            lastCapturedLogEvent = Optional.of(assertLoggedMessage(assertion.level, assertion.regex, lastCapturedLogEvent, assertion.logEventMatchers));
         }
 
         return new NothingElseLoggedAsserter(logAssertions.size());
@@ -77,7 +76,7 @@ public class LogAsserter {
 
     private LastCapturedLogEvent assertLoggedMessage(Level level, String regex, //TODO: format according to editorconfig
                                                      Optional<LastCapturedLogEvent> lastCapturedLogEvent,
-                                                     List<MatchingCondition> localMatchingConditions) {
+                                                     List<LogEventMatcher> localLogEventMatchers) {
         if (capturingAppender == null) {
             throw new IllegalStateException("capuringAppender is null. " +
                     "Please make sure that either LogCapture is used with a @Rule annotation or that addAppenderAndSetLogLevelToTrace is called manually.");
@@ -86,12 +85,11 @@ public class LogAsserter {
         Integer startIndex = lastCapturedLogEvent.isPresent() ? lastCapturedLogEvent.get().lastAssertedLogMessageIndex + 1 : 0;
         int numberOfAssertedLogMessages = lastCapturedLogEvent.isPresent() ? lastCapturedLogEvent.get().numberOfAssertedLogMessages + 1 : 1;
 
-        LinkedList<MatchingCondition> matchingConditions = new LinkedList<>();
-        matchingConditions.addAll(globalMatchingConditions);
-        matchingConditions.addAll(localMatchingConditions);
+        LinkedList<LogEventMatcher> logEventMatchers = new LinkedList<>();
+        logEventMatchers.addAll(globalLogEventMatchers);
+        logEventMatchers.addAll(localLogEventMatchers);
 
-        List<ExpectedMdcEntry> expectedMdcEntries = matchingConditions.stream().map(MatchingCondition::getExpectedMdcEntry).collect(Collectors.toList()); //TODO: move this logic to capturingAppender
-        Integer foundAtIndex = capturingAppender.assertCapturedNext(level, regex, startIndex, expectedMdcEntries);
+        Integer foundAtIndex = capturingAppender.assertCapturedNext(level, regex, startIndex, logEventMatchers);
 
         return new LastCapturedLogEvent(foundAtIndex, numberOfAssertedLogMessages);
     }

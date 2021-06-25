@@ -9,16 +9,49 @@ import java.util.regex.Pattern;
  * define expected MDC entries with this
  */
 @RequiredArgsConstructor
-public final class ExpectedMdcEntry {
+public final class ExpectedMdcEntry implements LogEventMatcher {
 
     private final String key;
     private final MdcMatcher matcher;
 
-    boolean isContainedIn(Map<String, String> mdcContents) {
-        if (!mdcContents.containsKey(key)) {
+    public static ExpectedMdcEntry mdc(String key, String valueRegex) {
+        return ExpectedMdcEntry.withMdc(key, valueRegex);
+    }
+
+    public static ExpectedMdcEntry mdc(String key, MdcMatcher mdcMatcher) {
+        return ExpectedMdcEntry.withMdc(key, mdcMatcher);
+    }
+
+    @Override
+    public boolean matches(LoggedEvent loggedEvent) {
+        if (!loggedEvent.getMdcData().containsKey(key)) {
             return false;
         }
-        return matcher.matches(mdcContents.get(key));
+        return matcher.matches(loggedEvent.getMdcData().get(key));
+    }
+
+    @Override
+    public String getNonMatchingErrorMessage(LoggedEvent loggedEvent) {
+        StringBuilder assertionMessage = new StringBuilder(String.format("  captured message: \"%s\"", loggedEvent.getFormattedMessage()));
+        assertionMessage.append(System.lineSeparator());
+        assertionMessage.append("  expected MDC key: " + key);
+        if (matcher instanceof PatternMatcher) {
+            PatternMatcher patternMatcher = (PatternMatcher) matcher;
+            assertionMessage.append(System.lineSeparator());
+            assertionMessage.append(String.format("  expected MDC value: \"%s\"", patternMatcher.pattern));
+        }
+        assertionMessage.append(System.lineSeparator());
+        assertionMessage.append("  captured MDC values:");
+        for (Map.Entry<String, String> entry : loggedEvent.getMdcData().entrySet()) {
+            assertionMessage.append(System.lineSeparator());
+            assertionMessage.append(String.format("    %s: \"%s\"", entry.getKey(), entry.getValue()));
+        }
+        return assertionMessage.toString();
+    }
+
+    @Override
+    public String getMatcherDescription() {
+        return "MDC value";
     }
 
     /**
@@ -50,7 +83,7 @@ public final class ExpectedMdcEntry {
         private final Pattern pattern;
 
         PatternMatcher(String valueRegex) {
-            pattern = Pattern.compile(".*" + valueRegex + ".*");
+            pattern = Pattern.compile(".*" + valueRegex + ".*", Pattern.DOTALL + Pattern.MULTILINE);
         }
 
         @Override

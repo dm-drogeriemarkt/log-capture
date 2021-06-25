@@ -168,11 +168,11 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
                 .assertLoggedInOrder(logAssertion, nextLogAssertion, nextLogAssertions);
     }
 
-    public LogAsserter with(MatchingCondition matchingCondition, MatchingCondition... moreMatchingConditions) {
-        LinkedList<MatchingCondition> matchingConditions = new LinkedList<>();
-        matchingConditions.add(matchingCondition);
-        matchingConditions.addAll(Arrays.asList(moreMatchingConditions));
-        return new LogAsserter(capturingAppender, matchingConditions);
+    public LogAsserter with(LogEventMatcher logEventMatcher, LogEventMatcher... moreLogEventMatchers) {
+        LinkedList<LogEventMatcher> logEventMatchers = new LinkedList<>();
+        logEventMatchers.add(logEventMatcher);
+        logEventMatchers.addAll(Arrays.asList(moreLogEventMatchers));
+        return new LogAsserter(capturingAppender, logEventMatchers);
     }
 
     /**
