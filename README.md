@@ -282,6 +282,10 @@ public class LogEntry {
 }
 ```
 
+## Future Plans
+
+LocCapture is currently complete for our (dmTECH) needs. A LogEventMatcher for [Markers](http://www.slf4j.org/apidocs/org/slf4j/Marker.html) would be an obviously useful addition, but is currently not needed by us.
+
 ## Changes
 
 ### 3.2.1
