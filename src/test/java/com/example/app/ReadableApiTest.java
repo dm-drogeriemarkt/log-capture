@@ -375,7 +375,7 @@ class ReadableApiTest {
                             info("hello 2")
                     ));
 
-            assertThat(assertionError).hasMessage("Expected log message has not occurred: Level: INFO, Regex: \"hello 2\""); //TODO: output that it has occurred before, out of order
+            assertThat(assertionError).hasMessage("Expected log message has not occurred: Level: INFO, Regex: \"hello 2\"");
         }
 
         @Test
