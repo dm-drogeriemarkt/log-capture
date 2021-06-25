@@ -153,7 +153,7 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
         int startIndex = lastCapturedLogEvent == null ? 0 : lastCapturedLogEvent.lastAssertedLogMessageIndex + 1;
         int numberOfAssertedLogMessages = lastCapturedLogEvent == null ? 1 : lastCapturedLogEvent.numberOfAssertedLogMessages + 1;
 
-        Integer foundAtIndex = capturingAppender.assertCapturedNext(level, regex, startIndex, Arrays.asList(expectedMdcEntries));
+        Integer foundAtIndex = new LogAsserter(capturingAppender, new LinkedList<>()).assertCapturedNext(level, regex, startIndex, Arrays.asList(expectedMdcEntries));
 
         return new LastCapturedLogEvent(foundAtIndex, numberOfAssertedLogMessages);
     }
@@ -211,7 +211,7 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
          */
         @Deprecated
         public void assertNothingElseLogged() {
-            if (capturingAppender.getNumberOfLoggedMessages() > numberOfAssertedLogMessages) {
+            if (capturingAppender.loggedEvents.size() > numberOfAssertedLogMessages) {
                 throw new AssertionError("There have been other log messages than the asserted ones.");
             }
         }

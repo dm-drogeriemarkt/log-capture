@@ -30,7 +30,7 @@ class CapturingAppenderIntegrationTest { //TODO: move this test to the right pla
                 .mdcData(mdcContents)
                 .build();
 
-        Assertions.assertTrue(CapturingAppender.isMatchedByAll(loggedEvent, expectedMdcEntries));
+        Assertions.assertTrue(LogAsserter.isMatchedByAll(loggedEvent, expectedMdcEntries));
     }
 
     @Test
@@ -41,6 +41,6 @@ class CapturingAppenderIntegrationTest { //TODO: move this test to the right pla
                 .mdcData(mdcContents)
                 .build();
 
-        Assertions.assertTrue(CapturingAppender.isMatchedByAll(loggedEvent, null));
+        Assertions.assertTrue(LogAsserter.isMatchedByAll(loggedEvent, null));
     }
 }
