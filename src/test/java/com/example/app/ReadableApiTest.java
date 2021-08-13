@@ -11,7 +11,9 @@ import org.slf4j.MarkerFactory;
 
 import static de.dm.infrastructure.logcapture.ExpectedException.exception;
 import static de.dm.infrastructure.logcapture.ExpectedLoggerName.logger;
+import static de.dm.infrastructure.logcapture.ExpectedMarker.marker;
 import static de.dm.infrastructure.logcapture.ExpectedMdcEntry.mdc;
+import static de.dm.infrastructure.logcapture.ExpectedMdcEntry.withMdc;
 import static de.dm.infrastructure.logcapture.LogAssertion.debug;
 import static de.dm.infrastructure.logcapture.LogAssertion.error;
 import static de.dm.infrastructure.logcapture.LogAssertion.info;
@@ -333,7 +335,7 @@ class ReadableApiTest {
                     logCapture
                             .with(
                                     mdc("key", "value"))
-                            .assertLoggedMessage(
+                            .assertLoggedMessage( //TODO: this should be assertLogged()
                                     info("hello world"),
                                     warn("bye world",
                                             mdc("another_key", "another_value"))
@@ -374,6 +376,38 @@ class ReadableApiTest {
                                     mdc("another_key", "another_value")),
                             error("hello again"));
         }
+
+        @Test
+        void customMdcMatcherFails() {
+            MDC.put("key", "value");
+            log.info("hello");
+            MDC.clear();
+
+            AssertionError assertionError = assertThrows(AssertionError.class,
+                    () -> logCapture.assertLogged(
+                            info("hello",
+                                    mdc("key", mdcValue -> !mdcValue.equals("value"))
+                            )));
+
+            assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected MDC value: Level: INFO, Regex: \"hello\"" +
+                    lineSeparator() + "  captured message: \"hello\"" +
+                    lineSeparator() + "  expected MDC key: key" +
+                    lineSeparator() + "  captured MDC values:" +
+                    lineSeparator() + "    key: \"value\"" +
+                    lineSeparator());
+        }
+
+        @Test
+        void customMdcMatcherSucceeds() {
+            MDC.put("key", "value");
+            log.info("hello");
+            MDC.clear();
+
+            logCapture.assertLogged(
+                    info("hello",
+                            withMdc("key", mdcValue -> mdcValue.equals("value"))));
+        }
+
     }
 
     @Nested

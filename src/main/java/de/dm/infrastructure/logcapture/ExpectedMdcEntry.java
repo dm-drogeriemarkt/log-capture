@@ -17,10 +17,27 @@ public final class ExpectedMdcEntry implements LogEventMatcher {
     private final String key;
     private final MdcMatcher matcher;
 
+    /**
+     * use this in LogCapture.assertLogged(...) to verify that something has been logged with an MDC value
+     *
+     * @param key MDC key
+     * @param valueRegex regex that must match the expected value. Will be wrapped with .*
+     *
+     * @return expected entry
+     */
     public static ExpectedMdcEntry mdc(String key, String valueRegex) {
         return ExpectedMdcEntry.withMdc(key, valueRegex);
     }
 
+    /**
+     * use this in LogCapture.assertLogged(...) to verify that something has been logged with an MDC value using
+     * your own {@link MdcMatcher} if MDC contents are structured and the Matcher needs to understand the structure
+     *
+     * @param key MDC key
+     * @param mdcMatcher implementation of {@link MdcMatcher} that checks if the actual MDC content matches the expectations
+     *
+     * @return expected entry
+     */
     public static ExpectedMdcEntry mdc(String key, MdcMatcher mdcMatcher) {
         return ExpectedMdcEntry.withMdc(key, mdcMatcher);
     }
@@ -64,19 +81,26 @@ public final class ExpectedMdcEntry implements LogEventMatcher {
      * @param valueRegex regex that must match the expected value. Will be wrapped with .*
      *
      * @return expected entry
+     *
+     * @deprecated in favor of mdc(key, valueRegex) that matches the new assertion style
      */
+    @Deprecated
     public static ExpectedMdcEntry withMdc(String key, String valueRegex) {
         return new ExpectedMdcEntry(key, new PatternMatcher(valueRegex));
     }
 
     /**
-     * use this in LogCapture.assertLogged(...) to verify that something has been logged with an MDC value
+     * use this in LogCapture.assertLogged(...) to verify that something has been logged with an MDC value using
+     * your own {@link MdcMatcher} if MDC contents are structured and the Matcher needs to understand the structure
      *
      * @param key MDC key
      * @param matcher implementation of {@link MdcMatcher} that checks if the actual MDC content matches the expectations
      *
      * @return expected entry
+     *
+     * @deprecated in favor of mdc(key, matcher) that matches the new assertion style
      */
+    @Deprecated
     public static ExpectedMdcEntry withMdc(String key, MdcMatcher matcher) {
         return new ExpectedMdcEntry(key, matcher);
     }
