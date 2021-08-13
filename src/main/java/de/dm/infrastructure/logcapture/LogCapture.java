@@ -226,9 +226,6 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
     /**
      * prepare the assertion of log messages with MDC contents
      *
-     * @param key MDC key
-     * @param regex regular expression describing the MDC value
-     *
      * <p>Example:
      * <pre>{@code
      * logCapture
@@ -236,6 +233,9 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
      *     .info().assertLogged("hello world")
      *     .warn().assertLogged("bye world"));
      * }</pre>
+     *
+     * @param key MDC key
+     * @param regex regular expression describing the MDC value
      *
      * @return FluentLogAssertion to assert the messages with MDC
      *
