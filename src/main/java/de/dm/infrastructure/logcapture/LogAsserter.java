@@ -20,7 +20,7 @@ public class LogAsserter {
     private final CapturingAppender capturingAppender;
     private final List<LogEventMatcher> globalLogEventMatchers;
 
-    public NothingElseLoggedAsserter assertLoggedMessage(LogAssertion logAssertion, LogAssertion... moreLogAssertions) {
+    public NothingElseLoggedAsserter assertLoggedMessage(LogAssertion logAssertion, LogAssertion... moreLogAssertions) { //TODO: make this inAnyOrder and extract assertLogged from this
         LinkedList<LogAssertion> logAssertions = new LinkedList<>();
         logAssertions.add(logAssertion);
         logAssertions.addAll(Arrays.asList(moreLogAssertions));
@@ -118,7 +118,7 @@ public class LogAsserter {
     private boolean eventMatchesWithoutAdditionalMatchers(LoggedEvent event, Level level, Pattern pattern) {
         return eventHasLevel(event, level) && eventMatchesPattern(event, pattern);
     }
-    
+
     private static void throwAssertionForPartiallyMatchingLoggedEvent(Level level, String regex, LoggedEvent partiallyMatchingLoggedEvent, List<LogEventMatcher> logEventMatchers) {
         StringBuilder assertionMessage = new StringBuilder();
 
