@@ -111,6 +111,9 @@ public final class ExpectedException implements LogEventMatcher {
         );
     }
 
+    /**
+     * helper for building ExcpectedExceptions
+     */
     public static final class ExpectedExceptionBuilder {
         private String expectedMessageRegex;
         private Class<? extends Exception> expectedType;
@@ -119,21 +122,47 @@ public final class ExpectedException implements LogEventMatcher {
         private ExpectedExceptionBuilder() {
         }
 
+        /**
+         * set an expected message that should be matched for an expected Exception
+         *
+         * @param expectedMessageRegex regular expression mathing an exception's message. Will be padded with .*
+         *
+         * @return the builder with the expected message set
+         */
         public ExpectedExceptionBuilder expectedMessageRegex(String expectedMessageRegex) {
             this.expectedMessageRegex = expectedMessageRegex;
             return this;
         }
 
+        /**
+         * set an expected type for an Exception that should be matched for an expected Exception
+         *
+         * @param expectedType expected type of the exception. Subtypes will be matched, too.
+         *
+         * @return the builder with the expected exception type
+         */
         public ExpectedExceptionBuilder expectedType(Class<? extends Exception> expectedType) {
             this.expectedType = expectedType;
             return this;
         }
 
+        /**
+         * set an expected cause for an Exception that should be matched for an expected Exception
+         *
+         * @param expectedCause ExpectedException that describes the expected cause
+         *
+         * @return the builder with the expected cause
+         */
         public ExpectedExceptionBuilder expectedCause(ExpectedException expectedCause) {
             this.expectedCause = expectedCause;
             return this;
         }
 
+        /**
+         * builds the ExpectedException so that it can be used in a log assertion
+         *
+         * @return the built Exception expectation
+         */
         public ExpectedException build() {
             return new ExpectedException(
                     Optional.ofNullable(expectedMessageRegex),
