@@ -137,7 +137,7 @@ class ReadableApiTest {
                                     marker("expected"))
                     ));
 
-            assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected logger name: Level: INFO, Regex: \"hello with marker\"" +
+            assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected marker name: Level: INFO, Regex: \"hello with marker\"" +
                     lineSeparator() + "  expected marker name: \"expected\"" +
                     lineSeparator() + "  actual marker names: \"unexpected\"" +
                     lineSeparator());
@@ -153,7 +153,7 @@ class ReadableApiTest {
                                     marker("expected"))
                     ));
 
-            assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected logger name: Level: INFO, Regex: \"hello without marker\"" +
+            assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected marker name: Level: INFO, Regex: \"hello without marker\"" +
                     lineSeparator() + "  expected marker name: \"expected\"" +
                     lineSeparator() + "  but no marker was found" +
                     lineSeparator());
@@ -171,7 +171,7 @@ class ReadableApiTest {
                                     marker("expected"))
                     ));
 
-            assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected logger name: Level: INFO, Regex: \"hello with marker\"" +
+            assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected marker name: Level: INFO, Regex: \"hello with marker\"" +
                     lineSeparator() + "  expected marker name: \"expected\"" +
                     lineSeparator() + "  actual marker names: \"unexpected_top [ unexpected_nested ]\"" +
                     lineSeparator());

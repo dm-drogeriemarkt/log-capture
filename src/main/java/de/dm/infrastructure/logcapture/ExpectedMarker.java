@@ -27,7 +27,7 @@ public class ExpectedMarker implements LogEventMatcher {
 
     @Override
     public String getMatcherDescription() {
-        return "logger name";
+        return "marker name";
     }
 
     public static ExpectedMarker marker(String expectedName) {
