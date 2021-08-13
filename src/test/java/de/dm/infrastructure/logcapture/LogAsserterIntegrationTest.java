@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-class CapturingAppenderIntegrationTest { //TODO: move this test to the right place/unit
+class LogAsserterIntegrationTest {
 
     @Test
     void containsMdcEntries() {
