@@ -19,6 +19,7 @@ logCapture
     * [Unit Test Example:](#unit-test-example)
     * [Integration Test Example:](#integration-test-example)
     * [Example with MDC](#example-with-mdc)
+    * [More Examples](#more-examples)
 * [Usage outside of JUnit 5 (Cucumber example)](#usage-outside-of-junit-5-cucumber-example)
   * [Cucumber example](#cucumber-example)
     * [Cucumber feature file](#cucumber-feature-file)
@@ -196,6 +197,10 @@ java.lang.AssertionError: Expected log message has occurred, but never with the 
     my_mdc_key: "this is the wrong MDC value"
     other_mdc_key: "this is the other MDC value"
 ```
+
+#### More Examples
+
+See [ReadableApiTest.java](src/test/java/com/example/app/ReadableApiTest.java) for more usage examples.
 
 ## Usage outside of JUnit 5 (Cucumber example)
 
