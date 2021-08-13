@@ -15,11 +15,24 @@ import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static lombok.AccessLevel.PACKAGE;
 
+/**
+ * class doing the actual assertions of log messages
+ */
 @RequiredArgsConstructor(access = PACKAGE)
 public class LogAsserter {
     private final CapturingAppender capturingAppender;
     private final List<LogEventMatcher> globalLogEventMatchers;
 
+    /**
+     * assert that multiple log messages have been logged in any order
+     *
+     * @param logExpectation description of an expected log message
+     * @param moreLogExpectations more descriptions of expected log messages
+     *
+     * @return asserter that can be used to check if anything else has been logged
+     *
+     * @throws AssertionError if any of the expected log message has not been logged or matching is imprecise (in case multiple expectations match the same message)
+     */
     public NothingElseLoggedAsserter assertLoggedInAnyOrder(LogExpectation logExpectation, LogExpectation... moreLogExpectations) {
         LinkedList<LogExpectation> logExpectations = new LinkedList<>();
         logExpectations.add(logExpectation);
@@ -43,6 +56,17 @@ public class LogAsserter {
         return new NothingElseLoggedAsserter(logExpectations.size());
     }
 
+    /**
+     * assert that multiple log messages have been logged in an expected order
+     *
+     * @param logExpectation description of the first expected log message
+     * @param nextLogExpectation description of the second expected log message
+     * @param moreLogExpectations descriptions of further expected log messages, in order
+     *
+     * @return asserter that can be used to check if anything else has been logged
+     *
+     * @throws AssertionError if any of the expected log message has not been logged or have been logged in the wrong order
+     */
     public NothingElseLoggedAsserter assertLoggedInOrder(LogExpectation logExpectation, LogExpectation nextLogExpectation, LogExpectation... moreLogExpectations) {
         LinkedList<LogExpectation> logExpectations = new LinkedList<>();
         logExpectations.add(logExpectation);
@@ -63,6 +87,9 @@ public class LogAsserter {
         private final int numberOfAssertedLogMessages;
     }
 
+    /**
+     * asserter to check nothing else has been logged
+     */
     public final class NothingElseLoggedAsserter {
         private final boolean nothingElseLogged;
 
@@ -70,6 +97,11 @@ public class LogAsserter {
             nothingElseLogged = capturingAppender.loggedEvents.size() == numberOfAssertedLogMessages;
         }
 
+        /**
+         * assert that nothing else has been logged (as far as log messages have been captured) see @{@link LogCapture} on how to configure this
+         *
+         * @throws AssertionError if anything unexpected has been logged
+         */
         public void assertNothingElseLogged() {
             if (!nothingElseLogged) {
                 throw new AssertionError("There have been other log messages than the asserted ones.");
