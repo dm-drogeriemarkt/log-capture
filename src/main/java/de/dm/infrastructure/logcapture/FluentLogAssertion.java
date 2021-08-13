@@ -17,7 +17,7 @@ import static lombok.AccessLevel.PACKAGE;
 import static lombok.AccessLevel.PRIVATE;
 
 /**
- * Helper class for fluent log assertions. Use this via {@link LogCapture#info()} et al. or {@link LogCapture#withMdcForAll(String, String)}
+ * Helper class for fluent log assertions/expectations. Use this via {@link LogCapture#info()} et al. or {@link LogCapture#withMdcForAll(String, String)}
  *
  * @deprecated in favor or the new assertion style
  */
@@ -94,7 +94,7 @@ public final class FluentLogAssertion {
      */
     public void assertNothingElseLogged() {
         LastCapturedLogEvent presentEvent = lastCapturedLogEvent.orElseThrow(() ->
-                new IllegalStateException("assertNothingElseLogged() must be called with a previous log assertion"));
+                new IllegalStateException("assertNothingElseLogged() must be called with a previous log expectation"));
         presentEvent.assertNothingElseLogged();
     }
 

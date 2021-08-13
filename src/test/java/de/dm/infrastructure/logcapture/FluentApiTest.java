@@ -77,7 +77,7 @@ class FluentApiTest {
 
         IllegalStateException illegalStateException = assertThrows(IllegalStateException.class, () -> fluentLogAssertion.assertNothingElseLogged());
 
-        assertThat(illegalStateException).hasMessage("assertNothingElseLogged() must be called with a previous log assertion");
+        assertThat(illegalStateException).hasMessage("assertNothingElseLogged() must be called with a previous log expectation");
     }
 
     @Test

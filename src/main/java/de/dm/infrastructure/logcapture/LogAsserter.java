@@ -20,19 +20,19 @@ public class LogAsserter {
     private final CapturingAppender capturingAppender;
     private final List<LogEventMatcher> globalLogEventMatchers;
 
-    public NothingElseLoggedAsserter assertLoggedInAnyOrder(LogAssertion logAssertion, LogAssertion... moreLogAssertions) {
-        LinkedList<LogAssertion> logAssertions = new LinkedList<>();
-        logAssertions.add(logAssertion);
-        logAssertions.addAll(Arrays.asList(moreLogAssertions));
+    public NothingElseLoggedAsserter assertLoggedInAnyOrder(LogExpectation logExpectation, LogExpectation... moreLogExpectations) {
+        LinkedList<LogExpectation> logExpectations = new LinkedList<>();
+        logExpectations.add(logExpectation);
+        logExpectations.addAll(Arrays.asList(moreLogExpectations));
 
-        Map<Integer, LogAssertion> matches = new HashMap<>();
+        Map<Integer, LogExpectation> matches = new HashMap<>();
 
-        for (LogAssertion assertion : logAssertions) {
+        for (LogExpectation assertion : logExpectations) {
             LastCapturedLogEvent lastCapturedLogEvent = assertCapturedNext(assertion.level, assertion.regex, Optional.empty(), assertion.logEventMatchers);
             if (matches.containsKey(lastCapturedLogEvent.lastAssertedLogMessageIndex)) {
-                LogAssertion previousMatch = matches.get(lastCapturedLogEvent.lastAssertedLogMessageIndex);
+                LogExpectation previousMatch = matches.get(lastCapturedLogEvent.lastAssertedLogMessageIndex);
                 throw new AssertionError(String.format(
-                        "Imprecise matching: Two log assertions have matched the same message. " +
+                        "Imprecise matching: Two log expectations have matched the same message. " +
                                 "Use more precise matching or in-order matching. " +
                                 "(First match: Level: %s, Regex: \"%s\" | Second match: Level: %s, Regex: \"%s\"",
                         previousMatch.level, previousMatch.regex, assertion.level, assertion.regex));
@@ -40,21 +40,21 @@ public class LogAsserter {
             matches.put(lastCapturedLogEvent.lastAssertedLogMessageIndex, assertion);
         }
 
-        return new NothingElseLoggedAsserter(logAssertions.size());
+        return new NothingElseLoggedAsserter(logExpectations.size());
     }
 
-    public NothingElseLoggedAsserter assertLoggedInOrder(LogAssertion logAssertion, LogAssertion nextLogAssertion, LogAssertion... moreLogAssertions) {
-        LinkedList<LogAssertion> logAssertions = new LinkedList<>();
-        logAssertions.add(logAssertion);
-        logAssertions.add(nextLogAssertion);
-        logAssertions.addAll(Arrays.asList(moreLogAssertions));
+    public NothingElseLoggedAsserter assertLoggedInOrder(LogExpectation logExpectation, LogExpectation nextLogExpectation, LogExpectation... moreLogExpectations) {
+        LinkedList<LogExpectation> logExpectations = new LinkedList<>();
+        logExpectations.add(logExpectation);
+        logExpectations.add(nextLogExpectation);
+        logExpectations.addAll(Arrays.asList(moreLogExpectations));
 
         Optional<LastCapturedLogEvent> lastCapturedLogEvent = Optional.empty();
-        for (LogAssertion assertion : logAssertions) {
+        for (LogExpectation assertion : logExpectations) {
             lastCapturedLogEvent = Optional.of(assertCapturedNext(assertion.level, assertion.regex, lastCapturedLogEvent, assertion.logEventMatchers));
         }
 
-        return new NothingElseLoggedAsserter(logAssertions.size());
+        return new NothingElseLoggedAsserter(logExpectations.size());
     }
 
     @RequiredArgsConstructor

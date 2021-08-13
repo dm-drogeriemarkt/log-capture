@@ -14,11 +14,11 @@ import static de.dm.infrastructure.logcapture.ExpectedLoggerName.logger;
 import static de.dm.infrastructure.logcapture.ExpectedMarker.marker;
 import static de.dm.infrastructure.logcapture.ExpectedMdcEntry.mdc;
 import static de.dm.infrastructure.logcapture.ExpectedMdcEntry.withMdc;
-import static de.dm.infrastructure.logcapture.LogAssertion.debug;
-import static de.dm.infrastructure.logcapture.LogAssertion.error;
-import static de.dm.infrastructure.logcapture.LogAssertion.info;
-import static de.dm.infrastructure.logcapture.LogAssertion.trace;
-import static de.dm.infrastructure.logcapture.LogAssertion.warn;
+import static de.dm.infrastructure.logcapture.LogExpectation.debug;
+import static de.dm.infrastructure.logcapture.LogExpectation.error;
+import static de.dm.infrastructure.logcapture.LogExpectation.info;
+import static de.dm.infrastructure.logcapture.LogExpectation.trace;
+import static de.dm.infrastructure.logcapture.LogExpectation.warn;
 import static java.lang.System.lineSeparator;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -454,7 +454,7 @@ class ReadableApiTest {
                             info("1")
                     ));
 
-            assertThat(assertionError).hasMessage("Imprecise matching: Two log assertions have matched the same message. " +
+            assertThat(assertionError).hasMessage("Imprecise matching: Two log expectations have matched the same message. " +
                     "Use more precise matching or in-order matching. " +
                     "(First match: Level: INFO, Regex: \"hello\" | Second match: Level: INFO, Regex: \"1\"");
         }

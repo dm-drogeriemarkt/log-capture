@@ -29,7 +29,7 @@ public final class ExpectedException implements LogEventMatcher {
     }
 
     /**
-     * use this to build an expected Exception to use in a log assertion (...) to verify that something has been logged
+     * use this to build an expected Exception to use in a log expectation to verify that something has been logged
      * with a certain Exception
      *
      * @return builder for expected exception
@@ -159,7 +159,7 @@ public final class ExpectedException implements LogEventMatcher {
         }
 
         /**
-         * builds the ExpectedException so that it can be used in a log assertion
+         * builds the ExpectedException so that it can be used in a log expectation
          *
          * @return the built Exception expectation
          */

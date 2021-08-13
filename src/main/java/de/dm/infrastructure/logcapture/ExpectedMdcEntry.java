@@ -18,25 +18,25 @@ public final class ExpectedMdcEntry implements LogEventMatcher {
     private final MdcMatcher matcher;
 
     /**
-     * use this in a log assertion (...) to verify that something has been logged with an MDC value
+     * use this in a log expectation to verify that something has been logged with an MDC value
      *
      * @param key MDC key
      * @param valueRegex regex that must match the expected value. Will be wrapped with .*
      *
-     * @return expected Mdc entry to use in log assertion
+     * @return expected Mdc entry to use in log expectation
      */
     public static ExpectedMdcEntry mdc(String key, String valueRegex) {
         return ExpectedMdcEntry.withMdc(key, valueRegex);
     }
 
     /**
-     * use this in log assertion (...) to verify that something has been logged with an MDC value using
+     * use this in log expectation to verify that something has been logged with an MDC value using
      * your own {@link MdcMatcher} if MDC contents are structured and the Matcher needs to understand the structure
      *
      * @param key MDC key
      * @param mdcMatcher implementation of {@link MdcMatcher} that checks if the actual MDC content matches the expectations
      *
-     * @return expected Mdc entry to use in log assertion
+     * @return expected Mdc entry to use in log expectation
      */
     public static ExpectedMdcEntry mdc(String key, MdcMatcher mdcMatcher) {
         return ExpectedMdcEntry.withMdc(key, mdcMatcher);

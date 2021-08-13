@@ -34,11 +34,11 @@ public final class ExpectedMarker implements LogEventMatcher {
     }
 
     /**
-     * use this in a log assertion (...) to verify that something has been logged with a certain marker
+     * use this in a log expectation to verify that something has been logged with a certain marker
      *
      * @param expectedName expected marker name
      *
-     * @return expected marker to use in log assertion
+     * @return expected marker to use in log expectation
      */
     public static ExpectedMarker marker(String expectedName) {
         return new ExpectedMarker(expectedName);

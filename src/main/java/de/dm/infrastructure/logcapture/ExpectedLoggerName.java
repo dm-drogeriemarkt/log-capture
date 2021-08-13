@@ -35,11 +35,11 @@ public final class ExpectedLoggerName implements LogEventMatcher {
     }
 
     /**
-     * use this in a log assertion (...) to verify that something has been logged from a certain logger
+     * use this in a log expectation to verify that something has been logged from a certain logger
      *
      * @param loggerNameRegex regular expression that matches the expected logger. Will be padded with .* - so for an exact match, use ^my.expected.logger$
      *
-     * @return expected logger name to use in log assertion
+     * @return expected logger name to use in log expectation
      */
     public static ExpectedLoggerName logger(String loggerNameRegex) {
         return new ExpectedLoggerName(loggerNameRegex);

@@ -160,19 +160,19 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
         return new LastCapturedLogEvent(foundAtIndex, numberOfAssertedLogMessages);
     }
 
-    public LogAsserter.NothingElseLoggedAsserter assertLogged(LogAssertion logAssertion) {
+    public LogAsserter.NothingElseLoggedAsserter assertLogged(LogExpectation logExpectation) {
         return new LogAsserter(capturingAppender, new LinkedList<>())
-                .assertLoggedInAnyOrder(logAssertion);
+                .assertLoggedInAnyOrder(logExpectation);
     }
 
-    public LogAsserter.NothingElseLoggedAsserter assertLoggedInAnyOrder(LogAssertion logAssertion, LogAssertion... moreLogAssertions) {
+    public LogAsserter.NothingElseLoggedAsserter assertLoggedInAnyOrder(LogExpectation logExpectation, LogExpectation... moreLogExpectations) {
         return new LogAsserter(capturingAppender, new LinkedList<>())
-                .assertLoggedInAnyOrder(logAssertion, moreLogAssertions);
+                .assertLoggedInAnyOrder(logExpectation, moreLogExpectations);
     }
 
-    public LogAsserter.NothingElseLoggedAsserter assertLoggedInOrder(LogAssertion logAssertion, LogAssertion nextLogAssertion, LogAssertion... nextLogAssertions) {
+    public LogAsserter.NothingElseLoggedAsserter assertLoggedInOrder(LogExpectation logExpectation, LogExpectation nextLogExpectation, LogExpectation... nextLogExpectations) {
         return new LogAsserter(capturingAppender, new LinkedList<>())
-                .assertLoggedInOrder(logAssertion, nextLogAssertion, nextLogAssertions);
+                .assertLoggedInOrder(logExpectation, nextLogExpectation, nextLogExpectations);
     }
 
     public LogAsserter with(LogEventMatcher logEventMatcher, LogEventMatcher... moreLogEventMatchers) {
