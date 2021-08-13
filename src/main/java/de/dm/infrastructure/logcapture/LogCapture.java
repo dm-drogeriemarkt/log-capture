@@ -160,9 +160,14 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
         return new LastCapturedLogEvent(foundAtIndex, numberOfAssertedLogMessages);
     }
 
-    public LogAsserter.NothingElseLoggedAsserter assertLogged(LogAssertion logAssertion, LogAssertion... moreLogAssertions) {
+    public LogAsserter.NothingElseLoggedAsserter assertLogged(LogAssertion logAssertion) {
         return new LogAsserter(capturingAppender, new LinkedList<>())
-                .assertLoggedMessage(logAssertion, moreLogAssertions);
+                .assertLoggedInAnyOrder(logAssertion);
+    }
+
+    public LogAsserter.NothingElseLoggedAsserter assertLoggedInAnyOrder(LogAssertion logAssertion, LogAssertion... moreLogAssertions) {
+        return new LogAsserter(capturingAppender, new LinkedList<>())
+                .assertLoggedInAnyOrder(logAssertion, moreLogAssertions);
     }
 
     public LogAsserter.NothingElseLoggedAsserter assertLoggedInOrder(LogAssertion logAssertion, LogAssertion nextLogAssertion, LogAssertion... nextLogAssertions) {

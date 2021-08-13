@@ -213,14 +213,14 @@ class ReadableApiTest {
 
             logCapture.with(
                     logger("ReadableApiTest$")
-            ).assertLoggedMessage(
+            ).assertLoggedInAnyOrder(
                     warn("bye world"),
                     info("hello world")
             );
 
             logCapture.with(
                     logger("^com.example.app.ReadableApiTest$")
-            ).assertLoggedMessage(
+            ).assertLoggedInAnyOrder(
                     info("hello world"),
                     warn("bye world")
             );
@@ -232,7 +232,7 @@ class ReadableApiTest {
             log.warn("bye world");
 
             AssertionError assertionError = assertThrows(AssertionError.class,
-                    () -> logCapture.assertLogged(
+                    () -> logCapture.assertLoggedInOrder(
                             info("hello world"),
                             warn("bye world",
                                     logger("WrongLogger$"))
@@ -254,7 +254,7 @@ class ReadableApiTest {
             log.warn("bye world");
             MDC.clear();
 
-            logCapture.assertLogged(
+            logCapture.assertLoggedInOrder(
                     info("hello world"),
                     warn("bye world",
                             mdc("key", "value"))
@@ -269,7 +269,7 @@ class ReadableApiTest {
             log.warn("bye world");
 
             AssertionError assertionError = assertThrows(AssertionError.class, () ->
-                    logCapture.assertLogged(
+                    logCapture.assertLoggedInOrder(
                             info("hello world"),
                             warn("bye world",
                                     mdc("key", "value"))
@@ -294,7 +294,7 @@ class ReadableApiTest {
                     logCapture
                             .with(
                                     mdc("key", "value"))
-                            .assertLoggedMessage(
+                            .assertLoggedInAnyOrder(
                                     info("hello world"),
                                     warn("bye world")
                             ));
@@ -317,7 +317,7 @@ class ReadableApiTest {
             logCapture
                     .with(
                             mdc("key", "value"))
-                    .assertLoggedMessage(
+                    .assertLoggedInAnyOrder(
                             info("hello world"),
                             warn("bye world"));
         }
@@ -335,7 +335,7 @@ class ReadableApiTest {
                     logCapture
                             .with(
                                     mdc("key", "value"))
-                            .assertLoggedMessage( //TODO: this should be assertLogged()
+                            .assertLoggedInAnyOrder(
                                     info("hello world"),
                                     warn("bye world",
                                             mdc("another_key", "another_value"))
@@ -418,7 +418,7 @@ class ReadableApiTest {
             log.info("hello 2");
             log.info("hello 3");
 
-            logCapture.assertLogged(
+            logCapture.assertLoggedInAnyOrder(
                     info("hello 3"),
                     info("hello 1"),
                     info("hello 2")
@@ -431,7 +431,7 @@ class ReadableApiTest {
             log.info("hello 3");
 
             AssertionError assertionError = assertThrows(AssertionError.class, () ->
-                    logCapture.assertLogged(
+                    logCapture.assertLoggedInAnyOrder(
                             info("hello 3"),
                             info("hello 1"),
                             info("hello 2")
@@ -449,7 +449,7 @@ class ReadableApiTest {
             log.info("hello 3");
 
             AssertionError assertionError = assertThrows(AssertionError.class, () ->
-                    logCapture.assertLogged(
+                    logCapture.assertLoggedInAnyOrder(
                             info("hello"),
                             info("1")
                     ));
@@ -522,7 +522,7 @@ class ReadableApiTest {
             log.info("hello universe");
 
             logCapture
-                    .assertLogged(
+                    .assertLoggedInAnyOrder(
                             info("hello universe"),
                             info("hello world"))
                     .assertNothingElseLogged();
@@ -536,7 +536,7 @@ class ReadableApiTest {
 
             AssertionError assertionError = assertThrows(AssertionError.class, () ->
                     logCapture
-                            .assertLogged(
+                            .assertLoggedInAnyOrder(
                                     info("hello universe"),
                                     info("hello world"))
                             .assertNothingElseLogged());
@@ -544,8 +544,4 @@ class ReadableApiTest {
             assertThat(assertionError).hasMessage("There have been other log messages than the asserted ones.");
         }
     }
-
-    //TODO: check if all necessary MDC combinations are tested
-
-
 }
