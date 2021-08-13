@@ -28,7 +28,7 @@ public class LogAsserter {
         Map<Integer, LogAssertion> matches = new HashMap<>();
 
         for (LogAssertion assertion : logAssertions) {
-            LastCapturedLogEvent lastCapturedLogEvent = assertLoggedInAnyOrder(assertion.level, assertion.regex, Optional.empty(), assertion.logEventMatchers);
+            LastCapturedLogEvent lastCapturedLogEvent = assertCapturedNext(assertion.level, assertion.regex, Optional.empty(), assertion.logEventMatchers);
             if (matches.containsKey(lastCapturedLogEvent.lastAssertedLogMessageIndex)) {
                 LogAssertion previousMatch = matches.get(lastCapturedLogEvent.lastAssertedLogMessageIndex);
                 throw new AssertionError(String.format(
@@ -51,7 +51,7 @@ public class LogAsserter {
 
         Optional<LastCapturedLogEvent> lastCapturedLogEvent = Optional.empty();
         for (LogAssertion assertion : logAssertions) {
-            lastCapturedLogEvent = Optional.of(assertLoggedInAnyOrder(assertion.level, assertion.regex, lastCapturedLogEvent, assertion.logEventMatchers));
+            lastCapturedLogEvent = Optional.of(assertCapturedNext(assertion.level, assertion.regex, lastCapturedLogEvent, assertion.logEventMatchers));
         }
 
         return new NothingElseLoggedAsserter(logAssertions.size());
@@ -77,9 +77,9 @@ public class LogAsserter {
         }
     }
 
-    private LastCapturedLogEvent assertLoggedInAnyOrder(Level level, String regex,
-                                                        Optional<LastCapturedLogEvent> optionalLastCapturedLogEvent,
-                                                        List<LogEventMatcher> localLogEventMatchers) {
+    private LastCapturedLogEvent assertCapturedNext(Level level, String regex,
+                                                    Optional<LastCapturedLogEvent> optionalLastCapturedLogEvent,
+                                                    List<LogEventMatcher> localLogEventMatchers) {
         if (capturingAppender == null) {
             throw new IllegalStateException("capturingAppender is null. " +
                     "Please make sure that either LogCapture is used with a @Rule annotation or that addAppenderAndSetLogLevelToTrace is called manually.");
