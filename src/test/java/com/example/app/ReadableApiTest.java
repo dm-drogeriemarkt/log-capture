@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.slf4j.MDC;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 
 import static de.dm.infrastructure.logcapture.ExpectedException.exception;
 import static de.dm.infrastructure.logcapture.ExpectedLoggerName.logger;
@@ -119,6 +121,80 @@ class ReadableApiTest {
                     lineSeparator() + "  actual exception: (null)" +
                     lineSeparator());
         }
+    }
+
+    @Nested
+    class ExpectedMarker {
+        @Test
+        void markerFailsBecauseOtherMarkerIsPresent() {
+            log.info(MarkerFactory.getMarker("unexpected"), "hello with marker");
+
+            AssertionError assertionError = assertThrows(AssertionError.class,
+                    () -> logCapture.assertLogged(
+                            info("hello with marker",
+                                    marker("expected"))
+                    ));
+
+            assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected logger name: Level: INFO, Regex: \"hello with marker\"" +
+                    lineSeparator() + "  expected marker name: \"expected\"" +
+                    lineSeparator() + "  actual marker names: \"unexpected\"" +
+                    lineSeparator());
+        }
+
+        @Test
+        void markerFailsBecauseNoMarkerIsPresent() {
+            log.info("hello without marker");
+
+            AssertionError assertionError = assertThrows(AssertionError.class,
+                    () -> logCapture.assertLogged(
+                            info("hello without marker",
+                                    marker("expected"))
+                    ));
+
+            assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected logger name: Level: INFO, Regex: \"hello without marker\"" +
+                    lineSeparator() + "  expected marker name: \"expected\"" +
+                    lineSeparator() + "  but no marker was found" +
+                    lineSeparator());
+        }
+
+        @Test
+        void markerFailsBecauseMultipleOtherMarkersArePresent() {
+            Marker marker = MarkerFactory.getMarker("unexpected_top");
+            marker.add(MarkerFactory.getMarker("unexpected_nested"));
+            log.info(marker, "hello with marker");
+
+            AssertionError assertionError = assertThrows(AssertionError.class,
+                    () -> logCapture.assertLogged(
+                            info("hello with marker",
+                                    marker("expected"))
+                    ));
+
+            assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected logger name: Level: INFO, Regex: \"hello with marker\"" +
+                    lineSeparator() + "  expected marker name: \"expected\"" +
+                    lineSeparator() + "  actual marker names: \"unexpected_top [ unexpected_nested ]\"" +
+                    lineSeparator());
+        }
+
+        @Test
+        void markerSucceedsForNestedMarker() {
+            Marker marker = MarkerFactory.getMarker("expected_top");
+            marker.add(MarkerFactory.getMarker("expected_nested"));
+            log.info(marker, "hello with marker");
+
+            logCapture.assertLogged(
+                    info("hello with marker",
+                            marker("expected_nested")));
+        }
+
+        @Test
+        void markerSucceeds() {
+            log.info(MarkerFactory.getMarker("expected"), "hello with marker");
+
+            logCapture.assertLogged(
+                    info("hello with marker",
+                            marker("expected")));
+        }
+
     }
 
     @Nested
