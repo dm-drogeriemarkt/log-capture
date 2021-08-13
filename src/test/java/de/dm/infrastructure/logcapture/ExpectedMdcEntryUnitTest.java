@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-class ExpectedMdcEntryUnitTest { //TODO: move this test to the right place/unit
+class ExpectedMdcEntryUnitTest {
 
     private static final String TEST_KEY = "test_key";
 
