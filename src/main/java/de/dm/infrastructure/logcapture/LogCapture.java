@@ -18,9 +18,11 @@ import java.util.Set;
 import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
 /**
- * a JUnit 4 @Rule that can be used to capture log output. Use the appropriate constructor for unit/integration tests.
+ * a JUnit 5 Extension that can be used to capture log output. Use the appropriate constructor for unit/integration tests.
+ * <p>
+ * //TODO: write Javadoc for all classes and their responsibilities (and how they interact)
  */
-public final class LogCapture implements BeforeEachCallback, AfterEachCallback { //should implement AfterEachCallback, BeforeEachCallback in JUnit 5
+public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
 
     final Set<String> capturedPackages;
     CapturingAppender capturingAppender;
