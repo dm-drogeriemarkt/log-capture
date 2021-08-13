@@ -3,7 +3,10 @@ package de.dm.infrastructure.logcapture;
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 
-public class ExpectedMarker implements LogEventMatcher {
+/**
+ * define expected markers on log messages with this
+ */
+public final class ExpectedMarker implements LogEventMatcher {
     private final String expectedName;
 
     ExpectedMarker(String expectedName) {
@@ -30,6 +33,13 @@ public class ExpectedMarker implements LogEventMatcher {
         return "marker name";
     }
 
+    /**
+     * use this in a log assertion (...) to verify that something has been logged with a certain marker
+     *
+     * @param expectedName expected marker name
+     *
+     * @return expected marker to use in log assertion
+     */
     public static ExpectedMarker marker(String expectedName) {
         return new ExpectedMarker(expectedName);
     }

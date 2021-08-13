@@ -5,7 +5,10 @@ import java.util.regex.Pattern;
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 
-public class ExpectedLoggerName implements LogEventMatcher {
+/**
+ * define expected logger from which a message is supposed to be logged
+ */
+public final class ExpectedLoggerName implements LogEventMatcher {
     private final Pattern expectedName;
     private final String inputRegex;
 
@@ -31,6 +34,14 @@ public class ExpectedLoggerName implements LogEventMatcher {
         return "logger name";
     }
 
+    /**
+     * use this in a log assertion (...) to verify that something has been logged from a certain logger
+     *
+     * @param loggerNameRegex regular expression that matches the expected logger. Will be padded with .* - so for an
+     * exact match, use ^my.expected.logger$
+     *
+     * @return expected logger name to use in log assertion
+     */
     public static ExpectedLoggerName logger(String loggerNameRegex) {
         return new ExpectedLoggerName(loggerNameRegex);
     }

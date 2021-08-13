@@ -1,15 +1,16 @@
 package de.dm.infrastructure.logcapture;
 
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.Optional;
 import java.util.regex.Pattern;
 
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 
-@Slf4j
-public class ExpectedException implements LogEventMatcher {
+/**
+ * define expected logger from which a message is supposed to be logged
+ */
+@SuppressWarnings("squid:S2166") //naming this Exception is OK
+public final class ExpectedException implements LogEventMatcher {
     private final Optional<String> expectedMessageRegex;
     private final Optional<Pattern> expectedMessage;
     private final Optional<Class<? extends Exception>> expectedType;
@@ -27,6 +28,12 @@ public class ExpectedException implements LogEventMatcher {
         this.expectedCause = expectedCause;
     }
 
+    /**
+     * use this to build an expected Exception to use in a log assertion (...) to verify that something has been logged
+     * with a certain Exception
+     *
+     * @return builder for expected exception
+     */
     public static ExpectedExceptionBuilder exception() {
         return new ExpectedExceptionBuilder();
     }
@@ -104,7 +111,7 @@ public class ExpectedException implements LogEventMatcher {
         );
     }
 
-    public static class ExpectedExceptionBuilder {
+    public static final class ExpectedExceptionBuilder {
         private String expectedMessageRegex;
         private Class<? extends Exception> expectedType;
         private ExpectedException expectedCause;
