@@ -160,21 +160,92 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
         return new LastCapturedLogEvent(foundAtIndex, numberOfAssertedLogMessages);
     }
 
+    /**
+     * assert that a certain expected message has been logged.
+     *
+     * <p>Example:
+     * <pre>{@code
+     * logCapture.assertLogged(info("hello world"));
+     * }</pre>
+     *
+     * @param logExpectation description of the expected log message
+     *
+     * @return asserter that can be used to check if anything else has been logged
+     *
+     * @throws AssertionError if the expected log message has not been logged
+     */
     public LogAsserter.NothingElseLoggedAsserter assertLogged(LogExpectation logExpectation) {
         return new LogAsserter(capturingAppender, new LinkedList<>())
                 .assertLoggedInAnyOrder(logExpectation);
     }
 
+    /**
+     * assert that multiple log messages have been logged in any order
+     *
+     * <p>Example:
+     * <pre>{@code
+     * logCapture.assertLoggedInAnyOrder(
+     *     info("bye world"),
+     *     warn("hello world")
+     * ));
+     * }</pre>
+     *
+     * @param logExpectation description of an expected log message
+     * @param moreLogExpectations more descriptions of expected log messages
+     *
+     * @return asserter that can be used to check if anything else has been logged
+     *
+     * @throws AssertionError if any of the expected log message has not been logged or matching is imprecise (in case multiple expectations match the same message)
+     */
     public LogAsserter.NothingElseLoggedAsserter assertLoggedInAnyOrder(LogExpectation logExpectation, LogExpectation... moreLogExpectations) {
         return new LogAsserter(capturingAppender, new LinkedList<>())
                 .assertLoggedInAnyOrder(logExpectation, moreLogExpectations);
     }
 
-    public LogAsserter.NothingElseLoggedAsserter assertLoggedInOrder(LogExpectation logExpectation, LogExpectation nextLogExpectation, LogExpectation... nextLogExpectations) {
+    /**
+     * assert that multiple log messages have been logged in an expected order
+     *
+     * <p>Example:
+     * <pre>{@code
+     * logCapture
+     *     .assertLoggedInOrder(
+     *         info("hello world"),
+     *         warn("bye world")
+     *     ));
+     * }</pre>
+     *
+     * @param logExpectation description of the first expected log message
+     * @param nextLogExpectation description of the second expected log message
+     * @param moreLogExpectations descriptions of further expected log messages, in order
+     *
+     * @return asserter that can be used to check if anything else has been logged
+     *
+     * @throws AssertionError if any of the expected log message has not been logged or have been logged in the wrong order
+     */
+    public LogAsserter.NothingElseLoggedAsserter assertLoggedInOrder(LogExpectation logExpectation, LogExpectation nextLogExpectation, LogExpectation... moreLogExpectations) {
         return new LogAsserter(capturingAppender, new LinkedList<>())
-                .assertLoggedInOrder(logExpectation, nextLogExpectation, nextLogExpectations);
+                .assertLoggedInOrder(logExpectation, nextLogExpectation, moreLogExpectations);
     }
 
+    /**
+     * set up additional log matchers describing aspects that all asserted log messages should match (for example MDC content)
+     *
+     * <p>Example:
+     * <pre>{@code
+     * logCapture
+     *     .with(
+     *         mdc("key", "value"))
+     *     .assertLoggedInAnyOrder(
+     *         info("hello world"),
+     *         warn("bye world")
+     *     ));
+     * }</pre>
+     *
+     * @param logEventMatcher log event matcher describing expectations
+     * @param moreLogEventMatchers more log event matchers describing expectations
+     *
+     * @return an asserter to assert log messages with the described additional expectations
+     */
     public LogAsserter with(LogEventMatcher logEventMatcher, LogEventMatcher... moreLogEventMatchers) {
         LinkedList<LogEventMatcher> logEventMatchers = new LinkedList<>();
         logEventMatchers.add(logEventMatcher);
