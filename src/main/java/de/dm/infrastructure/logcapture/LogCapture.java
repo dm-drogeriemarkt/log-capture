@@ -19,7 +19,6 @@ import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
 /**
  * a JUnit 5 Extension that can be used to capture log output. Use the appropriate constructor for unit/integration tests.
- * <p>
  */
 public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
 
