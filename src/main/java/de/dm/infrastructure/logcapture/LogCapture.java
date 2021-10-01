@@ -9,9 +9,11 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -154,7 +156,9 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
         int startIndex = lastCapturedLogEvent == null ? 0 : lastCapturedLogEvent.lastAssertedLogMessageIndex + 1;
         int numberOfAssertedLogMessages = lastCapturedLogEvent == null ? 1 : lastCapturedLogEvent.numberOfAssertedLogMessages + 1;
 
-        Integer foundAtIndex = new LogAsserter(capturingAppender, new LinkedList<>()).assertCapturedNext(level, regex, startIndex, Arrays.asList(expectedMdcEntries));
+        List<LogEventMatcher> expectedMdcEntriesList = expectedMdcEntries != null ? Arrays.asList(expectedMdcEntries) : Collections.emptyList();
+
+        Integer foundAtIndex = new LogAsserter(capturingAppender, new LinkedList<>()).assertCapturedNext(level, regex, startIndex, expectedMdcEntriesList);
 
         return new LastCapturedLogEvent(foundAtIndex, numberOfAssertedLogMessages);
     }

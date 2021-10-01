@@ -177,6 +177,13 @@ class LogCaptureTest {
         logLevelIsResetTo(null);
     }
 
+    @Test
+    void doesNotFailForNullArrayInMdcEntried() {
+        log.info("something interesting");
+
+        logCapture.assertLogged(Level.INFO, "^something interesting", null);
+    }
+
     private void logLevelIsResetTo(Level originalLevel) {
         final ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
         final ch.qos.logback.classic.Logger comExampleLogger = rootLogger.getLoggerContext().getLogger("com.example");
