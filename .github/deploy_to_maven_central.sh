@@ -13,3 +13,4 @@ if [ "$TRAVIS_BRANCH" = 'master' ] && [ "$TRAVIS_PULL_REQUEST" == 'false' ] || [
 
     mvn deploy -P sign,build-extras --settings .travis/mvnsettings.xml -DskipTests=true -B -U
 fi
+
