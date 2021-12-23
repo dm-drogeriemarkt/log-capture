@@ -77,7 +77,7 @@ class FluentApiTest {
 
         IllegalStateException illegalStateException = assertThrows(IllegalStateException.class, () -> fluentLogAssertion.assertNothingElseLogged());
 
-        assertThat(illegalStateException).hasMessage("assertNothingElseLogged() must be called with a previous log assertion");
+        assertThat(illegalStateException).hasMessage("assertNothingElseLogged() must be called with a previous log expectation");
     }
 
     @Test
@@ -105,8 +105,11 @@ class FluentApiTest {
                         .warn().withMdc("key", "value").assertLogged("bye world"));
 
         assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected MDC value: Level: WARN, Regex: \"bye world\"" +
-                lineSeparator() + "  Captured message: \"bye world\"" +
-                lineSeparator() + "  Captured MDC values:");
+                lineSeparator() + "  captured message: \"bye world\"" +
+                lineSeparator() + "  expected MDC key: key" +
+                lineSeparator() + "  expected MDC value: \".*value.*\"" +
+                lineSeparator() + "  captured MDC values:" +
+                lineSeparator());
     }
 
     @Test
@@ -123,8 +126,11 @@ class FluentApiTest {
                         .warn().assertLogged("bye world"));
 
         assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected MDC value: Level: WARN, Regex: \"bye world\"" +
-                lineSeparator() + "  Captured message: \"bye world\"" +
-                lineSeparator() + "  Captured MDC values:");
+                lineSeparator() + "  captured message: \"bye world\"" +
+                lineSeparator() + "  expected MDC key: key" +
+                lineSeparator() + "  expected MDC value: \".*value.*\"" +
+                lineSeparator() + "  captured MDC values:" +
+                lineSeparator());
     }
 
     @Test
@@ -149,17 +155,27 @@ class FluentApiTest {
         log.warn("bye world");
         MDC.clear();
 
-        AssertionError assertionError = assertThrows(AssertionError.class, () -> {
-            logCapture
-                    .withMdcForAll("key", "value")
-                    .info().assertLogged("hello world")
-                    .warn().withMdc("another_key", "another_value").assertLogged("bye world");
-        });
+        AssertionError assertionError = assertThrows(AssertionError.class, () ->
+                logCapture
+                        .withMdcForAll("key", "value")
+                        .info().assertLogged("hello world")
+                        .warn().withMdc("another_key", "another_value").assertLogged("bye world")
+        );
 
-        assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected MDC value: Level: WARN, Regex: \"bye world\""
-                + lineSeparator() + "  Captured message: \"bye world\""
-                + lineSeparator() + "  Captured MDC values:"
-                + lineSeparator() + "    key: \"value\"");
+        assertThat(assertionError).hasMessage(
+                "Expected log message has occurred, but never with the expected MDC value: Level: WARN, Regex: \"bye world\"" +
+                        lineSeparator() + "  captured message: \"bye world\"" +
+                        lineSeparator() + "  expected MDC key: key" +
+                        lineSeparator() + "  expected MDC value: \".*value.*\"" +
+                        lineSeparator() + "  captured MDC values:" +
+                        lineSeparator() + "    key: \"value\"" +
+                        lineSeparator() + "Expected log message has occurred, but never with the expected MDC value: Level: WARN, Regex: \"bye world\"" +
+                        lineSeparator() + "  captured message: \"bye world\"" +
+                        lineSeparator() + "  expected MDC key: another_key" +
+                        lineSeparator() + "  expected MDC value: \".*another_value.*\"" +
+                        lineSeparator() + "  captured MDC values:" +
+                        lineSeparator() + "    key: \"value\"" +
+                        lineSeparator());
     }
 
     @Test

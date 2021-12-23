@@ -17,10 +17,13 @@ import static lombok.AccessLevel.PACKAGE;
 import static lombok.AccessLevel.PRIVATE;
 
 /**
- * Helper class for fluent log assertions. Use this via {@link LogCapture#info()} et al. or {@link LogCapture#withMdcForAll(String, String)}
+ * Helper class for fluent log assertions/expectations. Use this via {@link LogCapture#info()} et al. or {@link LogCapture#withMdcForAll(String, String)}
+ *
+ * @deprecated in favor or the new assertion style
  */
 @RequiredArgsConstructor(access = PACKAGE)
-public class FluentLogAssertion {
+@Deprecated
+public final class FluentLogAssertion {
     private final LogCapture logCapture;
     private final Optional<LastCapturedLogEvent> lastCapturedLogEvent;
     private final List<ExpectedMdcEntry> expectedMdcEntries = new LinkedList<>();
@@ -91,13 +94,16 @@ public class FluentLogAssertion {
      */
     public void assertNothingElseLogged() {
         LastCapturedLogEvent presentEvent = lastCapturedLogEvent.orElseThrow(() ->
-                new IllegalStateException("assertNothingElseLogged() must be called with a previous log assertion"));
+                new IllegalStateException("assertNothingElseLogged() must be called with a previous log expectation"));
         presentEvent.assertNothingElseLogged();
     }
 
     /**
      * Helper class for fluent log assertions. Use this via {@link LogCapture#info()} et al. or {@link LogCapture#withMdcForAll(String, String)}
+     *
+     * @deprecated in favor of the new api
      */
+    @Deprecated
     @RequiredArgsConstructor(access = PRIVATE)
     public class ConfiguredLogAssertion {
         private final Level level;
@@ -113,7 +119,6 @@ public class FluentLogAssertion {
          */
         public ConfiguredLogAssertion withMdc(String key, String regex) {
             ConfiguredLogAssertion newAssertion = new ConfiguredLogAssertion(level);
-            newAssertion.expectedMdcEntries.addAll(expectedMdcEntries);
             newAssertion.expectedMdcEntries.add(ExpectedMdcEntry.withMdc(key, regex));
 
             return newAssertion;

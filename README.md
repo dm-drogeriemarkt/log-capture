@@ -6,9 +6,23 @@
 Simple assertions for log messages. See [Examples](#examples).
 
 ```java
-logCapture
-        .info().assertLogged("hello world")
-        .warn().assertLogged("bye world");
+logCapture.assertLogged(
+    info("hello world"),
+    warn("bye world")
+);
+```
+
+It's even simple when there's more than just the message and level to assert:
+
+```java
+logCapture.assertLogged(
+    info("hello world",
+        logger("com.acme.helloworld.WorldGreeter")
+    )
+    warn("bye world", 
+        exception().expectedType(WorldNotFoundException.class)
+    )
+);
 ```
 
 **Table of Contents**
@@ -19,12 +33,12 @@ logCapture
     * [Unit Test Example:](#unit-test-example)
     * [Integration Test Example:](#integration-test-example)
     * [Example with MDC](#example-with-mdc)
+    * [More Examples](#more-examples)
 * [Usage outside of JUnit 5 (Cucumber example)](#usage-outside-of-junit-5-cucumber-example)
   * [Cucumber example](#cucumber-example)
     * [Cucumber feature file](#cucumber-feature-file)
-    * [Cucumber stepdefs](#cucumber-stepdefs)
-    * [Cucumber DTOs](#cucumber-dtos)
 * [Changes](#changes)
+  * [3.3.0](#330)
   * [3.2.1](#321)
   * [3.2.0](#320)
   * [3.1.0](#310)
@@ -42,7 +56,7 @@ Add log-capture as a test dependency to your project. If you use Maven, add this
 <dependency>
     <groupId>de.dm.infrastructure</groupId>
     <artifactId>log-capture</artifactId>
-    <version>3.2.1</version>
+    <version>3.3.0</version>
     <scope>test</scope>
 </dependency>
 ```
@@ -71,15 +85,10 @@ public class MyUnitTest {
 
         //assert that the messages have been logged
         //expected log message is a regular expression
-        logCapture
-                .info().assertLogged("^something interesting$")
-                .error().assertLogged("terrible")
-
-        // alterative using the old, non-fluent API
-        logCapture
-                .assertLogged(Level.INFO, "^something interesting$") //second parameter is a regular expression
-                .thenLogged(Level.ERROR, "terrible")
-                .assertNothingElseLogged();
+        logCapture.assertLogged(
+            info("^something interesting$"),
+            error("terrible")
+        );
     }
 }
 ```
@@ -110,16 +119,10 @@ public class MyIntegrationTest {
         log.info("something interesting");
         log.error("something terrible");
 
-        logCapture
-                .info().assertLogged("^something interesting$")
-                .info().assertLogged("^start of info from utility.that.logs") // no $ at the end to only match the start of the message
-                .error().("terrible");
-
-        // alterative using the old, non-fluent API
-        logCapture
-                .assertLogged(Level.INFO, "^something interesting")
-                .assertLogged(Level.INFO, "^start of info from utility.that.logs")
-                .thenLogged(Level.ERROR, "terrible");
+        logCapture.assertLogged(
+            info("^something interesting$"),
+            info("^start of info from utility.that.logs"),
+            error("terrible"));
     }
 }
 ```
@@ -144,29 +147,17 @@ public class MyUnitTest {
     @Test
     public void logMessageWithMdcInformation() {
         MDC.put("my_mdc_key", "this is the MDC value");
-        MDC.put("other_mdc_key", "this is the other MDC value");
         log.info("this message has some MDC information attached");
-        log.info("this message has some MDC information attached, too");
+        MDC.put("other_mdc_key", "this is the other MDC value");
+        log.info("this message has some additional MDC information attached");
 
+        // asserts my_mdc_key for both message and other_mdc_key for the second one
         logCapture
-                .info()
-                .withMdc("my_mdc_key", "^this is the MDC value$")
-                .withMdc("other_mdc_key", "^this is the other MDC value$")
-                .assertLogged("information attached")
-
-        // to assert MDC content in both messages
-        logCapture
-                .withMdcForAll("my_mdc_key", "^this is the MDC value$")
-                .withMdcForAll("other_mdc_key", "^this is the other MDC value$")
-                .info().assertLogged("information attached")
-                .info().assertLogged("information attached, too")
-
-        // non-fluent API (no equivalent to withMdcForAll here)
-        logCapture
-            .assertLogged(Level.INFO, "information attached", 
-                withMdc("my_mdc_key", "^this is the MDC value$"),
-                withMdc("other_mdc_key", "^this is the other MDC value$")
-            );
+            .with(mdc("my_mdc_key", "^this is the MDC value$"))
+            .assertLoggedInOrder(
+                info("information attached"),
+                info("additional MDC information attached",
+                    mdc("other_mdc_key", "^this is the other MDC value$")));
     }
 }
 ```
@@ -180,11 +171,9 @@ This can be useful for debugging purposes. For example, this test code:
     MDC.put("other_mdc_key", "this is the other MDC value");
     log.info("this message has some MDC information attached");
 
-    logCapture
-        .assertLogged(Level.INFO, "information attached", 
-            withMdc("my_mdc_key", "^something expected that never occurs$"),
-            withMdc("other_mdc_key", "^this is the other MDC value$")
-        );
+    logCapture.assertLogged().info("information attached", 
+            mdc("my_mdc_key", "^something expected that never occurs$"),
+            mdc("other_mdc_key", "^this is the other MDC value$"));
 ```
 
 will output:
@@ -197,9 +186,13 @@ java.lang.AssertionError: Expected log message has occurred, but never with the 
     other_mdc_key: "this is the other MDC value"
 ```
 
+#### More Examples
+
+See [ReadableApiTest.java](src/test/java/com/example/app/ReadableApiTest.java) for more usage examples.
+
 ## Usage outside of JUnit 5 (Cucumber example)
 
-If you intend to use LogCapture outside of a JUnit test, you cannot rely on JUnit's `@Rule` annotation and must call LocCapture's `addAppenderAndSetLogLevelToTrace()` and `removeAppenderAndResetLogLevel()` methods manually.
+If you intend to use LogCapture outside of a JUnit test, you cannot rely on JUnit's `@RegisterExtension` annotation and must call LogCapture's `addAppenderAndSetLogLevelToTrace()` and `removeAppenderAndResetLogLevel()` methods manually.
 
 Be aware that this will still cause JUnit to be a dependency.
 
@@ -219,70 +212,14 @@ And with MDC logging context
   | INFO  | ^Something else happened with the same mdc context$ |
 ```
 
-#### Cucumber stepdefs
-
-You can create these stepdefs in your project to use log-capture in feature files.
-
-```java
-public class LoggingStepdefs {
-    private ExpectedMdcEntry[] expectedMdcEntries;
-
-    public LogCapture logCapture = LogCapture.forPackages("my.company.app");
-
-    @Before
-    public void setupLogCapture() {
-        logCapture.addAppenderAndSetLogLevelToTrace();
-    }
-    
-    @After
-    public void stopLogCapture() {
-        logCapture.removeAppenderAndResetLogLevel();
-    }
-
-    @And("with MDC logging context")
-    public void withMdcLoggingContext(List<LogContext> logContexts) {
-        List<ExpectedMdcEntry> expectedMdcEntries = new LinkedList<>();
-        logContexts.forEach(logContext -> expectedMdcEntries.add(ExpectedMdcEntry.withMdc(logContext.getContextId(), logContext.getContentRegex())));
-        this.expectedMdcEntries = expectedMdcEntries.toArray(new ExpectedMdcEntry[0]);
-    }
-
-    @And("the following messages where logged")
-    public void followingMessagedLogged(List<LogEntry> logEntries) {
-        LogEntry firstEntry = logEntries.get(0);
-        logEntries.remove(0);
-        LogCapture.LastCapturedLogEvent lastCapturedLogEvent = logCapture.assertLogged(Level.toLevel(firstEntry.getLevel()), firstEntry.getMessageRegex(), expectedMdcEntries);
-        for (LogEntry logEntry : logEntries) {
-            lastCapturedLogEvent = lastCapturedLogEvent.thenLogged(Level.toLevel(logEntry.getLevel()), logEntry.getMessageRegex(), expectedMdcEntries);
-        }
-    }
-}
-```
-
-#### Cucumber DTOs
-
-You need to register these DTOs with Cucumber's [TypeRegistryConfigurer](https://cucumber.io/docs/cucumber/configuration/#type-registry):
-
-```java
-import lombok.Data;
-
-@Data
-public class LogContext {
-    private String contextId;
-    private String contentRegex;
-}
-```
-
-```java
-import lombok.Data;
-
-@Data
-public class LogEntry {
-    private String level;
-    private String messageRegex;
-}
-```
-
 ## Changes
+
+### 3.3.0
+
+* Introduced a new fluent API with
+  * better readability
+  * extensible log message assertions (to assert attached Exceptions, Markers and LoggerName beyond MDC content)
+* Deprecated the old API (will be removed in 4.0)
 
 ### 3.2.1
 
@@ -315,4 +252,3 @@ Fixed a bug where multiline log messages (for example Messages that contain a st
 * `LogCapture.forIntegrationTest(...)` has been replaced with `LogCapture.forPackages(...)`
 * `logCapture.addAppender()` has been replaced with `logCapture.addAppenderAndSetLogLevelToTrace()`
 * `logCapture.removeAppender()` has been replaced with `logCapture.removeAppenderAndResetLogLevel()`
-
