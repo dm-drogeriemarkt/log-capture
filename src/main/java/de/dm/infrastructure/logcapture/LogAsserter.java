@@ -81,6 +81,35 @@ public class LogAsserter {
         return new NothingElseLoggedAsserter(logExpectations.size());
     }
 
+
+    /**
+     * assert that no log-message was logged
+     *
+     * @throws AssertionError if any log message has been logged
+     */
+    public void assertNothingLogged() {
+        new NothingElseLoggedAsserter(0).assertNothingElseLogged();
+    }
+
+
+    /**
+     * assert that no matching log-message was logged
+     *
+     * @param logExpectation description of an expected log message
+     * @param moreLogExpectations more descriptions of expected log messages
+     *
+     * @throws AssertionError if any of the expected log message has been logged
+     */
+    public void assertNothingMatchingLogged(LogExpectation logExpectation, LogExpectation... moreLogExpectations) {
+        LinkedList<LogExpectation> logExpectations = new LinkedList<>();
+        logExpectations.add(logExpectation);
+        logExpectations.addAll(Arrays.asList(moreLogExpectations));
+
+        for (LogExpectation assertion : logExpectations) {
+            assertNotCaptured(assertion.level, assertion.regex, assertion.logEventMatchers);
+        }
+    }
+
     @RequiredArgsConstructor
     private static final class LastCapturedLogEvent {
         private final int lastAssertedLogMessageIndex;
@@ -145,6 +174,17 @@ public class LogAsserter {
             throwAssertionForPartiallyMatchingLoggedEvent(level, regex, eventMatchingWithoutAdditionalMatchers, logEventMatchers);
         }
         throw new AssertionError(format("Expected log message has not occurred: Level: %s, Regex: \"%s\"", level, regex));
+    }
+
+    void assertNotCaptured(Level level, String regex, List<LogEventMatcher> logEventMatchers) {
+        Pattern pattern = Pattern.compile(".*" + regex + ".*", Pattern.DOTALL + Pattern.MULTILINE);
+
+        for (int i = 0; i < capturingAppender.loggedEvents.size(); i++) {
+            LoggedEvent event = capturingAppender.loggedEvents.get(i);
+            if (eventMatchesWithoutAdditionalMatchers(event, level, pattern) && isMatchedByAll(event, logEventMatchers)) {
+                throw new AssertionError(format("Expected log message should not occurre: Level: %s, Regex: \"%s\"", level, regex));
+            }
+        }
     }
 
     private boolean eventMatchesWithoutAdditionalMatchers(LoggedEvent event, Level level, Pattern pattern) {

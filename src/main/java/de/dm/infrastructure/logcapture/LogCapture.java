@@ -183,6 +183,39 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
     }
 
     /**
+     * assert that a certain expected message has not been logged.
+     *
+     * <p>Example:
+     * <pre>{@code
+     *  logCapture.assertNothingMatchingLogged(info("hello world"));
+     * }</pre>
+     *
+     * @param logExpectation description of the not expected log message
+     *
+     * @throws AssertionError if the expected log message has not been logged
+     */
+    public void assertNothingMatchingLogged(LogExpectation logExpectation, LogExpectation... moreLogExpectations) {
+        new LogAsserter(capturingAppender, new LinkedList<>())
+                .assertNothingMatchingLogged(logExpectation, moreLogExpectations);
+    }
+
+
+    /**
+     * assert that nothing was logged on any level
+     *
+     * <p>Example:
+     * <pre>{@code
+     * logCapture.assertNothingLogged();
+     * }</pre>
+     *
+     * @throws AssertionError if the expected log message has not been logged
+     */
+    public void assertNothingLogged() {
+        new LogAsserter(capturingAppender, new LinkedList<>())
+                .assertNothingLogged();
+    }
+
+    /**
      * assert that multiple log messages have been logged in any order
      *
      * <p>Example:
@@ -229,6 +262,7 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
         return new LogAsserter(capturingAppender, new LinkedList<>())
                 .assertLoggedInOrder(logExpectation, nextLogExpectation, moreLogExpectations);
     }
+
 
     /**
      * set up additional log matchers describing aspects that all asserted log messages should match (for example MDC content)

@@ -63,6 +63,7 @@ class ReadableApiTest {
         logCapture.assertLoggedInOrder(
                 trace("first trace"),
                 trace("second trace"));
+        logCapture.assertNothingMatchingLogged(warn("first error"));
     }
 
     @Nested
