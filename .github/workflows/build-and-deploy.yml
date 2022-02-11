@@ -1,7 +1,11 @@
-name: Build with Maven and deploy Sonatype OSS repo
+name: Build with Maven and deploy to Sonatype OSS repo
 
 on:
   push:
+    branches:
+      - github-actions
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
 
 jobs:
   build:
