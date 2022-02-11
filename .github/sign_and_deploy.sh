@@ -7,7 +7,7 @@ gpg --passphrase "${GPG_PASSPHRASE}" --batch --yes --fast-import ${KEY_FILE}
 echo gpg keyname ${GPG_KEYNAME}
 
 if [[ "${REF_TYPE}" == "tag" ]]; then
-    mvn --batch-mode install -P sign -DskipTests=true -Dproject.version=${REF_NAME}
+    mvn --batch-mode deploy -P sign -DskipTests=true -Dproject.version=${REF_NAME}
     SUCCESS=$?
 else
     echo "this should only be run for tags"
