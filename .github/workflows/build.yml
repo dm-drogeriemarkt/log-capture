@@ -2,6 +2,8 @@ name: Build with Maven
 
 on:
   push:
+    branches:
+      - *
 
 jobs:
   build:
