@@ -7,6 +7,9 @@ on:
         description: command to execute in mvn context
         type: string
         required: true
+      ENVIRONMENT:
+        type: string
+        required: false
     secrets:
       GPG_KEYNAME:
         required: false
@@ -21,9 +24,9 @@ on:
 
 jobs:
   run-with-maven:
-    environment: master # TODO: should be named oss nexus or similar
-
     runs-on: ubuntu-latest
+
+    environment: ${{ inputs.ENVIRONMENT }}
 
     steps:
       - uses: actions/checkout@v2

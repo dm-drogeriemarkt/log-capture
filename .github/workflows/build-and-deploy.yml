@@ -4,7 +4,6 @@ on:
   push:
 
 jobs:
-  environment: master # TODO: should be named oss nexus or similar
   build:
     uses: ./.github/workflows/run-with-maven.yml
     with:
@@ -12,6 +11,7 @@ jobs:
   deploy:
     uses: ./.github/workflows/run-with-maven.yml
     with:
+      ENVIRONMENT: master # TODO: should be named oss nexus or similar
       COMMAND: ./.github/sign_and_deploy.sh
       GPG_KEYNAME: ${{ secrets.GPG_KEYNAME }}
       GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
