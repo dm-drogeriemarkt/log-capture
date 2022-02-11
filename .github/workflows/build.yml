@@ -2,8 +2,6 @@ name: Build with Maven
 
 on:
   push:
-    tags-ignore:
-      - *
 
 jobs:
   build:
