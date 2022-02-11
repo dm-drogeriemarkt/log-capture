@@ -13,6 +13,7 @@ jobs:
     with:
       ENVIRONMENT: master # TODO: should be named oss nexus or similar
       COMMAND: ./.github/sign_and_deploy.sh
+    secrets:
       GPG_KEYNAME: ${{ secrets.GPG_KEYNAME }}
       GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
       GPG_KEY_BASE64: ${{ secrets.GPG_KEY_BASE64 }}
