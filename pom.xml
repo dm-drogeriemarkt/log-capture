@@ -5,7 +5,7 @@
 
     <groupId>de.dm.infrastructure</groupId>
     <artifactId>log-capture</artifactId>
-    <version>${version}</version>
+    <version>${project.version}</version>
 
     <name>Log Capture</name>
     <description>Makes it possible to capture logs and assert if things have been logged</description>
@@ -29,7 +29,7 @@
     </developers>
 
     <properties>
-        <version>SNAPSHOT</version>
+        <project.version>3.3.1-SNAPSHOT</project.version>
 
         <java.version>1.8</java.version>
         <lombok.version>1.18.20</lombok.version>
