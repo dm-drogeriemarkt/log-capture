@@ -1,4 +1,4 @@
-name: Java CI with Maven
+name: Build with Maven and deploy Sonatype OSS repo
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   environment: master # TODO: should be named oss nexus or similar
-  build:
+  buildit:
     uses: ./.github/workflows/run-with-maven.yml
     with:
       COMMAND: mvn --batch-mode -Dmaven.compiler.showDeprecation=true -Dmaven.compiler.showWarnings=true clean verify
