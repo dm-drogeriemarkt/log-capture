@@ -7,7 +7,11 @@ gpg --passphrase "${GPG_PASSPHRASE}" --batch --yes --fast-import ${KEY_FILE}
 echo gpg keyname ${GPG_KEYNAME}
 
 if [[ "${REF_TYPE}" == "tag" ]]; then
-    mvn --batch-mode -DskipTests=true -Dproject.version=${REF_NAME} verify gpg:sign deploy
+    # -P sign plugin is used instead of gpg:sign because gpg:sign has side-effects
+    # also, install cannot be used because deploy will cause the signatures to be invalid because it
+    # re-creates the jars. So explicitly calling source:jar and javadoc:jar seems to be the only
+    # viable solution.
+    mvn --batch-mode -DskipTests=true -Dproject.version=${REF_NAME} -P sign clean source:jar javadoc:jar deploy
     SUCCESS=$?
 else
     echo "this should only be run for tags"
