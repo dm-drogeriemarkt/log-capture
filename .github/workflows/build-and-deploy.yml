@@ -2,11 +2,10 @@ name: Build with Maven and deploy Sonatype OSS repo
 
 on:
   push:
-  # tags: # TODO: how to run if a tag is created?
 
 jobs:
   environment: master # TODO: should be named oss nexus or similar
-  buildit:
+  build:
     uses: ./.github/workflows/run-with-maven.yml
     with:
       COMMAND: mvn --batch-mode -Dmaven.compiler.showDeprecation=true -Dmaven.compiler.showWarnings=true clean verify
