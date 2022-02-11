@@ -1,0 +1,57 @@
+name: Java CI with Maven
+
+on:
+  workflow_call:
+    inputs:
+      COMMAND:
+        description: command to execute in mvn context
+        type: string
+        required: true
+    secrets:
+      GPG_KEYNAME:
+        required: false
+      GPG_PASSPHRASE:
+        required: false
+      GPG_KEY_BASE64:
+        required: false
+      OSSRH_JIRA_PASSWORD:
+        required: false
+      OSSRH_JIRA_USERNAME:
+        required: false
+
+jobs:
+  run-with-maven:
+    environment: master # TODO: should be named oss nexus or similar
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@v2
+        with:
+          java-version: '8'
+          distribution: 'adopt'
+          cache: maven
+
+      - name: Run with mvn context
+        env:
+          GPG_KEYNAME: ${{ secrets.GPG_KEYNAME }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          GPG_KEY_BASE64: ${{ secrets.GPG_KEY_BASE64 }}
+          OSSRH_JIRA_PASSWORD: ${{ secrets.OSSRH_JIRA_PASSWORD }}
+          OSSRH_JIRA_USERNAME: ${{ secrets.OSSRH_JIRA_USERNAME}}
+          COMMAND: ${{ inputs.COMMAND }}
+
+        run:
+          cp .github/mvnsettings.xml ~/.m2/settings.xml && eval "${COMMAND}"
+        # run: mvn --batch-mode -Dmaven.compiler.showDeprecation=true -Dmaven.compiler.showWarnings=true clean verify
