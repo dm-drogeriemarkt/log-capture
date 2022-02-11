@@ -6,6 +6,9 @@ gpg --passphrase "${GPG_PASSPHRASE}" --batch --yes --fast-import daniel.flassak.
 # TODO: where does the version come from here?
 # TODO: maven batch mode everywhere
 mvn --batch-mode -Dmaven.compiler.showDeprecation=true -Dmaven.compiler.showWarnings=true clean verify
+
+echo gpg keyname $GPG_KEYNAME
+
 mvn --batch-mode install -P sign --settings .github/mvnsettings.xml -DskipTests=true
 
 tree target

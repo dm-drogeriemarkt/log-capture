@@ -27,5 +27,12 @@ jobs:
           cache: maven
 
       - name: Build with Maven
-        run: .github/deploy_to_maven_central.sh
+        env:
+          TEST_VAR: Foo
+          GPG_KEYNAME: ${{ secrets.GPG_KEYNAME }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          GPG_KEY_BASE64: ${{ secrets.GPG_KEY_BASE64 }}
+          OSSRH_JIRA_PASSWORD: ${{ secrets.OSSRH_JIRA_PASSWORD }}
+          OSSRH_JIRA_USERNAME: ${{ secrets.OSSRH_JIRA_USERNAME}}
+        run: echo test $TEST_VAR && echo keyname $GPG_KEYNAME && .github/deploy_to_maven_central.sh
         # run: mvn --batch-mode -Dmaven.compiler.showDeprecation=true -Dmaven.compiler.showWarnings=true clean verify
