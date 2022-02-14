@@ -1,0 +1,24 @@
+name: Build with Maven and deploy to Sonatype OSS repo
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  build:
+    uses: ./.github/workflows/run-with-maven.yml
+    with:
+      COMMAND: mvn --batch-mode -Dmaven.compiler.showDeprecation=true -Dmaven.compiler.showWarnings=true clean verify
+  deploy:
+    needs: build
+    uses: ./.github/workflows/run-with-maven.yml
+    with:
+      ENVIRONMENT: sonatype-oss
+      COMMAND: ./.github/sign_and_deploy.sh
+    secrets:
+      GPG_KEYNAME: ${{ secrets.GPG_KEYNAME }}
+      GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      GPG_KEY_BASE64: ${{ secrets.GPG_KEY_BASE64 }}
+      OSSRH_JIRA_PASSWORD: ${{ secrets.OSSRH_JIRA_PASSWORD }}
+      OSSRH_JIRA_USERNAME: ${{ secrets.OSSRH_JIRA_USERNAME}}
