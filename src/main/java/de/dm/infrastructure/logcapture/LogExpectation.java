@@ -48,6 +48,26 @@ public final class LogExpectation {
     }
 
     /**
+     * use this to describe any TRACE log message
+     *
+     * <p>
+     * there are multiple additional matchers you can use to describe a log message beyond the message itself:
+     * <ul>
+     *     <li>@{@link ExpectedMdcEntry}</li>
+     *     <li>@{@link ExpectedException}</li>
+     *     <li>@{@link ExpectedLoggerName}</li>
+     *     <li>@{@link ExpectedMarker}</li>
+     * </ul>
+     *
+     * @param logEventMatchersForThisMessage additional matchers for the log event.
+     *
+     * @return the log expectation
+     */
+    public static LogExpectation trace(LogEventMatcher... logEventMatchersForThisMessage) {
+        return new LogExpectation(Level.TRACE, "", logEventMatchersForThisMessage);
+    }
+
+    /**
      * use this to describe an expected DEBUG log message
      *
      * <p>
@@ -66,6 +86,26 @@ public final class LogExpectation {
      */
     public static LogExpectation debug(String regex, LogEventMatcher... logEventMatchersForThisMessage) {
         return new LogExpectation(Level.DEBUG, regex, logEventMatchersForThisMessage);
+    }
+
+    /**
+     * use this to describe any DEBUG log message
+     *
+     * <p>
+     * there are multiple additional matchers you can use to describe a log message beyond the message itself:
+     * <ul>
+     *     <li>@{@link ExpectedMdcEntry}</li>
+     *     <li>@{@link ExpectedException}</li>
+     *     <li>@{@link ExpectedLoggerName}</li>
+     *     <li>@{@link ExpectedMarker}</li>
+     * </ul>
+     *
+     * @param logEventMatchersForThisMessage additional matchers for the log event.
+     *
+     * @return the log expectation
+     */
+    public static LogExpectation debug(LogEventMatcher... logEventMatchersForThisMessage) {
+        return new LogExpectation(Level.DEBUG, "", logEventMatchersForThisMessage);
     }
 
     /**
@@ -90,6 +130,26 @@ public final class LogExpectation {
     }
 
     /**
+     * use this to describe any INFO log message
+     *
+     * <p>
+     * there are multiple additional matchers you can use to describe a log message beyond the message itself:
+     * <ul>
+     *     <li>@{@link ExpectedMdcEntry}</li>
+     *     <li>@{@link ExpectedException}</li>
+     *     <li>@{@link ExpectedLoggerName}</li>
+     *     <li>@{@link ExpectedMarker}</li>
+     * </ul>
+     *
+     * @param logEventMatchersForThisMessage additional matchers for the log event.
+     *
+     * @return the log expectation
+     */
+    public static LogExpectation info(LogEventMatcher... logEventMatchersForThisMessage) {
+        return new LogExpectation(Level.INFO, "", logEventMatchersForThisMessage);
+    }
+
+    /**
      * use this to describe an expected WARN log message
      *
      * <p>
@@ -108,6 +168,26 @@ public final class LogExpectation {
      */
     public static LogExpectation warn(String regex, LogEventMatcher... logEventMatchersForThisMessage) {
         return new LogExpectation(Level.WARN, regex, logEventMatchersForThisMessage);
+    }
+
+    /**
+     * use this to describe any WARN log message
+     *
+     * <p>
+     * there are multiple additional matchers you can use to describe a log message beyond the message itself:
+     * <ul>
+     *     <li>@{@link ExpectedMdcEntry}</li>
+     *     <li>@{@link ExpectedException}</li>
+     *     <li>@{@link ExpectedLoggerName}</li>
+     *     <li>@{@link ExpectedMarker}</li>
+     * </ul>
+     *
+     * @param logEventMatchersForThisMessage additional matchers for the log event.
+     *
+     * @return the log expectation
+     */
+    public static LogExpectation warn(LogEventMatcher... logEventMatchersForThisMessage) {
+        return new LogExpectation(Level.WARN, "", logEventMatchersForThisMessage);
     }
 
     /**
@@ -130,6 +210,27 @@ public final class LogExpectation {
     public static LogExpectation error(String regex, LogEventMatcher... logEventMatchersForThisMessage) {
         return new LogExpectation(Level.ERROR, regex, logEventMatchersForThisMessage);
     }
+
+    /**
+     * use this to describe any ERROR log message
+     *
+     * <p>
+     * there are multiple additional matchers you can use to describe a log message beyond the message itself:
+     * <ul>
+     *     <li>@{@link ExpectedMdcEntry}</li>
+     *     <li>@{@link ExpectedException}</li>
+     *     <li>@{@link ExpectedLoggerName}</li>
+     *     <li>@{@link ExpectedMarker}</li>
+     * </ul>
+     *
+     * @param logEventMatchersForThisMessage additional matchers for the log event.
+     *
+     * @return the log expectation
+     */
+    public static LogExpectation error(LogEventMatcher... logEventMatchersForThisMessage) {
+        return new LogExpectation(Level.ERROR, "", logEventMatchersForThisMessage);
+    }
+
 
     /**
      * use this to describe an expected log message with any level
