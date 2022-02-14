@@ -166,14 +166,6 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
                         <version>${maven-source-plugin.version}</version>
-                        <executions>
-                            <execution>
-                                <id>attach-sources</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -183,7 +175,8 @@
                             <source>${java.version}</source>
                             <encoding>${encoding}</encoding>
                         </configuration>
-                        <executions>
+                        <executions><!-- not actually for needed for deployment (called explicitly in sign_and_deploy.sh)
+                         - but it's nice to get javadoc warnings/errors on plain 'mvn clean verify' -->
                             <execution>
                                 <id>attach-javadocs</id>
                                 <goals>
