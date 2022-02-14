@@ -59,4 +59,3 @@ jobs:
 
         run:
           cp .github/mvnsettings.xml ~/.m2/settings.xml && eval "${COMMAND}"
-        # run: mvn --batch-mode -Dmaven.compiler.showDeprecation=true -Dmaven.compiler.showWarnings=true clean verify
