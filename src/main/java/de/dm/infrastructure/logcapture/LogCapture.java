@@ -158,7 +158,7 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
 
         List<LogEventMatcher> expectedMdcEntriesList = expectedMdcEntries != null ? Arrays.asList(expectedMdcEntries) : Collections.emptyList();
 
-        Integer foundAtIndex = new LogAsserter(capturingAppender, new LinkedList<>()).assertCapturedNext(level, regex, startIndex, expectedMdcEntriesList);
+        Integer foundAtIndex = new LogAsserter(capturingAppender, new LinkedList<>()).assertCapturedNext(Optional.of(level), regex, startIndex, expectedMdcEntriesList);
 
         return new LastCapturedLogEvent(foundAtIndex, numberOfAssertedLogMessages);
     }
@@ -194,25 +194,9 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
      *
      * @throws AssertionError if the expected log message has not been logged
      */
-    public void assertNothingMatchingLogged(LogExpectation logExpectation, LogExpectation... moreLogExpectations) {
+    public void assertNotLogged(LogExpectation logExpectation, LogExpectation... moreLogExpectations) {
         new LogAsserter(capturingAppender, new LinkedList<>())
-                .assertNothingMatchingLogged(logExpectation, moreLogExpectations);
-    }
-
-
-    /**
-     * assert that nothing was logged on any level
-     *
-     * <p>Example:
-     * <pre>{@code
-     * logCapture.assertNothingLogged();
-     * }</pre>
-     *
-     * @throws AssertionError if the expected log message has not been logged
-     */
-    public void assertNothingLogged() {
-        new LogAsserter(capturingAppender, new LinkedList<>())
-                .assertNothingLogged();
+                .assertNotLogged(logExpectation, moreLogExpectations);
     }
 
     /**

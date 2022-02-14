@@ -37,34 +37,7 @@ class LogCaptureTest {
                 .thenLogged(Level.ERROR, "terrible")
                 .assertNothingElseLogged();
     }
-
-    @Test
-    void twoLogMessagesAndNothingMatchingLogged() {
-        log.info("something interesting");
-        log.error("something terrible");
-
-        logCapture.assertNothingMatchingLogged(LogExpectation.warn("something interesting"), LogExpectation.error("something terrible!!"));
-    }
-
-    @Test
-    void twoLogMessagesAndNothingMatchingLoggedFails() {
-        log.info("something interesting");
-        log.error("something terrible");
-
-        assertThrows(AssertionError.class, () -> logCapture.assertNothingMatchingLogged(LogExpectation.error("something terrible")));
-    }
-
-    @Test
-    void nothingLogged() {
-        logCapture.assertNothingLogged();
-    }
-
-    @Test
-    void nothingLoggedFails() {
-        log.info("something logged");
-        assertThrows(AssertionError.class, () -> logCapture.assertNothingLogged());
-    }
-
+    
     @Test
     void twoLogMessagesInOrderAndSomethingElseFails() {
         log.info("something interesting");

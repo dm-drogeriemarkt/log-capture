@@ -4,17 +4,24 @@ import ch.qos.logback.classic.Level;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * class for describing an expected log message
  */
 public final class LogExpectation {
-    final Level level;
+    final Optional<Level> level;
     final String regex;
     final List<LogEventMatcher> logEventMatchers;
 
     private LogExpectation(Level level, String regex, LogEventMatcher... logEventMatchersForThisMessage) {
-        this.level = level;
+        this.level = Optional.of(level);
+        this.regex = regex;
+        logEventMatchers = Arrays.asList(logEventMatchersForThisMessage);
+    }
+
+    private LogExpectation(String regex, LogEventMatcher... logEventMatchersForThisMessage) {
+        level = Optional.empty();
         this.regex = regex;
         logEventMatchers = Arrays.asList(logEventMatchersForThisMessage);
     }
@@ -123,5 +130,47 @@ public final class LogExpectation {
     public static LogExpectation error(String regex, LogEventMatcher... logEventMatchersForThisMessage) {
         return new LogExpectation(Level.ERROR, regex, logEventMatchersForThisMessage);
     }
+
+    /**
+     * use this to describe an expected log message with any level
+     *
+     * <p>
+     * there are multiple additional matchers you can use to describe a log message beyond the message itself:
+     * <ul>
+     *     <li>@{@link ExpectedMdcEntry}</li>
+     *     <li>@{@link ExpectedException}</li>
+     *     <li>@{@link ExpectedLoggerName}</li>
+     *     <li>@{@link ExpectedMarker}</li>
+     * </ul>
+     *
+     * @param regex regular expression describing the expected message. Will be padded with .* - so use ^hello world$ for an exact match.
+     * @param logEventMatchersForThisMessage additional matchers for the log event.
+     *
+     * @return the log expectation
+     */
+    public static LogExpectation any(String regex, LogEventMatcher... logEventMatchersForThisMessage) {
+        return new LogExpectation(regex, logEventMatchersForThisMessage);
+    }
+
+    /**
+     * use this to describe any log message with any level
+     *
+     * <p>
+     * there are multiple additional matchers you can use to describe a log message beyond the message itself:
+     * <ul>
+     *     <li>@{@link ExpectedMdcEntry}</li>
+     *     <li>@{@link ExpectedException}</li>
+     *     <li>@{@link ExpectedLoggerName}</li>
+     *     <li>@{@link ExpectedMarker}</li>
+     * </ul>
+     *
+     * @param logEventMatchersForThisMessage additional matchers for the log event.
+     *
+     * @return the log expectation
+     */
+    public static LogExpectation any(LogEventMatcher... logEventMatchersForThisMessage) {
+        return new LogExpectation("", logEventMatchersForThisMessage);
+    }
+
 
 }

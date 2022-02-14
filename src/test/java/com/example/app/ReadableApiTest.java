@@ -14,6 +14,7 @@ import static de.dm.infrastructure.logcapture.ExpectedLoggerName.logger;
 import static de.dm.infrastructure.logcapture.ExpectedMarker.marker;
 import static de.dm.infrastructure.logcapture.ExpectedMdcEntry.mdc;
 import static de.dm.infrastructure.logcapture.ExpectedMdcEntry.withMdc;
+import static de.dm.infrastructure.logcapture.LogExpectation.any;
 import static de.dm.infrastructure.logcapture.LogExpectation.debug;
 import static de.dm.infrastructure.logcapture.LogExpectation.error;
 import static de.dm.infrastructure.logcapture.LogExpectation.info;
@@ -63,7 +64,8 @@ class ReadableApiTest {
         logCapture.assertLoggedInOrder(
                 trace("first trace"),
                 trace("second trace"));
-        logCapture.assertNothingMatchingLogged(warn("first error"));
+        logCapture.assertNotLogged(warn("first error"));
+        logCapture.assertNotLogged(any("notlogged error"));
     }
 
     @Nested
@@ -123,6 +125,9 @@ class ReadableApiTest {
                     lineSeparator() + "  expected exception: message (regex): \"a message never used\" type: java.lang.RuntimeException" +
                     lineSeparator() + "  actual exception: (null)" +
                     lineSeparator());
+
+            final AssertionError nothingLoggedException = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(any()));
+            assertThat(nothingLoggedException).hasMessage("Expected log message should not occurre: Level: Optional.empty, Regex: \"\"");
         }
     }
 
