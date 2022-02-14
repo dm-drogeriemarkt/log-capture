@@ -37,7 +37,7 @@ class LogCaptureTest {
                 .thenLogged(Level.ERROR, "terrible")
                 .assertNothingElseLogged();
     }
-    
+
     @Test
     void twoLogMessagesInOrderAndSomethingElseFails() {
         log.info("something interesting");

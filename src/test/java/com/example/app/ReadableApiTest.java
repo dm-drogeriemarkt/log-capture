@@ -91,6 +91,8 @@ class ReadableApiTest {
                                             .build())
                                     .build()
                     ));
+            logCapture.assertNotLogged(debug(), info(), trace(), error());
+            logCapture.assertLogged(warn());
         }
 
         @Test
@@ -127,7 +129,7 @@ class ReadableApiTest {
                     lineSeparator());
 
             final AssertionError nothingLoggedException = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(any()));
-            assertThat(nothingLoggedException).hasMessage("Expected log message should not occurre: Level: Optional.empty, Regex: \"\"");
+            assertThat(nothingLoggedException).hasMessage("Expected log message should not occur: <Any log message>");
         }
     }
 

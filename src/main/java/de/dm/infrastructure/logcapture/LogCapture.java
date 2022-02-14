@@ -158,7 +158,7 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
 
         List<LogEventMatcher> expectedMdcEntriesList = expectedMdcEntries != null ? Arrays.asList(expectedMdcEntries) : Collections.emptyList();
 
-        Integer foundAtIndex = new LogAsserter(capturingAppender, new LinkedList<>()).assertCapturedNext(Optional.of(level), regex, startIndex, expectedMdcEntriesList);
+        Integer foundAtIndex = new LogAsserter(capturingAppender, new LinkedList<>()).assertCapturedNext(Optional.of(level), Optional.of(regex), startIndex, expectedMdcEntriesList);
 
         return new LastCapturedLogEvent(foundAtIndex, numberOfAssertedLogMessages);
     }

@@ -11,18 +11,30 @@ import java.util.Optional;
  */
 public final class LogExpectation {
     final Optional<Level> level;
-    final String regex;
+    final Optional<String> regex;
     final List<LogEventMatcher> logEventMatchers;
 
     private LogExpectation(Level level, String regex, LogEventMatcher... logEventMatchersForThisMessage) {
         this.level = Optional.of(level);
-        this.regex = regex;
+        this.regex = Optional.of(regex);
+        logEventMatchers = Arrays.asList(logEventMatchersForThisMessage);
+    }
+
+    private LogExpectation(Level level, LogEventMatcher... logEventMatchersForThisMessage) {
+        this.level = Optional.of(level);
+        regex = Optional.empty();
         logEventMatchers = Arrays.asList(logEventMatchersForThisMessage);
     }
 
     private LogExpectation(String regex, LogEventMatcher... logEventMatchersForThisMessage) {
         level = Optional.empty();
-        this.regex = regex;
+        this.regex = Optional.of(regex);
+        logEventMatchers = Arrays.asList(logEventMatchersForThisMessage);
+    }
+
+    private LogExpectation(LogEventMatcher... logEventMatchersForThisMessage) {
+        level = Optional.empty();
+        regex = Optional.empty();
         logEventMatchers = Arrays.asList(logEventMatchersForThisMessage);
     }
 
@@ -64,7 +76,7 @@ public final class LogExpectation {
      * @return the log expectation
      */
     public static LogExpectation trace(LogEventMatcher... logEventMatchersForThisMessage) {
-        return new LogExpectation(Level.TRACE, "", logEventMatchersForThisMessage);
+        return new LogExpectation(Level.TRACE, logEventMatchersForThisMessage);
     }
 
     /**
@@ -105,7 +117,7 @@ public final class LogExpectation {
      * @return the log expectation
      */
     public static LogExpectation debug(LogEventMatcher... logEventMatchersForThisMessage) {
-        return new LogExpectation(Level.DEBUG, "", logEventMatchersForThisMessage);
+        return new LogExpectation(Level.DEBUG, logEventMatchersForThisMessage);
     }
 
     /**
@@ -146,7 +158,7 @@ public final class LogExpectation {
      * @return the log expectation
      */
     public static LogExpectation info(LogEventMatcher... logEventMatchersForThisMessage) {
-        return new LogExpectation(Level.INFO, "", logEventMatchersForThisMessage);
+        return new LogExpectation(Level.INFO, logEventMatchersForThisMessage);
     }
 
     /**
@@ -187,7 +199,7 @@ public final class LogExpectation {
      * @return the log expectation
      */
     public static LogExpectation warn(LogEventMatcher... logEventMatchersForThisMessage) {
-        return new LogExpectation(Level.WARN, "", logEventMatchersForThisMessage);
+        return new LogExpectation(Level.WARN, logEventMatchersForThisMessage);
     }
 
     /**
@@ -228,7 +240,7 @@ public final class LogExpectation {
      * @return the log expectation
      */
     public static LogExpectation error(LogEventMatcher... logEventMatchersForThisMessage) {
-        return new LogExpectation(Level.ERROR, "", logEventMatchersForThisMessage);
+        return new LogExpectation(Level.ERROR, logEventMatchersForThisMessage);
     }
 
 
@@ -270,7 +282,7 @@ public final class LogExpectation {
      * @return the log expectation
      */
     public static LogExpectation any(LogEventMatcher... logEventMatchersForThisMessage) {
-        return new LogExpectation("", logEventMatchersForThisMessage);
+        return new LogExpectation(logEventMatchersForThisMessage);
     }
 
 
