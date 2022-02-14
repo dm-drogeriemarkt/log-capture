@@ -14,7 +14,7 @@ jobs:
     needs: build
     uses: ./.github/workflows/run-with-maven.yml
     with:
-      ENVIRONMENT: master # TODO: should be named oss nexus or similar
+      ENVIRONMENT: sonatype-oss
       COMMAND: ./.github/sign_and_deploy.sh
     secrets:
       GPG_KEYNAME: ${{ secrets.GPG_KEYNAME }}

@@ -4,8 +4,6 @@ KEY_FILE='daniel.flassak.open.source.private.key'
 echo $GPG_KEY_BASE64 | base64 -d  > ${KEY_FILE}
 gpg --passphrase "${GPG_PASSPHRASE}" --batch --yes --fast-import ${KEY_FILE}
 
-echo gpg keyname ${GPG_KEYNAME}
-
 if [[ "${REF_TYPE}" == "tag" ]]; then
     # 'install' cannot be used in addition to 'deploy', because that makes the signatures invalid by re-creating jars
     # after they have been signed.
