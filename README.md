@@ -91,14 +91,15 @@ public class MyUnitTest {
                 info("^something interesting$"),
                 error("terrible")
         );
-        //is the same assertion, but also asserts the order of this log messages
+        
+        //is the same assertion, but also asserts the order of these log messages
         logCapture.assertLoggedInOrder(
                 info("^something interesting$"),
                 error("terrible")
         );
 
         //assert that no log message containing "something unwanted" with any log level exists 
-        // and that no log message with level DEBUG exists
+        //and that no log message with level DEBUG exists
         logCapture.assertNotLogged(
                 any("something unwanted"),
                 debug()
