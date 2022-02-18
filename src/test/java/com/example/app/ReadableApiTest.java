@@ -233,7 +233,7 @@ class ReadableApiTest {
             final AssertionError assertionError = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(
                     info("hello with marker",
                             marker("expected"))));
-            assertThat(assertionError).hasMessage("hello with marker\", with matchers: not expected marker name: \"expected\" was found");
+            assertThat(assertionError).hasMessage("Expected log message should not occur: Level: INFO, Regex: \"hello with marker\", with matchers: not expected marker name: \"expected\" was found");
         }
 
     }
