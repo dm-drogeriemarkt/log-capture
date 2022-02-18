@@ -128,10 +128,27 @@ class ReadableApiTest {
                     lineSeparator() + "  actual exception: (null)" +
                     lineSeparator());
 
-            final AssertionError nothingLoggedException = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(any()));
-            assertThat(nothingLoggedException).hasMessage("Expected log message should not occur: <Any log message>");
         }
+
+        @Test
+        void assertNotLoggedFails() {
+            log.info("testlogmessage");
+
+            final AssertionError exceptionAny = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(any()));
+            assertThat(exceptionAny).hasMessage("Expected log message should not occur: <Any log message>");
+
+            final AssertionError exceptionWithLevel = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(info()));
+            assertThat(exceptionWithLevel).hasMessage("Expected log message should not occur: Level: INFO");
+
+            final AssertionError exceptionWithRegex = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(any("testlogmessage")));
+            assertThat(exceptionWithRegex).hasMessage("Expected log message should not occur: Regex: \"testlogmessage\"");
+
+            final AssertionError exceptionWithRegexAndLevel = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(info("testlogmessage")));
+            assertThat(exceptionWithRegexAndLevel).hasMessage("Expected log message should not occur: Level: INFO, Regex: \"testlogmessage\"");
+        }
+
     }
+
 
     @Nested
     class ExpectedMarker {

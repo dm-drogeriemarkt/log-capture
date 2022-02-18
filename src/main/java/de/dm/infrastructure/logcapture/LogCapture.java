@@ -191,6 +191,7 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
      * }</pre>
      *
      * @param logExpectation description of the not expected log message
+     * @param moreLogExpectations more log event matchers describing expectations
      *
      * @throws AssertionError if the expected log message has not been logged
      */

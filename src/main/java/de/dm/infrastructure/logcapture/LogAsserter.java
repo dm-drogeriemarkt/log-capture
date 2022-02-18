@@ -48,7 +48,7 @@ public class LogAsserter {
                         "Imprecise matching: Two log expectations have matched the same message. " +
                                 "Use more precise matching or in-order matching. " +
                                 "(First match: %s | Second match: %s",
-                        getLevelAndRegexExpactation(previousMatch.level, previousMatch.regex), getLevelAndRegexExpactation(assertion.level, assertion.regex)));
+                        getLevelAndRegexExpectation(previousMatch.level, previousMatch.regex), getLevelAndRegexExpectation(assertion.level, assertion.regex)));
             }
             matches.put(lastCapturedLogEvent.lastAssertedLogMessageIndex, assertion);
         }
@@ -163,7 +163,7 @@ public class LogAsserter {
         if (eventMatchingWithoutAdditionalMatchers != null) {
             throwAssertionForPartiallyMatchingLoggedEvent(level, regex, eventMatchingWithoutAdditionalMatchers, logEventMatchers);
         }
-        throw new AssertionError(format("Expected log message has not occurred: %s", getLevelAndRegexExpactation(level, regex)));
+        throw new AssertionError(format("Expected log message has not occurred: %s", getLevelAndRegexExpectation(level, regex)));
     }
 
     void assertNotCaptured(Optional<Level> level, Optional<String> regex, List<LogEventMatcher> logEventMatchers) {
@@ -172,7 +172,7 @@ public class LogAsserter {
         for (int i = 0; i < capturingAppender.loggedEvents.size(); i++) {
             LoggedEvent event = capturingAppender.loggedEvents.get(i);
             if (eventMatchesWithoutAdditionalMatchers(event, level, pattern) && isMatchedByAll(event, logEventMatchers)) {
-                throw new AssertionError(format("Expected log message should not occur: %s", getLevelAndRegexExpactation(level, regex)));
+                throw new AssertionError(format("Expected log message should not occur: %s", getLevelAndRegexExpectation(level, regex)));
             }
         }
     }
@@ -186,7 +186,7 @@ public class LogAsserter {
 
         for (LogEventMatcher logEventMatcher : logEventMatchers) {
             assertionMessage.append(format("Expected log message has occurred, but never with the expected %s: %s",
-                    logEventMatcher.getMatcherDescription(), getLevelAndRegexExpactation(level, regex)));
+                    logEventMatcher.getMatcherDescription(), getLevelAndRegexExpectation(level, regex)));
             assertionMessage.append(lineSeparator());
             assertionMessage.append(logEventMatcher.getNonMatchingErrorMessage(partiallyMatchingLoggedEvent));
             assertionMessage.append(lineSeparator());
@@ -212,12 +212,15 @@ public class LogAsserter {
         return logEventMatchers.stream().allMatch(matcher -> matcher.matches(loggedEvent));
     }
 
-    private static String getLevelAndRegexExpactation(Optional<Level> level, Optional<String> regex) {
+    private static String getLevelAndRegexExpectation(Optional<Level> level, Optional<String> regex) {
         if (!level.isPresent() && !regex.isPresent()) {
             return "<Any log message>";
         }
-        return (level.isPresent() ? "Level: " + level.get() : "")
-                + (regex.isPresent() ? ", Regex: \"" + regex.get() + "\"" : "");
+        if (level.isPresent() && regex.isPresent()) {
+            return "Level: " + level.get() + ", Regex: \"" + regex.get() + "\"";
+        }
+        return (level.isPresent() ? "Level: " + level.get() : "") +
+                (regex.isPresent() ? "Regex: \"" + regex.get() + "\"" : "");
     }
 }
 
