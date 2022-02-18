@@ -28,4 +28,15 @@ public interface LogEventMatcher {
      * @return matched acpect
      */
     String getMatcherDescription();
+
+    /**
+     * returns an error message describing why a logged event does match, even of it shouldn't.
+     *
+     * @param loggedEvent logged event that does match
+     *
+     * @return matched acpect
+     */
+    String getMatchingErrorMessage();
+
+
 }

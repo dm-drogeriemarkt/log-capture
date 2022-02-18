@@ -222,6 +222,20 @@ class ReadableApiTest {
                             marker("expected")));
         }
 
+        @Test
+        void markerWithAssertNotLogged() {
+            log.info(MarkerFactory.getMarker("expected"), "hello with marker");
+
+            logCapture.assertNotLogged(
+                    info("hello with marker",
+                            marker("not expected")));
+
+            final AssertionError assertionError = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(
+                    info("hello with marker",
+                            marker("expected"))));
+            assertThat(assertionError).hasMessage("hello with marker\", with matchers: not expected marker name: \"expected\" was found");
+        }
+
     }
 
     @Nested
@@ -267,6 +281,21 @@ class ReadableApiTest {
                     lineSeparator() + "  expected logger name (regex): \"WrongLogger$\"" +
                     lineSeparator() + "  actual logger name: \"com.example.app.ReadableApiTest\"" +
                     lineSeparator());
+        }
+
+        @Test
+        void loggerWithAssertNotLogged() {
+            log.info("hello on this logger");
+
+            logCapture.assertNotLogged(
+                    info("ello on this logger",
+                            logger("wrongLogger")));
+
+            final AssertionError assertionError = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(
+                    info("hello on this logger",
+                            logger("ReadableApiTest$"))));
+            assertThat(assertionError)
+                    .hasMessage("Expected log message should not occur: Level: INFO, Regex: \"hello on this logger\", with matchers: not expected logger name (regex) was found: \"ReadableApiTest$\"");
         }
     }
 
@@ -431,6 +460,24 @@ class ReadableApiTest {
             logCapture.assertLogged(
                     info("hello",
                             withMdc("key", mdcValue -> mdcValue.equals("value"))));
+        }
+
+        @Test
+        void notLoggedWithMdc() {
+            MDC.put("key", "value");
+            MDC.put("another_key", "another_value");
+            log.info("hello world");
+            MDC.clear();
+
+            logCapture.assertNotLogged(info("helloWorld", mdc("thirdKey", "value")));
+
+            final AssertionError oneKeyMatches = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(info("hello world", mdc("key", "value"))));
+            assertThat(oneKeyMatches).hasMessage("Expected log message should not occur: Level: INFO, Regex: \"hello world\", with matchers: not expected MDCValue with key was found: \"key\"");
+
+            final AssertionError bothKeysMatches = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(info("hello world", mdc("key", "value"), mdc("another_key", "another_value"))));
+            assertThat(bothKeysMatches).hasMessage("Expected log message should not occur: Level: INFO, Regex: \"hello world\", with matchers: not expected MDCValue with key was found: \"key\", not expected MDCValue with key was found: \"another_key\"");
+
+
         }
 
     }

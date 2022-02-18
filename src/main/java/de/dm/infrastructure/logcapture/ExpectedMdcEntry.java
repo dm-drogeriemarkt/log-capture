@@ -74,6 +74,12 @@ public final class ExpectedMdcEntry implements LogEventMatcher {
         return "MDC value";
     }
 
+    @Override
+    public String getMatchingErrorMessage() {
+
+        return format("not expected MDCValue with key was found: \"%s\"", key);
+    }
+
     /**
      * use this in LogCapture.assertLogged(...) to verify that something has been logged with an MDC value
      *
