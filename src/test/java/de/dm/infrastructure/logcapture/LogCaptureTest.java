@@ -19,6 +19,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Slf4j
+// tests that test correct behaviour of logCapture in test context go here.
+// tests of actual assertions should go to com.example.app.ReadableApiTest instead.
 class LogCaptureTest {
 
     @RegisterExtension

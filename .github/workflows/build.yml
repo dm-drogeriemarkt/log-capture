@@ -1,0 +1,10 @@
+name: Build with Maven
+
+on:
+  push:
+
+jobs:
+  build:
+    uses: ./.github/workflows/run-with-maven.yml
+    with:
+      COMMAND: mvn --batch-mode -Dmaven.compiler.showDeprecation=true -Dmaven.compiler.showWarnings=true clean verify
