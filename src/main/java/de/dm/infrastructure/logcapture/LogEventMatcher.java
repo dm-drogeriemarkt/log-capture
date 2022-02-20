@@ -25,14 +25,14 @@ public interface LogEventMatcher {
     /**
      * short description of what aspect of the log event matcher matches, for example "marker name" or "Exception"
      *
-     * @return matched acpect
+     * @return matched aspect
      */
     String getMatcherDescription();
 
     /**
      * returns an error message describing why a logged event does match, even of it shouldn't.
      *
-     * @return matched acpect
+     * @return matched aspect
      */
     String getMatchingErrorMessage();
 
