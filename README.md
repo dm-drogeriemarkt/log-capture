@@ -64,11 +64,10 @@ logCapture.assertLoggedInOrder(
 Add log-capture as a test dependency to your project. If you use Maven, add this to your pom.xml:
 
 ```xml
-
 <dependency>
     <groupId>de.dm.infrastructure</groupId>
     <artifactId>log-capture</artifactId>
-    <version>3.3.0</version>
+    <version>3.4.0</version>
     <scope>test</scope>
 </dependency>
 ```
