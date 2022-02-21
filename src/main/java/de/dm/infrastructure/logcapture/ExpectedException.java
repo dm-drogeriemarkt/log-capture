@@ -50,6 +50,11 @@ public final class ExpectedException implements LogEventMatcher {
                 format("  actual exception: %s", loggedExceptionToString(loggedEvent.getLoggedException()));
     }
 
+    @Override
+    public String getMatchingErrorMessage() {
+        return format("not expected exception was found: %s", this);
+    }
+
     private static String loggedExceptionToString(Optional<LoggedEvent.LoggedException> optionalException) {
         if (!optionalException.isPresent()) {
             return "(null)";

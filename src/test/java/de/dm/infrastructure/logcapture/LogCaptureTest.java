@@ -163,6 +163,7 @@ class LogCaptureTest {
                 lineSeparator());
     }
 
+
     @Test
     void fromCurrentPackageWorks() {
         LogCapture logCapture = LogCaptureCreatorInOtherPackage.getLogCaptureFromCurrentPackage();

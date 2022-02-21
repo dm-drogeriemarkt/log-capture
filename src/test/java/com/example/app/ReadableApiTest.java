@@ -14,6 +14,7 @@ import static de.dm.infrastructure.logcapture.ExpectedLoggerName.logger;
 import static de.dm.infrastructure.logcapture.ExpectedMarker.marker;
 import static de.dm.infrastructure.logcapture.ExpectedMdcEntry.mdc;
 import static de.dm.infrastructure.logcapture.ExpectedMdcEntry.withMdc;
+import static de.dm.infrastructure.logcapture.LogExpectation.any;
 import static de.dm.infrastructure.logcapture.LogExpectation.debug;
 import static de.dm.infrastructure.logcapture.LogExpectation.error;
 import static de.dm.infrastructure.logcapture.LogExpectation.info;
@@ -63,6 +64,8 @@ class ReadableApiTest {
         logCapture.assertLoggedInOrder(
                 trace("first trace"),
                 trace("second trace"));
+        logCapture.assertNotLogged(warn("first error"));
+        logCapture.assertNotLogged(any("notlogged error"));
     }
 
     @Nested
@@ -88,6 +91,8 @@ class ReadableApiTest {
                                             .build())
                                     .build()
                     ));
+            logCapture.assertNotLogged(debug(), info(), trace(), error());
+            logCapture.assertLogged(warn());
         }
 
         @Test
@@ -122,8 +127,28 @@ class ReadableApiTest {
                     lineSeparator() + "  expected exception: message (regex): \"a message never used\" type: java.lang.RuntimeException" +
                     lineSeparator() + "  actual exception: (null)" +
                     lineSeparator());
+
         }
+
+        @Test
+        void assertNotLoggedFails() {
+            log.info("testlogmessage");
+
+            final AssertionError exceptionAny = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(any()));
+            assertThat(exceptionAny).hasMessage("Expected log message should not occur: <Any log message>");
+
+            final AssertionError exceptionWithLevel = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(info()));
+            assertThat(exceptionWithLevel).hasMessage("Expected log message should not occur: Level: INFO");
+
+            final AssertionError exceptionWithRegex = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(any("testlogmessage")));
+            assertThat(exceptionWithRegex).hasMessage("Expected log message should not occur: Regex: \"testlogmessage\"");
+
+            final AssertionError exceptionWithRegexAndLevel = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(info("testlogmessage")));
+            assertThat(exceptionWithRegexAndLevel).hasMessage("Expected log message should not occur: Level: INFO, Regex: \"testlogmessage\"");
+        }
+
     }
+
 
     @Nested
     class ExpectedMarker {
@@ -197,6 +222,20 @@ class ReadableApiTest {
                             marker("expected")));
         }
 
+        @Test
+        void markerWithAssertNotLogged() {
+            log.info(MarkerFactory.getMarker("expected"), "hello with marker");
+
+            logCapture.assertNotLogged(
+                    info("hello with marker",
+                            marker("not expected")));
+
+            final AssertionError assertionError = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(
+                    info("hello with marker",
+                            marker("expected"))));
+            assertThat(assertionError).hasMessage("Expected log message should not occur: Level: INFO, Regex: \"hello with marker\", with matchers: not expected marker name: \"expected\" was found");
+        }
+
     }
 
     @Nested
@@ -242,6 +281,21 @@ class ReadableApiTest {
                     lineSeparator() + "  expected logger name (regex): \"WrongLogger$\"" +
                     lineSeparator() + "  actual logger name: \"com.example.app.ReadableApiTest\"" +
                     lineSeparator());
+        }
+
+        @Test
+        void loggerWithAssertNotLogged() {
+            log.info("hello on this logger");
+
+            logCapture.assertNotLogged(
+                    info("ello on this logger",
+                            logger("wrongLogger")));
+
+            final AssertionError assertionError = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(
+                    info("hello on this logger",
+                            logger("ReadableApiTest$"))));
+            assertThat(assertionError)
+                    .hasMessage("Expected log message should not occur: Level: INFO, Regex: \"hello on this logger\", with matchers: not expected logger name (regex) was found: \"ReadableApiTest$\"");
         }
     }
 
@@ -406,6 +460,24 @@ class ReadableApiTest {
             logCapture.assertLogged(
                     info("hello",
                             withMdc("key", mdcValue -> mdcValue.equals("value"))));
+        }
+
+        @Test
+        void notLoggedWithMdc() {
+            MDC.put("key", "value");
+            MDC.put("another_key", "another_value");
+            log.info("hello world");
+            MDC.clear();
+
+            logCapture.assertNotLogged(info("helloWorld", mdc("thirdKey", "value")));
+
+            final AssertionError oneKeyMatches = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(info("hello world", mdc("key", "value"))));
+            assertThat(oneKeyMatches).hasMessage("Expected log message should not occur: Level: INFO, Regex: \"hello world\", with matchers: not expected MDCValue with key was found: \"key\"");
+
+            final AssertionError bothKeysMatches = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(info("hello world", mdc("key", "value"), mdc("another_key", "another_value"))));
+            assertThat(bothKeysMatches).hasMessage("Expected log message should not occur: Level: INFO, Regex: \"hello world\", with matchers: not expected MDCValue with key was found: \"key\", not expected MDCValue with key was found: \"another_key\"");
+
+
         }
 
     }

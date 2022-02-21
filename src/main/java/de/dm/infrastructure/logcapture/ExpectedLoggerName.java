@@ -34,6 +34,11 @@ public final class ExpectedLoggerName implements LogEventMatcher {
         return "logger name";
     }
 
+    @Override
+    public String getMatchingErrorMessage() {
+        return format("not expected logger name (regex) was found: \"%s\"", inputRegex);
+    }
+
     /**
      * use this in a log expectation to verify that something has been logged from a certain logger
      *

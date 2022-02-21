@@ -158,7 +158,7 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
 
         List<LogEventMatcher> expectedMdcEntriesList = expectedMdcEntries != null ? Arrays.asList(expectedMdcEntries) : Collections.emptyList();
 
-        Integer foundAtIndex = new LogAsserter(capturingAppender, new LinkedList<>()).assertCapturedNext(level, regex, startIndex, expectedMdcEntriesList);
+        Integer foundAtIndex = new LogAsserter(capturingAppender, new LinkedList<>()).assertCapturedNext(Optional.of(level), Optional.of(regex), startIndex, expectedMdcEntriesList);
 
         return new LastCapturedLogEvent(foundAtIndex, numberOfAssertedLogMessages);
     }
@@ -180,6 +180,24 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
     public LogAsserter.NothingElseLoggedAsserter assertLogged(LogExpectation logExpectation) {
         return new LogAsserter(capturingAppender, new LinkedList<>())
                 .assertLoggedInAnyOrder(logExpectation);
+    }
+
+    /**
+     * assert that a certain expected message has not been logged.
+     *
+     * <p>Example:
+     * <pre>{@code
+     *  logCapture.assertNothingMatchingLogged(info("hello world"));
+     * }</pre>
+     *
+     * @param logExpectation description of the not expected log message
+     * @param moreLogExpectations more log event matchers describing expectations
+     *
+     * @throws AssertionError if the expected log message has not been logged
+     */
+    public void assertNotLogged(LogExpectation logExpectation, LogExpectation... moreLogExpectations) {
+        new LogAsserter(capturingAppender, new LinkedList<>())
+                .assertNotLogged(logExpectation, moreLogExpectations);
     }
 
     /**
@@ -229,6 +247,7 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
         return new LogAsserter(capturingAppender, new LinkedList<>())
                 .assertLoggedInOrder(logExpectation, nextLogExpectation, moreLogExpectations);
     }
+
 
     /**
      * set up additional log matchers describing aspects that all asserted log messages should match (for example MDC content)

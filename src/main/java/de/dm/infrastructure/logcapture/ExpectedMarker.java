@@ -33,6 +33,11 @@ public final class ExpectedMarker implements LogEventMatcher {
         return "marker name";
     }
 
+    @Override
+    public String getMatchingErrorMessage() {
+        return format("not expected marker name: \"%s\" was found", expectedName);
+    }
+
     /**
      * use this in a log expectation to verify that something has been logged with a certain marker
      *
