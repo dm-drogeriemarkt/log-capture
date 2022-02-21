@@ -1,7 +1,9 @@
 # log-capture
 
 [<img src="https://opensourcelogos.aws.dmtech.cloud/dmTECH_opensource_logo.svg" height="20" width="130">](https://dmtech.de/)
-[![Build Status](https://travis-ci.org/dm-drogeriemarkt/log-capture.svg?branch=master)](https://travis-ci.org/dm-drogeriemarkt/log-capture)
+[![Apache License 2](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Build Status](https://github.com/dm-drogeriemarkt/log-capture/actions/workflows/build.yml/badge.svg)](https://github.com/dm-drogeriemarkt/log-capture/actions)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/de.dm.infrastructure/log-capture/badge.svg)](https://maven-badges.herokuapp.com/maven-central/de.dm.infrastructure/log-capture)
 
 Simple assertions for log messages. See [Examples](#examples).
 

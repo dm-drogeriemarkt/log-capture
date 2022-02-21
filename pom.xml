@@ -8,7 +8,7 @@
     <version>${project.version}</version>
 
     <name>Log Capture</name>
-    <description>Makes it possible to capture logs and assert if things have been logged</description>
+    <description>assertions for logging with logback</description>
     <url>https://github.com/dm-drogeriemarkt/log-capture</url>
 
     <licenses>
