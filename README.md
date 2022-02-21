@@ -119,7 +119,7 @@ logCapture.info("hello with marker", marker("my-marker"));
 ```java
 log.info("did something");
 
-logCapture.info("did something", info("com.acme.foo"));
+logCapture.info("did something", logger("com.acme.foo"));
 ```
 
 ### Examples
