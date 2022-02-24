@@ -27,18 +27,13 @@ public class LogAsserter {
     /**
      * assert that multiple log messages have been logged in any order
      *
-     * @param logExpectation description of an expected log message
-     * @param moreLogExpectations more descriptions of expected log messages
+     * @param logExpectations more descriptions of expected log messages
      *
      * @return asserter that can be used to check if anything else has been logged
      *
      * @throws AssertionError if any of the expected log message has not been logged or matching is imprecise (in case multiple expectations match the same message)
      */
-    public NothingElseLoggedAsserter assertLoggedInAnyOrder(LogExpectation logExpectation, LogExpectation... moreLogExpectations) {
-        LinkedList<LogExpectation> logExpectations = new LinkedList<>();
-        logExpectations.add(logExpectation);
-        logExpectations.addAll(Arrays.asList(moreLogExpectations));
-
+    public NothingElseLoggedAsserter assertLoggedInAnyOrder(LogExpectation... logExpectations) {
         Map<Integer, LogExpectation> matches = new HashMap<>();
 
         for (LogExpectation assertion : logExpectations) {
@@ -54,32 +49,25 @@ public class LogAsserter {
             matches.put(lastCapturedLogEvent.lastAssertedLogMessageIndex, assertion);
         }
 
-        return new NothingElseLoggedAsserter(logExpectations.size());
+        return new NothingElseLoggedAsserter(logExpectations.length);
     }
 
     /**
      * assert that multiple log messages have been logged in an expected order
      *
-     * @param logExpectation description of the first expected log message
-     * @param nextLogExpectation description of the second expected log message
-     * @param moreLogExpectations descriptions of further expected log messages, in order
+     * @param logExpectations descriptions of expected log messages, in order
      *
      * @return asserter that can be used to check if anything else has been logged
      *
      * @throws AssertionError if any of the expected log message has not been logged or have been logged in the wrong order
      */
-    public NothingElseLoggedAsserter assertLoggedInOrder(LogExpectation logExpectation, LogExpectation nextLogExpectation, LogExpectation... moreLogExpectations) {
-        LinkedList<LogExpectation> logExpectations = new LinkedList<>();
-        logExpectations.add(logExpectation);
-        logExpectations.add(nextLogExpectation);
-        logExpectations.addAll(Arrays.asList(moreLogExpectations));
-
+    public NothingElseLoggedAsserter assertLoggedInOrder(LogExpectation... logExpectations) {
         Optional<LastCapturedLogEvent> lastCapturedLogEvent = Optional.empty();
         for (LogExpectation assertion : logExpectations) {
             lastCapturedLogEvent = Optional.of(assertCapturedNext(assertion.level, assertion.regex, lastCapturedLogEvent, assertion.logEventMatchers));
         }
 
-        return new NothingElseLoggedAsserter(logExpectations.size());
+        return new NothingElseLoggedAsserter(logExpectations.length);
     }
 
 

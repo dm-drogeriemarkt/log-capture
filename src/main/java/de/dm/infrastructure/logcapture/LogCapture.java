@@ -211,16 +211,15 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
      * ));
      * }</pre>
      *
-     * @param logExpectation description of an expected log message
-     * @param moreLogExpectations more descriptions of expected log messages
+     * @param logExpectations more descriptions of expected log messages
      *
      * @return asserter that can be used to check if anything else has been logged
      *
      * @throws AssertionError if any of the expected log message has not been logged or matching is imprecise (in case multiple expectations match the same message)
      */
-    public LogAsserter.NothingElseLoggedAsserter assertLoggedInAnyOrder(LogExpectation logExpectation, LogExpectation... moreLogExpectations) {
+    public LogAsserter.NothingElseLoggedAsserter assertLoggedInAnyOrder(LogExpectation... logExpectations) {
         return new LogAsserter(capturingAppender, new LinkedList<>())
-                .assertLoggedInAnyOrder(logExpectation, moreLogExpectations);
+                .assertLoggedInAnyOrder(logExpectations);
     }
 
     /**
@@ -235,17 +234,15 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
      *     ));
      * }</pre>
      *
-     * @param logExpectation description of the first expected log message
-     * @param nextLogExpectation description of the second expected log message
-     * @param moreLogExpectations descriptions of further expected log messages, in order
+     * @param logExpectations descriptions of expected log messages, in order
      *
      * @return asserter that can be used to check if anything else has been logged
      *
      * @throws AssertionError if any of the expected log message has not been logged or have been logged in the wrong order
      */
-    public LogAsserter.NothingElseLoggedAsserter assertLoggedInOrder(LogExpectation logExpectation, LogExpectation nextLogExpectation, LogExpectation... moreLogExpectations) {
+    public LogAsserter.NothingElseLoggedAsserter assertLoggedInOrder(LogExpectation... logExpectations) {
         return new LogAsserter(capturingAppender, new LinkedList<>())
-                .assertLoggedInOrder(logExpectation, nextLogExpectation, moreLogExpectations);
+                .assertLoggedInOrder(logExpectations);
     }
 
 
