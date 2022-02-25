@@ -666,7 +666,7 @@ class ReadableApiTest {
             log.info("hello world");
 
             logCapture
-                    .assertLogged(info("hello universe"))
+                    .assertLogged(info("hello world"))
                     .assertNothingElseLogged();
         }
 
