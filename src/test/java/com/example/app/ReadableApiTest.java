@@ -25,6 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Slf4j
+@SuppressWarnings("java:S5778") //this rule does not increase the clarity of these tests
 class ReadableApiTest {
     @RegisterExtension
     LogCapture logCapture = LogCapture.forCurrentPackage();
@@ -34,6 +35,50 @@ class ReadableApiTest {
         log.info("hello world", new IllegalArgumentException("shame on you", new NullPointerException("bah!")));
 
         logCapture.assertLogged(info("hello world"));
+    }
+
+    @Test
+    void varargsAssertionsRequireLogExpectations() {
+        assertThat(
+                assertThrows(IllegalArgumentException.class, () ->
+                        logCapture.assertLoggedInAnyOrder()
+                ))
+                .hasMessage("at least 2 LogExpectations are required for assertLoggedInAnyOrder(). Found none");
+
+        assertThat(
+                assertThrows(IllegalArgumentException.class, () ->
+                        logCapture.assertLoggedInAnyOrder(info("Hello world"))
+                ))
+                .hasMessageMatching("at least 2 LogExpectations are required for assertLoggedInAnyOrder\\(\\)\\. Found .*Hello world.*");
+
+        assertThat(
+                assertThrows(IllegalArgumentException.class, () ->
+                        logCapture.assertLoggedInOrder()
+                ))
+                .hasMessage("at least 2 LogExpectations are required for assertLoggedInOrder(). Found none");
+
+        assertThat(
+                assertThrows(IllegalArgumentException.class, () ->
+                        logCapture.assertLoggedInOrder(info("Hello world"))
+                ))
+                .hasMessageMatching("at least 2 LogExpectations are required for assertLoggedInOrder\\(\\)\\. Found .*Hello world.*");
+
+        assertThat(
+                assertThrows(IllegalArgumentException.class, () ->
+                        logCapture.assertNotLogged()
+                ))
+                .hasMessageMatching("at least one LogExpectation is required for assertNotLogged\\(\\)\\. Found none");
+    }
+
+    @Test
+    void withRequiresAtLeastOneMatcher() {
+        assertThat(
+                assertThrows(IllegalArgumentException.class, () ->
+                        logCapture
+                                .with()
+                                .assertLogged(info("Hello world"))
+                ))
+                .hasMessage("with() needs at least one LogEventMatcher");
     }
 
     @Test
@@ -611,6 +656,28 @@ class ReadableApiTest {
                             .assertLoggedInAnyOrder(
                                     info("hello universe"),
                                     info("hello world"))
+                            .assertNothingElseLogged());
+
+            assertThat(assertionError).hasMessage("There have been other log messages than the asserted ones.");
+        }
+
+        @Test
+        void nothingElseLoggedSingleLogMessageSucceeds() {
+            log.info("hello world");
+
+            logCapture
+                    .assertLogged(info("hello universe"))
+                    .assertNothingElseLogged();
+        }
+
+        @Test
+        void nothingElseLoggedSingleLogMessageFails() {
+            log.info("hello world");
+            log.info("hello universe");
+
+            AssertionError assertionError = assertThrows(AssertionError.class, () ->
+                    logCapture
+                            .assertLogged(info("hello world"))
                             .assertNothingElseLogged());
 
             assertThat(assertionError).hasMessage("There have been other log messages than the asserted ones.");

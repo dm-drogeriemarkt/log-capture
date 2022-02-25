@@ -3,7 +3,6 @@ package de.dm.infrastructure.logcapture;
 import ch.qos.logback.classic.Level;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,13 +26,19 @@ public class LogAsserter {
     /**
      * assert that multiple log messages have been logged in any order
      *
-     * @param logExpectations more descriptions of expected log messages
+     * @param logExpectations descriptions of expected log messages
      *
      * @return asserter that can be used to check if anything else has been logged
      *
      * @throws AssertionError if any of the expected log message has not been logged or matching is imprecise (in case multiple expectations match the same message)
+     * @throws IllegalArgumentException if less than two LogExpectations are provided
      */
     public NothingElseLoggedAsserter assertLoggedInAnyOrder(LogExpectation... logExpectations) {
+        if (logExpectations.length < 2) {
+            throw new IllegalArgumentException("at least 2 LogExpectations are required for assertLoggedInAnyOrder(). Found " +
+                    (logExpectations.length == 1 ? logExpectations[0] : "none"));
+        }
+
         Map<Integer, LogExpectation> matches = new HashMap<>();
 
         for (LogExpectation assertion : logExpectations) {
@@ -44,13 +49,29 @@ public class LogAsserter {
                         "Imprecise matching: Two log expectations have matched the same message. " +
                                 "Use more precise matching or in-order matching. " +
                                 "(First match: %s | Second match: %s",
-                        getLevelAndRegexExpectation(previousMatch.level, previousMatch.regex, previousMatch.logEventMatchers), getLevelAndRegexExpectation(assertion.level, assertion.regex, assertion.logEventMatchers)));
+                        getLevelAndRegexExpectation(previousMatch.level, previousMatch.regex, previousMatch.logEventMatchers),
+                        getLevelAndRegexExpectation(assertion.level, assertion.regex, assertion.logEventMatchers)));
             }
             matches.put(lastCapturedLogEvent.lastAssertedLogMessageIndex, assertion);
         }
 
         return new NothingElseLoggedAsserter(logExpectations.length);
     }
+
+    /**
+     * assert a single multiple message has been logged
+     *
+     * @param logExpectation descriptions of expected log message
+     *
+     * @return asserter that can be used to check if anything else has been logged
+     *
+     * @throws AssertionError if the expected log message has not been logged
+     */
+    public NothingElseLoggedAsserter assertLogged(LogExpectation logExpectation) {
+        assertCapturedNext(logExpectation.level, logExpectation.regex, Optional.empty(), logExpectation.logEventMatchers);
+        return new NothingElseLoggedAsserter(1);
+    }
+
 
     /**
      * assert that multiple log messages have been logged in an expected order
@@ -60,8 +81,14 @@ public class LogAsserter {
      * @return asserter that can be used to check if anything else has been logged
      *
      * @throws AssertionError if any of the expected log message has not been logged or have been logged in the wrong order
+     * @throws IllegalArgumentException if less than two LogExpectations are provided
      */
     public NothingElseLoggedAsserter assertLoggedInOrder(LogExpectation... logExpectations) {
+        if (logExpectations.length < 2) {
+            throw new IllegalArgumentException("at least 2 LogExpectations are required for assertLoggedInOrder(). Found " +
+                    (logExpectations.length == 1 ? logExpectations[0] : "none"));
+        }
+
         Optional<LastCapturedLogEvent> lastCapturedLogEvent = Optional.empty();
         for (LogExpectation assertion : logExpectations) {
             lastCapturedLogEvent = Optional.of(assertCapturedNext(assertion.level, assertion.regex, lastCapturedLogEvent, assertion.logEventMatchers));
@@ -74,15 +101,16 @@ public class LogAsserter {
     /**
      * assert that no matching log-message was logged
      *
-     * @param logExpectation description of an expected log message
-     * @param moreLogExpectations more descriptions of expected log messages
+     * @param logExpectations descriptions of log messages that should not occur
      *
      * @throws AssertionError if any of the expected log message has been logged
+     * @throws IllegalArgumentException if no LogExpectation is provided
      */
-    public void assertNotLogged(LogExpectation logExpectation, LogExpectation... moreLogExpectations) {
-        LinkedList<LogExpectation> logExpectations = new LinkedList<>();
-        logExpectations.add(logExpectation);
-        logExpectations.addAll(Arrays.asList(moreLogExpectations));
+    public void assertNotLogged(LogExpectation... logExpectations) {
+        if (logExpectations.length < 1) {
+            throw new IllegalArgumentException("at least one LogExpectation is required for assertNotLogged(). Found none");
+        }
+
 
         for (LogExpectation assertion : logExpectations) {
             assertNotCaptured(assertion.level, assertion.regex, assertion.logEventMatchers);
@@ -187,11 +215,10 @@ public class LogAsserter {
         return pattern.matcher(event.getFormattedMessage()).matches();
     }
 
-    private static boolean eventMatchesLevel(LoggedEvent event, Optional<Level> level) {
-        if (!level.isPresent()) {
-            return true;
-        }
-        return event.getLevel().equals(level.get());
+    private static boolean eventMatchesLevel(LoggedEvent event, Optional<Level> expectedLevel) {
+        return expectedLevel
+                .map(expected -> event.getLevel().equals(expected))
+                .orElse(true);
     }
 
     static boolean isMatchedByAll(LoggedEvent loggedEvent, List<? extends LogEventMatcher> logEventMatchers) {
@@ -201,6 +228,7 @@ public class LogAsserter {
         return logEventMatchers.stream().allMatch(matcher -> matcher.matches(loggedEvent));
     }
 
+    @SuppressWarnings("squid:S1192") // a constant for "Level: " is not helpful
     private static String getLevelAndRegexExpectation(Optional<Level> level, Optional<String> regex) {
 
         if (!level.isPresent() && !regex.isPresent()) {
@@ -209,14 +237,14 @@ public class LogAsserter {
         if (level.isPresent() && regex.isPresent()) {
             return "Level: " + level.get() + ", Regex: \"" + regex.get() + "\"";
         }
-        return (level.isPresent() ? "Level: " + level.get() : "") +
-                (regex.isPresent() ? "Regex: \"" + regex.get() + "\"" : "");
+        return (level.map(value -> "Level: " + value).orElse("")) +
+                (regex.map(s -> "Regex: \"" + s + "\"").orElse(""));
     }
 
     private static String getLevelAndRegexExpectation(Optional<Level> level, Optional<String> regex, List<LogEventMatcher> matchers) {
         String matchersText = "";
         if (!matchers.isEmpty()) {
-            matchersText = ", with matchers: " + matchers.stream().map(logEventMatcher -> logEventMatcher.getMatchingErrorMessage()).collect(Collectors.joining(", "));
+            matchersText = ", with matchers: " + matchers.stream().map(LogEventMatcher::getMatchingErrorMessage).collect(Collectors.joining(", "));
         }
         if (!level.isPresent() && !regex.isPresent()) {
             return "<Any log message>" + matchersText;
@@ -224,8 +252,8 @@ public class LogAsserter {
         if (level.isPresent() && regex.isPresent()) {
             return "Level: " + level.get() + ", Regex: \"" + regex.get() + "\"" + matchersText;
         }
-        return (level.isPresent() ? "Level: " + level.get() : "") +
-                (regex.isPresent() ? "Regex: \"" + regex.get() + "\"" : "") + matchersText;
+        return (level.map(value -> "Level: " + value).orElse("")) +
+                (regex.map(s -> "Regex: \"" + s + "\"").orElse("")) + matchersText;
     }
 }
 
