@@ -7,7 +7,7 @@
 
 Simple assertions for log messages. See [Examples](#examples).
 
-**Note that** log-capture asserts evaluated log statements. That means it is dependent on a logging implementation (*logback*), but works with any logging facade (*slf4j* and others)
+**Note that** log-capture asserts evaluated log statements. That means it depends on a logging implementation (*logback*), but works with any logging facade (*slf4j* and others)
 
 ```java
 var name="world";
@@ -76,7 +76,7 @@ Add log-capture as a test dependency to your project. If you use Maven, add this
 
 ### Additional matchers
 
-The default matchers can match level and/or message. But there are additional matchers for log messages. Also see [the detailed example below](#example-with-additional-mdc-matcher)
+The default matchers can match level and/or message. But there are additional matchers for log messages. See also [the detailed example below](#example-with-additional-mdc-matcher)
 
 #### MDC content
 
@@ -292,7 +292,7 @@ And with MDC logging context
 ### 3.4.0
 
 * Added `assertNotLogged(...)` for asserting that no matching log message has been logged
-* Added more factory methods for `warn(...)`, `error(...)` to make matching the expected message optional
+* Added more factory methods for `warn(...)`, `error(...)` as a shortcut to ignore the message when matching
 * Added `any(...)` factory method for matching any log message regardless of level
 
 ### 3.3.0
@@ -336,7 +336,7 @@ Fixed a bug where multiline log messages (for example Messages that contain a st
 
 ### Updating from Version 3.2.x or lower to Version 3.3.x or higher
 
-Since the old API has been deprecated in 3.3.0 in preparation for 4.0, existing assertions need to be replaced. So for example:
+Since the old API has been deprecated in 3.3.0 in preparation for 4.0, existing assertions should be replaced. So for example:
 
 ```java
 ...
