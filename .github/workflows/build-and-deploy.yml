@@ -1,4 +1,4 @@
-name: Build with Maven and deploy to Sonatype OSS repo
+name: Build and deploy to Sonatype OSS repo
 
 on:
   push:

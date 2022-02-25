@@ -179,7 +179,7 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
      */
     public LogAsserter.NothingElseLoggedAsserter assertLogged(LogExpectation logExpectation) {
         return new LogAsserter(capturingAppender, new LinkedList<>())
-                .assertLoggedInAnyOrder(logExpectation);
+                .assertLogged(logExpectation);
     }
 
     /**
@@ -190,14 +190,14 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
      *  logCapture.assertNothingMatchingLogged(info("hello world"));
      * }</pre>
      *
-     * @param logExpectation description of the not expected log message
-     * @param moreLogExpectations more log event matchers describing expectations
+     * @param logExpectations descriptions of log messages that should not occur
      *
      * @throws AssertionError if the expected log message has not been logged
+     * @throws IllegalArgumentException if no LogExpectation is provided
      */
-    public void assertNotLogged(LogExpectation logExpectation, LogExpectation... moreLogExpectations) {
+    public void assertNotLogged(LogExpectation... logExpectations) {
         new LogAsserter(capturingAppender, new LinkedList<>())
-                .assertNotLogged(logExpectation, moreLogExpectations);
+                .assertNotLogged(logExpectations);
     }
 
     /**
@@ -211,16 +211,16 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
      * ));
      * }</pre>
      *
-     * @param logExpectation description of an expected log message
-     * @param moreLogExpectations more descriptions of expected log messages
+     * @param logExpectations more descriptions of expected log messages
      *
      * @return asserter that can be used to check if anything else has been logged
      *
      * @throws AssertionError if any of the expected log message has not been logged or matching is imprecise (in case multiple expectations match the same message)
+     * @throws IllegalArgumentException if less than two LogExpectations are provided
      */
-    public LogAsserter.NothingElseLoggedAsserter assertLoggedInAnyOrder(LogExpectation logExpectation, LogExpectation... moreLogExpectations) {
+    public LogAsserter.NothingElseLoggedAsserter assertLoggedInAnyOrder(LogExpectation... logExpectations) {
         return new LogAsserter(capturingAppender, new LinkedList<>())
-                .assertLoggedInAnyOrder(logExpectation, moreLogExpectations);
+                .assertLoggedInAnyOrder(logExpectations);
     }
 
     /**
@@ -235,17 +235,16 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
      *     ));
      * }</pre>
      *
-     * @param logExpectation description of the first expected log message
-     * @param nextLogExpectation description of the second expected log message
-     * @param moreLogExpectations descriptions of further expected log messages, in order
+     * @param logExpectations descriptions of expected log messages, in order
      *
      * @return asserter that can be used to check if anything else has been logged
      *
      * @throws AssertionError if any of the expected log message has not been logged or have been logged in the wrong order
+     * @throws IllegalArgumentException if less than two LogExpectations are provided
      */
-    public LogAsserter.NothingElseLoggedAsserter assertLoggedInOrder(LogExpectation logExpectation, LogExpectation nextLogExpectation, LogExpectation... moreLogExpectations) {
+    public LogAsserter.NothingElseLoggedAsserter assertLoggedInOrder(LogExpectation... logExpectations) {
         return new LogAsserter(capturingAppender, new LinkedList<>())
-                .assertLoggedInOrder(logExpectation, nextLogExpectation, moreLogExpectations);
+                .assertLoggedInOrder(logExpectations);
     }
 
 
@@ -263,16 +262,18 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
      *     ));
      * }</pre>
      *
-     * @param logEventMatcher log event matcher describing expectations
-     * @param moreLogEventMatchers more log event matchers describing expectations
+     * @param logEventMatchers log event matchers describing expectations
      *
      * @return an asserter to assert log messages with the described additional expectations
+     *
+     * @throws IllegalArgumentException if no LogEventMatcher is provided
      */
-    public LogAsserter with(LogEventMatcher logEventMatcher, LogEventMatcher... moreLogEventMatchers) {
-        LinkedList<LogEventMatcher> logEventMatchers = new LinkedList<>();
-        logEventMatchers.add(logEventMatcher);
-        logEventMatchers.addAll(Arrays.asList(moreLogEventMatchers));
-        return new LogAsserter(capturingAppender, logEventMatchers);
+    public LogAsserter with(LogEventMatcher... logEventMatchers) {
+        if (logEventMatchers.length < 1) {
+            throw new IllegalArgumentException("with() needs at least one LogEventMatcher");
+        }
+
+        return new LogAsserter(capturingAppender, Arrays.asList(logEventMatchers));
     }
 
     /**

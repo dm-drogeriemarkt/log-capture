@@ -1,6 +1,7 @@
 package de.dm.infrastructure.logcapture;
 
 import ch.qos.logback.classic.Level;
+import lombok.ToString;
 
 import java.util.Arrays;
 import java.util.List;
@@ -9,8 +10,11 @@ import java.util.Optional;
 /**
  * class for describing an expected log message
  */
+@ToString(onlyExplicitlyIncluded = true)
 public final class LogExpectation {
+    @ToString.Include
     final Optional<Level> level;
+    @ToString.Include
     final Optional<String> regex;
     final List<LogEventMatcher> logEventMatchers;
 
