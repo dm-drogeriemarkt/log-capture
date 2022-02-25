@@ -336,7 +336,7 @@ Fixed a bug where multiline log messages (for example Messages that contain a st
 
 ### Updating from Version 3.2.x or lower to Version 3.3.x or higher
 
-Since the old API has been deprecated in 3.3.0 in preparation for 4.0, existing assertions should be replaced. So for example:
+Since the old API has been deprecated in 3.3.0 existing assertions should be replaced in preparation for 4.0. So for example:
 
 ```java
 ...
