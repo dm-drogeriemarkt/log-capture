@@ -13,7 +13,6 @@ import static de.dm.infrastructure.logcapture.ExpectedException.exception;
 import static de.dm.infrastructure.logcapture.ExpectedLoggerName.logger;
 import static de.dm.infrastructure.logcapture.ExpectedMarker.marker;
 import static de.dm.infrastructure.logcapture.ExpectedMdcEntry.mdc;
-import static de.dm.infrastructure.logcapture.ExpectedMdcEntry.withMdc;
 import static de.dm.infrastructure.logcapture.LogExpectation.any;
 import static de.dm.infrastructure.logcapture.LogExpectation.debug;
 import static de.dm.infrastructure.logcapture.LogExpectation.error;
@@ -504,7 +503,7 @@ class ReadableApiTest {
 
             logCapture.assertLogged(
                     info("hello",
-                            withMdc("key", mdcValue -> mdcValue.equals("value"))));
+                            mdc("key", mdcValue -> mdcValue.equals("value"))));
         }
 
         @Test
