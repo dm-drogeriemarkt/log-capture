@@ -49,6 +49,7 @@ logCapture.assertLoggedInOrder(
   * [Cucumber example](#cucumber-example)
     * [Cucumber feature file](#cucumber-feature-file)
 * [Changes](#changes)
+  * [3.4.1](#341)
   * [3.4.0](#340)
   * [3.3.0](#330)
   * [3.2.1](#321)
@@ -304,6 +305,10 @@ And with MDC logging context
 ```
 
 ## Changes
+
+### 3.4.1
+
+* Improved Javadoc for deprecated methods
 
 ### 3.4.0
 
