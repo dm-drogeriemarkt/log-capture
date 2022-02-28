@@ -139,7 +139,7 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
      * @return a LastCapturedLogEvent from which .thenLogged(...) can be called to assert if things have been logged in a specific order
      *
      * @throws AssertionError if the expected log message has not been logged
-     * @deprecated use the new assertion methods (withMdc(), withException(), assertLogged(), assertLoggedInOrder()) instead
+     * @deprecated use the new assertion methods from ({@link #assertLogged(LogExpectation)}) instead. Use {@link ExpectedMdcEntry#mdc(String, String)} for MDC assertions.
      */
     @Deprecated
     public LastCapturedLogEvent assertLogged(Level level, String regex, ExpectedMdcEntry... expectedMdcEntries) {
@@ -297,7 +297,7 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
          * @return another LastCapturedLogEvent - for obvious reasons
          *
          * @throws AssertionError if the expected log message has not been logged
-         * @deprecated use the new assertion methods (withMdc(), withException(), assertLogged(), assertLoggedInOrder()) instead
+         * @deprecated use the new assertion methods from ({@link #assertLoggedInOrder(LogExpectation...)} (LogExpectation)}) instead. Use {@link ExpectedMdcEntry#mdc(String, String)} for MDC assertions.
          */
         @Deprecated
         public LastCapturedLogEvent thenLogged(Level level, String regex, ExpectedMdcEntry... expectedMdcEntries) {
@@ -308,7 +308,7 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
          * assert that nothing else has been logged except for the asserted log messages
          *
          * @throws AssertionError if something else has been logged
-         * @deprecated use the new assertion methods (withMdc(), withException(), assertLogged(), assertLoggedInOrder()) instead
+         * @deprecated use the new log assertions with {@link LogAsserter.NothingElseLoggedAsserter#assertNothingElseLogged()} instead
          */
         @Deprecated
         public void assertNothingElseLogged() {
@@ -334,7 +334,7 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
      *
      * @return FluentLogAssertion to assert the messages with MDC
      *
-     * @deprecated use the new assertion methods (withMdc(), withException(), assertLogged(), assertLoggedInOrder()) instead
+     * @deprecated use {@link #with(LogEventMatcher...)} before ({@link #assertLoggedInOrder(LogExpectation...)} or {@link #assertLoggedInAnyOrder(LogExpectation...)} instead
      */
     @Deprecated
     public FluentLogAssertion withMdcForAll(String key, String regex) {
@@ -353,7 +353,7 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
      *
      * @return FluentLogAssertion to assert an error message
      *
-     * @deprecated use the new assertion methods (withMdc(), withException(), assertLogged(), assertLoggedInOrder()) instead
+     * @deprecated use {@link LogExpectation#error(LogEventMatcher...)} instead
      */
     @Deprecated
     public FluentLogAssertion.ConfiguredLogAssertion error() {
@@ -372,7 +372,7 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
      *
      * @return FluentLogAssertion to assert an warn message
      *
-     * @deprecated use the new assertion methods (withMdc(), withException(), assertLogged(), assertLoggedInOrder()) instead
+     * @deprecated use {@link LogExpectation#warn(LogEventMatcher...)} instead
      */
     @Deprecated
     public FluentLogAssertion.ConfiguredLogAssertion warn() {
@@ -391,7 +391,7 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
      *
      * @return FluentLogAssertion to assert an info message
      *
-     * @deprecated use the new assertion methods (withMdc(), withException(), assertLogged(), assertLoggedInOrder()) instead
+     * @deprecated use {@link LogExpectation#info(LogEventMatcher...)} instead
      */
     @Deprecated
     public FluentLogAssertion.ConfiguredLogAssertion info() {
@@ -410,7 +410,7 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
      *
      * @return FluentLogAssertion to assert an debug message
      *
-     * @deprecated use the new assertion methods (withMdc(), withException(), assertLogged(), assertLoggedInOrder()) instead
+     * @deprecated use {@link LogExpectation#debug(LogEventMatcher...)} instead
      */
     @Deprecated
     public FluentLogAssertion.ConfiguredLogAssertion debug() {
@@ -429,7 +429,7 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
      *
      * @return FluentLogAssertion to assert an trace message
      *
-     * @deprecated use the new assertion methods (withMdc(), withException(), assertLogged(), assertLoggedInOrder()) instead
+     * @deprecated use {@link LogExpectation#trace(LogEventMatcher...)} instead
      */
     @Deprecated
     public FluentLogAssertion.ConfiguredLogAssertion trace() {

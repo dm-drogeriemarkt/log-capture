@@ -81,6 +81,10 @@ The default matchers can match level and/or message. But there are additional ma
 #### MDC content
 
 ```java
+import static de.dm.infrastructure.logcapture.ExpectedMdcEntry.mdc;
+
+...
+
 MDC.put("key", "value");
 log.info("did something");
 
@@ -90,6 +94,10 @@ logCapture.info("did something", mdc("key", "value"));`
 #### Exceptions
 
 ```java
+import static de.dm.infrastructure.logcapture.ExpectedException.exception;
+
+...
+
 log.warn("oh no!",
     new IllegalArgumentException("shame on you!",
         new NullPointerException("never use null")));
@@ -109,6 +117,10 @@ logCapture.assertLogged(
 #### Markers
 
 ```java
+import static de.dm.infrastructure.logcapture.ExpectedMarker.marker;
+
+...
+
 log.info(MarkerFactory.getMarker("my-marker"), "hello with marker");
 
 logCapture.info("hello with marker", marker("my-marker"));
@@ -117,6 +129,10 @@ logCapture.info("hello with marker", marker("my-marker"));
 #### Logger name
 
 ```java
+import static de.dm.infrastructure.logcapture.ExpectedLoggerName.logger;
+
+...
+
 log.info("did something");
 
 logCapture.info("did something", logger("com.acme.foo"));
