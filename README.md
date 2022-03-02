@@ -70,7 +70,7 @@ Add log-capture as a test dependency to your project. If you use Maven, add this
 <dependency>
     <groupId>de.dm.infrastructure</groupId>
     <artifactId>log-capture</artifactId>
-    <version>3.4.0</version>
+    <version>3.4.1</version>
     <scope>test</scope>
 </dependency>
 ```
