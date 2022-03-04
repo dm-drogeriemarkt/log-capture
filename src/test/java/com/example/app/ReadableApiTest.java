@@ -332,7 +332,7 @@ class ReadableApiTest {
             log.info("hello on this logger");
 
             logCapture.assertNotLogged(
-                    info("ello on this logger",
+                    info("hello on this logger",
                             logger("wrongLogger")));
 
             final AssertionError assertionError = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(
