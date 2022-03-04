@@ -21,6 +21,7 @@ class LoggedEvent {
     private final Optional<LoggedException> loggedException;
     private final String loggerName;
     private final Marker marker;
+    private final Object[] argumentArray;
 
     @AllArgsConstructor(access = PRIVATE)
     @Builder
