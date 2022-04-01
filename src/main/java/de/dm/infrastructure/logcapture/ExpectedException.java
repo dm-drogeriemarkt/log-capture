@@ -51,8 +51,8 @@ public final class ExpectedException implements LogEventMatcher {
     }
 
     @Override
-    public String getMatchingErrorMessage() {
-        return format("not expected exception was found: %s", this);
+    public String getMatcherDetailDescription() {
+        return format("Exception: %s", this);
     }
 
     private static String loggedExceptionToString(Optional<LoggedEvent.LoggedException> optionalException) {
@@ -70,7 +70,7 @@ public final class ExpectedException implements LogEventMatcher {
     }
 
     @Override
-    public String getMatcherDescription() {
+    public String getMatcherTypeDescription() {
         return "Exception";
     }
 

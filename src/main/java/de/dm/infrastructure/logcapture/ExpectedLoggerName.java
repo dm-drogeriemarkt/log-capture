@@ -30,13 +30,13 @@ public final class ExpectedLoggerName implements LogEventMatcher {
     }
 
     @Override
-    public String getMatcherDescription() {
+    public String getMatcherTypeDescription() {
         return "logger name";
     }
 
     @Override
-    public String getMatchingErrorMessage() {
-        return format("not expected logger name (regex) was found: \"%s\"", inputRegex);
+    public String getMatcherDetailDescription() {
+        return format("logger name (regex): \"%s\"", inputRegex);
     }
 
     /**

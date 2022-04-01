@@ -29,13 +29,13 @@ public final class ExpectedMarker implements LogEventMatcher {
     }
 
     @Override
-    public String getMatcherDescription() {
+    public String getMatcherTypeDescription() {
         return "marker name";
     }
 
     @Override
-    public String getMatchingErrorMessage() {
-        return format("not expected marker name: \"%s\" was found", expectedName);
+    public String getMatcherDetailDescription() {
+        return format("marker name: \"%s\"", expectedName);
     }
 
     /**

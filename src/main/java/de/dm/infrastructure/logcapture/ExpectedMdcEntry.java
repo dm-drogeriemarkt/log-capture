@@ -70,14 +70,13 @@ public final class ExpectedMdcEntry implements LogEventMatcher {
     }
 
     @Override
-    public String getMatcherDescription() {
+    public String getMatcherTypeDescription() {
         return "MDC value";
     }
 
     @Override
-    public String getMatchingErrorMessage() {
-
-        return format("not expected MDCValue with key was found: \"%s\"", key);
+    public String getMatcherDetailDescription() {
+        return format("MDCValue with key: \"%s\"", key);
     }
 
     /**

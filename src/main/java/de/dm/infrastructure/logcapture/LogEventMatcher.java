@@ -27,14 +27,14 @@ public interface LogEventMatcher {
      *
      * @return matched aspect
      */
-    String getMatcherDescription();
+    String getMatcherTypeDescription();
 
     /**
-     * returns an error message describing why a logged event does match, even of it shouldn't.
+     * returns an error message describing the concrete matcher, including as much of its expectations as possible
      *
      * @return matched aspect
      */
-    String getMatchingErrorMessage();
+    String getMatcherDetailDescription();
 
 
 }
