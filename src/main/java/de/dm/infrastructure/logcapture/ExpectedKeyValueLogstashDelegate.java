@@ -15,13 +15,13 @@ final class ExpectedKeyValueLogstashDelegate {
     private ExpectedKeyValueLogstashDelegate() {
     }
 
-    static boolean matches(LoggedEvent loggedEvent, String expectedKey, Object expectedValue) {
+    static boolean matches(LoggedEvent loggedEvent, String expectedKey, String expectedValue) {
         return Arrays.stream(loggedEvent.getArgumentArray())
                 .flatMap(argument -> argument instanceof SingleFieldAppendingMarker ? Stream.of((SingleFieldAppendingMarker) argument) : Stream.empty())
-                .anyMatch(marker -> marker.getFieldValue().equals(expectedValue) && marker.getFieldName().equals(expectedKey));
+                .anyMatch(marker -> expectedValue.equals(marker.getFieldValue()) && marker.getFieldName().equals(expectedKey));
     }
 
-    static String getNonMatchingErrorMessage(LoggedEvent loggedEvent, String expectedKey, Object expectedValue) {
+    static String getNonMatchingErrorMessage(LoggedEvent loggedEvent, String expectedKey, String expectedValue) {
         String actualKeyValue = Arrays.stream(loggedEvent.getArgumentArray())
                 .flatMap(argument -> argument instanceof SingleFieldAppendingMarker ? Stream.of((SingleFieldAppendingMarker) argument) : Stream.empty())
                 .map(marker -> format("    key: \"%s\", value: \"%s\"", marker.getFieldName(), marker.getFieldValue()))
