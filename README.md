@@ -40,6 +40,7 @@ logCapture.assertLoggedInOrder(
     * [Exceptions](#exceptions)
     * [Markers](#markers)
     * [Logger name](#logger-name)
+    * [Key-Value (from Logstash)](#key-value-from-logstash)
   * [Examples](#examples)
     * [Unit Test Example:](#unit-test-example)
     * [Integration Test Example:](#integration-test-example)
@@ -49,6 +50,7 @@ logCapture.assertLoggedInOrder(
   * [Cucumber example](#cucumber-example)
     * [Cucumber feature file](#cucumber-feature-file)
 * [Changes](#changes)
+  * [3.5.0](#350)
   * [3.4.1](#341)
   * [3.4.0](#340)
   * [3.3.0](#330)
@@ -70,7 +72,7 @@ Add log-capture as a test dependency to your project. If you use Maven, add this
 <dependency>
     <groupId>de.dm.infrastructure</groupId>
     <artifactId>log-capture</artifactId>
-    <version>3.4.1</version>
+    <version>3.5.0</version>
     <scope>test</scope>
 </dependency>
 ```
