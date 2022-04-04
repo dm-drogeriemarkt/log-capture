@@ -139,6 +139,26 @@ log.info("did something");
 logCapture.info("did something", logger("com.acme.foo"));
 ```
 
+#### Key-Value (from Logstash)
+
+**Note that** this will only work if logstash-logback-encoder is in your classpath - log-capture does not depend on it, so you need to add it manually if you intend to use it.
+
+```java
+import static de.dm.infrastructure.logcapture.ExpectedKeyValue.keyValue;
+
+...
+
+log.info("hello",
+    StructuredArguments.keyValue("myString", "hello"),
+    StructuredArguments.keyValue("myNumber", 42)
+);
+
+logCapture.assertLogged(info("hello",
+    keyValue("myString", "hello"),
+    keyValue("myNumber", 42))
+);
+```
+
 ### Examples
 
 #### Unit Test Example:
@@ -305,6 +325,12 @@ And with MDC logging context
 ```
 
 ## Changes
+
+### 3.5.0
+
+* Added new Log Event Matcher: `ExpectedKeyValue.keyValue(...)` to assert `StructuredArguments.keyValue(...)` from Logstash
+* Improved readability for assertion errors when using `assertNotLogged(...)`
+* Updated dependencies
 
 ### 3.4.1
 

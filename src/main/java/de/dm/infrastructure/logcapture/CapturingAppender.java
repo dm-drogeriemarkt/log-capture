@@ -43,6 +43,7 @@ class CapturingAppender extends ContextAwareBase implements Appender<ILoggingEve
                             .mdcData(loggingEvent.getMDCPropertyMap())
                             .loggedException(getLoggedException(loggingEvent.getThrowableProxy()))
                             .marker(loggingEvent.getMarker())
+                            .argumentArray(loggingEvent.getArgumentArray())
                             .build());
         }
     }

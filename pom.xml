@@ -29,15 +29,17 @@
     </developers>
 
     <properties>
-        <project.version>3.4.1-SNAPSHOT</project.version>
+        <project.version>3.5.0-SNAPSHOT</project.version>
 
         <java.version>1.8</java.version>
-        <lombok.version>1.18.20</lombok.version>
-        <logback.version>1.2.5</logback.version>
-        <junit.version>5.7.2</junit.version>
+        <lombok.version>1.18.22</lombok.version>
+        <logback.version>1.2.11</logback.version>
+        <logstash-logback-encoder.version>7.0.1</logstash-logback-encoder.version>
+        <junit.version>5.8.2</junit.version>
         <encoding>UTF-8</encoding>
 
-        <assertj-core.version>3.20.1</assertj-core.version>
+        <archunit.version>0.23.1</archunit.version>
+        <assertj-core.version>3.22.0</assertj-core.version>
         <checkstyle.version>8.45.1</checkstyle.version>
         <jacoco.version>0.8.7</jacoco.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
@@ -47,16 +49,11 @@
         <maven-compiler-plugin.version>3.9.0</maven-compiler-plugin.version>
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <maven-gpg-plugin.version>3.0.1</maven-gpg-plugin.version>
+        <mockito.version>4.4.0</mockito.version>
         <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
@@ -72,10 +69,32 @@
             <artifactId>junit-jupiter-engine</artifactId>
             <version>${junit.version}</version>
         </dependency>
+
+        <!-- dependencies that are only needed for development of log-capture and are not needed or automatically downloaded when using it -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>${logstash-logback-encoder.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- test dependencies -->
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <version>${assertj-core.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.tngtech.archunit</groupId>
+            <artifactId>archunit-junit5</artifactId>
+            <version>${archunit.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
