@@ -29,7 +29,7 @@
     </developers>
 
     <properties>
-        <project.version>3.4.1-SNAPSHOT</project.version>
+        <project.version>3.5.0-SNAPSHOT</project.version>
 
         <java.version>1.8</java.version>
         <lombok.version>1.18.22</lombok.version>
