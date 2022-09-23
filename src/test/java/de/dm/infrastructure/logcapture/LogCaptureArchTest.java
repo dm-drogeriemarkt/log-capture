@@ -10,10 +10,12 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 @AnalyzeClasses(packagesOf = LogCapture.class, importOptions = DoNotIncludeTests.class)
 public class LogCaptureArchTest {
     @ArchTest
-    static ArchRule logstashIsOnlyUsedInDelegate = classes()
+    static ArchRule niceApiForExpectations = classes()
             .that()
-            .doNotHaveFullyQualifiedName(ExpectedKeyValueLogstashDelegate.class.getCanonicalName())
+            .haveSimpleNameStartingWith("Expected")
+            .and()
+            .haveSimpleNameNotStartingWith("ExpectedException")// because somehow ArchUnit has hiccups in this class, although it only has private constructors
             .should()
-            .onlyDependOnClassesThat()
-            .resideOutsideOfPackage("net.logstash.logback..");
+            .haveOnlyPrivateConstructors()
+            .because("log expectations should have easy-to-read builders instead of public constructors");
 }
