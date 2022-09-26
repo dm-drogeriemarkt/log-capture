@@ -7,11 +7,12 @@ import java.util.regex.Pattern;
 
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
+import static lombok.AccessLevel.PRIVATE;
 
 /**
  * define expected MDC entries with this
  */
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = PRIVATE)
 public final class ExpectedMdcEntry implements LogEventMatcher {
 
     private final String key;

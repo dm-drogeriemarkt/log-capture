@@ -40,7 +40,6 @@ logCapture.assertLoggedInOrder(
     * [Exceptions](#exceptions)
     * [Markers](#markers)
     * [Logger name](#logger-name)
-    * [Key-Value (from Logstash)](#key-value-from-logstash)
   * [Examples](#examples)
     * [Unit Test Example:](#unit-test-example)
     * [Integration Test Example:](#integration-test-example)
@@ -50,6 +49,7 @@ logCapture.assertLoggedInOrder(
   * [Cucumber example](#cucumber-example)
     * [Cucumber feature file](#cucumber-feature-file)
 * [Changes](#changes)
+  * [3.6.0](#360)
   * [3.5.0](#350)
   * [3.4.1](#341)
   * [3.4.0](#340)
@@ -139,26 +139,6 @@ import static de.dm.infrastructure.logcapture.ExpectedLoggerName.logger;
 log.info("did something");
 
 logCapture.info("did something", logger("com.acme.foo"));
-```
-
-#### Key-Value (from Logstash)
-
-**Note that** this will only work if logstash-logback-encoder is in your classpath - log-capture does not depend on it, so you need to add it manually if you intend to use it.
-
-```java
-import static de.dm.infrastructure.logcapture.ExpectedKeyValue.keyValue;
-
-...
-
-log.info("hello",
-    StructuredArguments.keyValue("myString", "hello"),
-    StructuredArguments.keyValue("myNumber", 42)
-);
-
-logCapture.assertLogged(info("hello",
-    keyValue("myString", "hello"),
-    keyValue("myNumber", 42))
-);
 ```
 
 ### Examples
@@ -327,6 +307,10 @@ And with MDC logging context
 ```
 
 ## Changes
+
+### 3.6.0
+
+* Removed ExpectedKeyValue again due to an [API change in Logstash without a workaround](https://github.com/logfellow/logstash-logback-encoder/issues/788)
 
 ### 3.5.0
 

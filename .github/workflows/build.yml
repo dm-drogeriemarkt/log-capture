@@ -9,5 +9,3 @@ jobs:
     with:
       COMMAND: >
         mvn --batch-mode -Dmaven.compiler.showDeprecation=true -Dmaven.compiler.showWarnings=true -Dproject.version=0.0.0-SNAPSHOT clean install
-        && cd project-without-logstash
-        && mvn --batch-mode -Dlog-capture.version=0.0.0-SNAPSHOT clean verify 

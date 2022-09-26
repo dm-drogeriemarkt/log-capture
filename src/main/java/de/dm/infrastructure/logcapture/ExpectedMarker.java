@@ -9,7 +9,7 @@ import static java.lang.System.lineSeparator;
 public final class ExpectedMarker implements LogEventMatcher {
     private final String expectedName;
 
-    ExpectedMarker(String expectedName) {
+    private ExpectedMarker(String expectedName) {
         this.expectedName = expectedName;
     }
 

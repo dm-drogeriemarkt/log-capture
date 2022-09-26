@@ -12,7 +12,7 @@ public final class ExpectedLoggerName implements LogEventMatcher {
     private final Pattern expectedName;
     private final String inputRegex;
 
-    ExpectedLoggerName(String loggerNameRegex) {
+    private ExpectedLoggerName(String loggerNameRegex) {
         inputRegex = loggerNameRegex;
         expectedName = Pattern.compile(".*" + loggerNameRegex + ".*");
     }
