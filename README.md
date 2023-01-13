@@ -91,7 +91,7 @@ import static de.dm.infrastructure.logcapture.ExpectedMdcEntry.mdc;
 MDC.put("key", "value");
 log.info("did something");
 
-logCapture.info("did something", mdc("key", "value"));`
+logCapture.assertLogged(info("did something", mdc("key", "value")));`
 ```
 
 #### Exceptions
@@ -126,7 +126,7 @@ import static de.dm.infrastructure.logcapture.ExpectedMarker.marker;
 
 log.info(MarkerFactory.getMarker("my-marker"), "hello with marker");
 
-logCapture.info("hello with marker", marker("my-marker"));
+logCapture.assertLogged(info("hello with marker", marker("my-marker")));
 ```
 
 #### Logger name
@@ -138,7 +138,7 @@ import static de.dm.infrastructure.logcapture.ExpectedLoggerName.logger;
 
 log.info("did something");
 
-logCapture.info("did something", logger("com.acme.foo"));
+logCapture.assertLogged(info("did something", logger("com.acme.foo")));
 ```
 
 ### Examples
