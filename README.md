@@ -14,7 +14,7 @@ var name="world";
 log.info("hello {}", name);
 log.warn("bye {}", name);
 
-logCapture.assertLogged(
+logCapture.assertLoggedInOrder(
     info("hello world"),
     warn("bye world")
 );
