@@ -49,6 +49,7 @@ logCapture.assertLoggedInOrder(
   * [Cucumber example](#cucumber-example)
     * [Cucumber feature file](#cucumber-feature-file)
 * [Changes](#changes)
+  * [3.6.1](#361)
   * [3.6.0](#360)
   * [3.5.0](#350)
   * [3.4.1](#341)
@@ -72,7 +73,7 @@ Add log-capture as a test dependency to your project. If you use Maven, add this
 <dependency>
     <groupId>de.dm.infrastructure</groupId>
     <artifactId>log-capture</artifactId>
-    <version>3.6.0</version>
+    <version>3.6.1</version>
     <scope>test</scope>
 </dependency>
 ```
@@ -307,6 +308,10 @@ And with MDC logging context
 ```
 
 ## Changes
+
+### 3.6.1
+
+* Fixed a misleading and wrong assertion message. The assertion itself was correct, but the message always said all matchers did not match when only a subset did not match.
 
 ### 3.6.0
 
