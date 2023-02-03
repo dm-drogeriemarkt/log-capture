@@ -443,12 +443,6 @@ class ReadableApiTest {
 
             assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected MDC value: Level: WARN, Regex: \"bye world\"" +
                     lineSeparator() + "  captured message: \"bye world\"" +
-                    lineSeparator() + "  expected MDC key: key" +
-                    lineSeparator() + "  expected MDC value: \".*value.*\"" +
-                    lineSeparator() + "  captured MDC values:" +
-                    lineSeparator() + "    key: \"value\"" +
-                    lineSeparator() + "Expected log message has occurred, but never with the expected MDC value: Level: WARN, Regex: \"bye world\"" +
-                    lineSeparator() + "  captured message: \"bye world\"" +
                     lineSeparator() + "  expected MDC key: another_key" +
                     lineSeparator() + "  expected MDC value: \".*another_value.*\"" +
                     lineSeparator() + "  captured MDC values:" +
@@ -684,5 +678,24 @@ class ReadableApiTest {
 
             assertThat(assertionError).hasMessage("There have been other log messages than the asserted ones.");
         }
+    }
+
+    @Test
+    void combinedLogExpectationsOnlyOutputMismatch() {
+        MDC.put("key", "a value");
+        log.error("some error", new RuntimeException("an exception that was logged"));
+        MDC.clear();
+
+        AssertionError assertionError = assertThrows(AssertionError.class, () ->
+                logCapture.assertLogged(
+                        error("some error",
+                                mdc("key", "a value"),
+                                exception().expectedMessageRegex("an exception that was not logged").build())
+                ));
+
+        assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected Exception: Level: ERROR, Regex: \"some error\"" +
+                lineSeparator() + "  expected exception: message (regex): \"an exception that was not logged\"" +
+                lineSeparator() + "  actual exception: message: \"an exception that was logged\", message: java.lang.RuntimeException" +
+                lineSeparator());
     }
 }

@@ -165,12 +165,6 @@ class FluentApiTest {
         assertThat(assertionError).hasMessage(
                 "Expected log message has occurred, but never with the expected MDC value: Level: WARN, Regex: \"bye world\"" +
                         lineSeparator() + "  captured message: \"bye world\"" +
-                        lineSeparator() + "  expected MDC key: key" +
-                        lineSeparator() + "  expected MDC value: \".*value.*\"" +
-                        lineSeparator() + "  captured MDC values:" +
-                        lineSeparator() + "    key: \"value\"" +
-                        lineSeparator() + "Expected log message has occurred, but never with the expected MDC value: Level: WARN, Regex: \"bye world\"" +
-                        lineSeparator() + "  captured message: \"bye world\"" +
                         lineSeparator() + "  expected MDC key: another_key" +
                         lineSeparator() + "  expected MDC value: \".*another_value.*\"" +
                         lineSeparator() + "  captured MDC values:" +

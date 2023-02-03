@@ -202,11 +202,13 @@ public class LogAsserter {
         StringBuilder assertionMessage = new StringBuilder();
 
         for (LogEventMatcher logEventMatcher : logEventMatchers) {
-            assertionMessage.append(format("Expected log message has occurred, but never with the expected %s: %s",
-                    logEventMatcher.getMatcherTypeDescription(), getDescriptionForExpectedMessage(level, regex)));
-            assertionMessage.append(lineSeparator());
-            assertionMessage.append(logEventMatcher.getNonMatchingErrorMessage(partiallyMatchingLoggedEvent));
-            assertionMessage.append(lineSeparator());
+            if (!logEventMatcher.matches(partiallyMatchingLoggedEvent)) {
+                assertionMessage.append(format("Expected log message has occurred, but never with the expected %s: %s",
+                        logEventMatcher.getMatcherTypeDescription(), getDescriptionForExpectedMessage(level, regex)));
+                assertionMessage.append(lineSeparator());
+                assertionMessage.append(logEventMatcher.getNonMatchingErrorMessage(partiallyMatchingLoggedEvent));
+                assertionMessage.append(lineSeparator());
+            }
         }
         throw new AssertionError(assertionMessage.toString());
     }
