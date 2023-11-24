@@ -160,7 +160,7 @@ class ReadableApiTest {
 
             assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected Exception: Level: WARN, Regex: \"oh no!\"" +
                     lineSeparator() + "  expected exception: message (regex): \"a message never used\" type: java.lang.RuntimeException" +
-                    lineSeparator() + "  actual exception: message: \"this is illegal\", message: java.lang.IllegalArgumentException, cause: (message: \"never be null!\", message: java.lang.NullPointerException)" +
+                    lineSeparator() + "  actual exception: message: \"this is illegal\", type: java.lang.IllegalArgumentException, cause: (message: \"never be null!\", type: java.lang.NullPointerException)" +
                     lineSeparator());
 
             AssertionError withoutExceptionAssertionError = assertThrows(AssertionError.class,
@@ -720,7 +720,7 @@ class ReadableApiTest {
 
         assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected Exception: Level: ERROR, Regex: \"some error\"" +
                 lineSeparator() + "  expected exception: message (regex): \"an exception that was not logged\"" +
-                lineSeparator() + "  actual exception: message: \"an exception that was logged\", message: java.lang.RuntimeException" +
+                lineSeparator() + "  actual exception: message: \"an exception that was logged\", type: java.lang.RuntimeException" +
                 lineSeparator());
     }
 

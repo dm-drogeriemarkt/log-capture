@@ -62,7 +62,7 @@ public final class ExpectedException implements LogEventMatcher {
 
         LoggedEvent.LoggedException loggedException = optionalException.get();
 
-        return format("message: \"%s\", message: %s%s",
+        return format("message: \"%s\", type: %s%s",
                 loggedException.getMessage(),
                 loggedException.getType(),
                 loggedException.getCause().isPresent() ? format(", cause: (%s)", loggedExceptionToString(loggedException.getCause())) : ""

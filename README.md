@@ -51,6 +51,7 @@ logCapture.assertLoggedInOrder(
     * [Cucumber feature file](#cucumber-feature-file)
 * [Changes](#changes)
   * [4.0.0](#400)
+  * [3.6.2](#362)
   * [3.6.1](#361)
   * [3.6.0](#360)
   * [3.5.0](#350)
@@ -329,6 +330,10 @@ And with MDC logging context
 * **breaking change:** all deprecated parts have been removed
 * added a new log event matcher [for key-value content](#key-value)
 * lots of dependency updates
+
+### 3.6.2
+
+* Fixed an assertion message concerning captured Exceptions.
 
 ### 3.6.1
 
