@@ -39,6 +39,7 @@ logCapture.assertLoggedInOrder(
     * [MDC content](#mdc-content)
     * [Exceptions](#exceptions)
     * [Markers](#markers)
+    * [Key-Value](#key-value)
     * [Logger name](#logger-name)
   * [Examples](#examples)
     * [Unit Test Example:](#unit-test-example)
@@ -49,6 +50,7 @@ logCapture.assertLoggedInOrder(
   * [Cucumber example](#cucumber-example)
     * [Cucumber feature file](#cucumber-feature-file)
 * [Changes](#changes)
+  * [4.0.0](#400)
   * [3.6.1](#361)
   * [3.6.0](#360)
   * [3.5.0](#350)
@@ -73,7 +75,7 @@ Add log-capture as a test dependency to your project. If you use Maven, add this
 <dependency>
     <groupId>de.dm.infrastructure</groupId>
     <artifactId>log-capture</artifactId>
-    <version>3.6.1</version>
+    <version>4.0.0</version>
     <scope>test</scope>
 </dependency>
 ```
@@ -128,6 +130,18 @@ import static de.dm.infrastructure.logcapture.ExpectedMarker.marker;
 log.info(MarkerFactory.getMarker("my-marker"), "hello with marker");
 
 logCapture.assertLogged(info("hello with marker", marker("my-marker")));
+```
+
+#### Key-Value
+
+```java
+import static de.dm.infrastructure.logcapture.ExpectedKeyValue.keyValue;
+
+...
+
+log.atInfo().setMessage("hello").addKeyValue("meaning", 42).log();
+
+logCapture.assertLogged(info("hello", keyValue("meaning", 42)))
 ```
 
 #### Logger name
@@ -308,6 +322,13 @@ And with MDC logging context
 ```
 
 ## Changes
+
+### 4.0.0
+
+* **breaking change:** log-capture now requires Java 17
+* **breaking change:** all deprecated parts have been removed
+* added a new log event matcher [for key-value content](#key-value)
+* lots of dependency updates
 
 ### 3.6.1
 
