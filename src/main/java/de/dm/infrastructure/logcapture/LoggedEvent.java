@@ -14,7 +14,7 @@ import static lombok.AccessLevel.PRIVATE;
 @AllArgsConstructor(access = PRIVATE)
 @Builder
 @Getter
-class LoggedEvent {
+public class LoggedEvent {
     private final Level level;
     private final String formattedMessage;
     private final Map<String, String> mdcData;
@@ -23,6 +23,7 @@ class LoggedEvent {
     private final Marker marker;
     private final Object[] argumentArray;
 
+    @SuppressWarnings("squid:S2166") // LoggedException is not an Exception, but the name is still appropriate
     @AllArgsConstructor(access = PRIVATE)
     @Builder
     @Getter

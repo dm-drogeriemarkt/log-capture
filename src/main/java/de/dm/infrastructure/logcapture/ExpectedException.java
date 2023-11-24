@@ -56,7 +56,7 @@ public final class ExpectedException implements LogEventMatcher {
     }
 
     private static String loggedExceptionToString(Optional<LoggedEvent.LoggedException> optionalException) {
-        if (!optionalException.isPresent()) {
+        if (optionalException.isEmpty()) {
             return "(null)";
         }
 
@@ -75,10 +75,10 @@ public final class ExpectedException implements LogEventMatcher {
     }
 
     private static boolean exceptionMatches(Optional<LoggedEvent.LoggedException> optionalActualException, Optional<ExpectedException> optionalExpectedException) {
-        if (!optionalActualException.isPresent() && optionalExpectedException.isPresent()) {
+        if (optionalActualException.isEmpty() && optionalExpectedException.isPresent()) {
             return false;
         }
-        if (!optionalExpectedException.isPresent()) {
+        if (optionalExpectedException.isEmpty()) {
             return true;
         }
 
@@ -91,12 +91,12 @@ public final class ExpectedException implements LogEventMatcher {
     }
 
     private static boolean expectedMessageMatches(LoggedEvent.LoggedException loggedException, ExpectedException expectedException) {
-        return !expectedException.expectedMessage.isPresent() ||
+        return expectedException.expectedMessage.isEmpty() ||
                 expectedException.expectedMessage.get().matcher(loggedException.getMessage()).matches();
     }
 
     private static boolean expectedTypeMatches(LoggedEvent.LoggedException loggedException, ExpectedException expectedException) {
-        if (!expectedException.expectedType.isPresent()) {
+        if (expectedException.expectedType.isEmpty()) {
             return true;
         }
         try {
@@ -117,7 +117,7 @@ public final class ExpectedException implements LogEventMatcher {
     }
 
     /**
-     * helper for building ExcpectedExceptions
+     * helper for building ExpectedExceptions
      */
     public static final class ExpectedExceptionBuilder {
         private String expectedMessageRegex;
@@ -130,7 +130,7 @@ public final class ExpectedException implements LogEventMatcher {
         /**
          * set an expected message that should be matched for an expected Exception
          *
-         * @param expectedMessageRegex regular expression mathing an exception's message. Will be padded with .*
+         * @param expectedMessageRegex regular expression matching an exception's message. Will be padded with .*
          *
          * @return the builder with the expected message set
          */
