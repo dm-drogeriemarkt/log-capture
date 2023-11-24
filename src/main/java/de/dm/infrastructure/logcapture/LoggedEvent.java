@@ -12,6 +12,9 @@ import java.util.Optional;
 
 import static lombok.AccessLevel.PRIVATE;
 
+/**
+ * represents a captured logged event
+ */
 @AllArgsConstructor(access = PRIVATE)
 @Builder
 @Getter
@@ -22,7 +25,6 @@ public class LoggedEvent {
     private final Optional<LoggedException> loggedException;
     private final String loggerName;
     private final List<Marker> markers;
-    private final Object[] argumentArray;
 
     @SuppressWarnings("squid:S2166") // LoggedException is not an Exception, but the name is still appropriate
     @AllArgsConstructor(access = PRIVATE)
