@@ -16,14 +16,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-@Getter
-@Setter
 class CapturingAppender extends ContextAwareBase implements Appender<ILoggingEvent> {
-
+    @Getter
     List<LoggedEvent> loggedEvents = new ArrayList<>();
     private final Set<String> capturedPackages;
 
+    @Getter
+    @Setter
     private String name;
+    @Getter
     private boolean started;
 
     CapturingAppender(LoggerContext loggerContext, Set<String> capturedPackages) {
@@ -42,7 +43,7 @@ class CapturingAppender extends ContextAwareBase implements Appender<ILoggingEve
                             .formattedMessage(loggingEvent.getFormattedMessage())
                             .mdcData(loggingEvent.getMDCPropertyMap())
                             .loggedException(getLoggedException(loggingEvent.getThrowableProxy()))
-                            .marker(loggingEvent.getMarker())
+                            .marker(loggingEvent.getMarker()) // TODO: this has been deprecated
                             .argumentArray(loggingEvent.getArgumentArray())
                             .build());
         }

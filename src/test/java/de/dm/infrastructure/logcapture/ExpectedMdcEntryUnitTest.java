@@ -6,13 +6,15 @@ import org.junit.jupiter.api.Test;
 import java.util.HashMap;
 import java.util.Map;
 
+import static de.dm.infrastructure.logcapture.ExpectedMdcEntry.mdc;
+
 class ExpectedMdcEntryUnitTest {
 
     private static final String TEST_KEY = "test_key";
 
     @Test
     void isContainedIn() {
-        ExpectedMdcEntry expectedMdcEntry = ExpectedMdcEntry.withMdc(TEST_KEY, "test value");
+        ExpectedMdcEntry expectedMdcEntry = mdc(TEST_KEY, "test value");
         Map<String, String> mdcContents = new HashMap<>();
         mdcContents.put(TEST_KEY, "this is a test value, cool!");
 
@@ -25,7 +27,7 @@ class ExpectedMdcEntryUnitTest {
 
     @Test
     void isNotContainedIn() {
-        ExpectedMdcEntry expectedMdcEntry = ExpectedMdcEntry.withMdc(TEST_KEY, "test value");
+        ExpectedMdcEntry expectedMdcEntry = mdc(TEST_KEY, "test value");
         Map<String, String> mdcContents = new HashMap<>();
         mdcContents.put(TEST_KEY, "this is a value, cool!");
         mdcContents.put("some_other_key", "this is a test value, cool!");
