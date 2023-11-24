@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import org.slf4j.Marker;
+import org.slf4j.event.KeyValuePair;
 
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,7 @@ public class LoggedEvent {
     private final Optional<LoggedException> loggedException;
     private final String loggerName;
     private final List<Marker> markers;
+    private final List<KeyValuePair> keyValuePairs;
 
     @SuppressWarnings("squid:S2166") // LoggedException is not an Exception, but the name is still appropriate
     @AllArgsConstructor(access = PRIVATE)
