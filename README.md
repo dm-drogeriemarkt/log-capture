@@ -49,6 +49,7 @@ logCapture.assertLoggedInOrder(
   * [Cucumber example](#cucumber-example)
     * [Cucumber feature file](#cucumber-feature-file)
 * [Changes](#changes)
+  * [3.6.2](#362)
   * [3.6.1](#361)
   * [3.6.0](#360)
   * [3.5.0](#350)
@@ -73,7 +74,7 @@ Add log-capture as a test dependency to your project. If you use Maven, add this
 <dependency>
     <groupId>de.dm.infrastructure</groupId>
     <artifactId>log-capture</artifactId>
-    <version>3.6.1</version>
+    <version>3.6.2</version>
     <scope>test</scope>
 </dependency>
 ```
@@ -308,6 +309,10 @@ And with MDC logging context
 ```
 
 ## Changes
+
+### 3.6.2
+
+* Fixed an assertion message concerning captured Exceptions.
 
 ### 3.6.1
 
