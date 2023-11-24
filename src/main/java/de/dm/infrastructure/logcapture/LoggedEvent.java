@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import org.slf4j.Marker;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -20,7 +21,7 @@ public class LoggedEvent {
     private final Map<String, String> mdcData;
     private final Optional<LoggedException> loggedException;
     private final String loggerName;
-    private final Marker marker;
+    private final List<Marker> markers;
     private final Object[] argumentArray;
 
     @SuppressWarnings("squid:S2166") // LoggedException is not an Exception, but the name is still appropriate

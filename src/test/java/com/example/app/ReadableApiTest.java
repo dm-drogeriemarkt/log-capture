@@ -208,7 +208,7 @@ class ReadableApiTest {
 
             assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected marker name: Level: INFO, Regex: \"hello with marker\"" +
                     lineSeparator() + "  expected marker name: \"expected\"" +
-                    lineSeparator() + "  actual marker names: \"unexpected\"" +
+                    lineSeparator() + "  actual marker names: \"[unexpected]\"" +
                     lineSeparator());
         }
 
@@ -229,7 +229,7 @@ class ReadableApiTest {
         }
 
         @Test
-        void markerFailsBecauseMultipleOtherMarkersArePresent() {
+        void markerFailsWhileNestedMarkersArePresent() {
             Marker marker = MarkerFactory.getMarker("unexpected_top");
             marker.add(MarkerFactory.getMarker("unexpected_nested"));
             log.info(marker, "hello with marker");
@@ -242,7 +242,27 @@ class ReadableApiTest {
 
             assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected marker name: Level: INFO, Regex: \"hello with marker\"" +
                     lineSeparator() + "  expected marker name: \"expected\"" +
-                    lineSeparator() + "  actual marker names: \"unexpected_top [ unexpected_nested ]\"" +
+                    lineSeparator() + "  actual marker names: \"[unexpected_top [ unexpected_nested ]]\"" +
+                    lineSeparator());
+        }
+
+        @Test
+        void markerFailsWhileMultipleMarkersArePresent() {
+            log.atInfo()
+                    .setMessage("hello with markers")
+                    .addMarker(MarkerFactory.getMarker("unexpected1"))
+                    .addMarker(MarkerFactory.getMarker("unexpected2"))
+                    .log();
+
+            AssertionError assertionError = assertThrows(AssertionError.class,
+                    () -> logCapture.assertLogged(
+                            info("hello with markers",
+                                    marker("expected"))
+                    ));
+
+            assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected marker name: Level: INFO, Regex: \"hello with markers\"" +
+                    lineSeparator() + "  expected marker name: \"expected\"" +
+                    lineSeparator() + "  actual marker names: \"[unexpected1, unexpected2]\"" +
                     lineSeparator());
         }
 
