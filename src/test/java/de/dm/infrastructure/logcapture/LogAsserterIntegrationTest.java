@@ -8,6 +8,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import static de.dm.infrastructure.logcapture.ExpectedMdcEntry.mdc;
+
 class LogAsserterIntegrationTest {
 
     @Test
@@ -15,8 +17,8 @@ class LogAsserterIntegrationTest {
         String testKey = "test_key";
         String otherKey = "test_key_2";
 
-        ExpectedMdcEntry expectedMdcEntry1 = ExpectedMdcEntry.withMdc(testKey, "test value");
-        ExpectedMdcEntry expectedMdcEntry2 = ExpectedMdcEntry.withMdc(otherKey, "good value");
+        ExpectedMdcEntry expectedMdcEntry1 = mdc(testKey, "test value");
+        ExpectedMdcEntry expectedMdcEntry2 = mdc(otherKey, "good value");
         List<ExpectedMdcEntry> expectedMdcEntries = new LinkedList<>();
 
         expectedMdcEntries.add(expectedMdcEntry1);

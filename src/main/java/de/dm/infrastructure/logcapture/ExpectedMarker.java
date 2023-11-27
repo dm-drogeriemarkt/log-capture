@@ -15,17 +15,16 @@ public final class ExpectedMarker implements LogEventMatcher {
 
     @Override
     public boolean matches(LoggedEvent loggedEvent) {
-        return loggedEvent.getMarker() != null &&
-                (loggedEvent.getMarker().getName().equals(expectedName) || loggedEvent.getMarker().contains(expectedName));
+        return loggedEvent.getMarkers() != null && loggedEvent.getMarkers().stream().anyMatch(marker -> marker.contains(expectedName));
     }
 
     @Override
     public String getNonMatchingErrorMessage(LoggedEvent loggedEvent) {
         String expected = format("  expected marker name: \"%s\"", expectedName) + lineSeparator();
-        if (loggedEvent.getMarker() == null) {
+        if (loggedEvent.getMarkers() == null) {
             return expected + "  but no marker was found";
         }
-        return expected + format("  actual marker names: \"%s\"", loggedEvent.getMarker());
+        return expected + format("  actual marker names: \"%s\"", loggedEvent.getMarkers());
     }
 
     @Override

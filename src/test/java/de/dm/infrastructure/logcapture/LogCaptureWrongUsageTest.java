@@ -2,7 +2,7 @@ package de.dm.infrastructure.logcapture;
 
 import org.junit.jupiter.api.Test;
 
-import static ch.qos.logback.classic.Level.INFO;
+import static de.dm.infrastructure.logcapture.LogExpectation.info;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class LogCaptureWrongUsageTest {
@@ -20,15 +20,10 @@ class LogCaptureWrongUsageTest {
         assertThrows(IllegalStateException.class, () -> logCapture.removeAppenderAndResetLogLevel());
     }
 
+    @SuppressWarnings("java:S5778") //this rule does not increase the clarity of this test
     @Test
     void assertionWithoutInitializationFails() {
-        assertThrows(IllegalStateException.class, () -> logCapture.assertLogged(INFO, "something"));
+        assertThrows(IllegalStateException.class, () -> logCapture.assertLogged(info("something")));
     }
 
-    @Test
-    void deprecatedAddAppenderDelegates() {
-        logCapture.addAppenderAndSetLogLevelToDebug();
-
-        assertThrows(IllegalStateException.class, () -> logCapture.addAppenderAndSetLogLevelToDebug());
-    }
 }

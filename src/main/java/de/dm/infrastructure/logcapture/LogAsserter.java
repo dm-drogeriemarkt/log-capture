@@ -233,7 +233,7 @@ public class LogAsserter {
     @SuppressWarnings("squid:S1192") // a constant for "Level: " is not helpful
     private static String getDescriptionForExpectedMessage(Optional<Level> level, Optional<String> regex) {
 
-        if (!level.isPresent() && !regex.isPresent()) {
+        if (level.isEmpty() && regex.isEmpty()) {
             return "<Any log message>";
         }
         if (level.isPresent() && regex.isPresent()) {
@@ -245,11 +245,11 @@ public class LogAsserter {
 
     private static String getDescriptionForUnwantedLogMessage(Optional<Level> level, Optional<String> regex, List<LogEventMatcher> matchers) {
         String matchersText = "";
-        if (!matchers.isEmpty()) {
+        if (matchers != null && !matchers.isEmpty()) {
             matchersText = ", with matchers:" + lineSeparator() + "  " + matchers.stream().map(LogEventMatcher::getMatcherDetailDescription)
                     .collect(Collectors.joining(lineSeparator() + "  "));
         }
-        if (!level.isPresent() && !regex.isPresent()) {
+        if (level.isEmpty() && regex.isEmpty()) {
             return "<Any log message>" + matchersText;
         }
         if (level.isPresent() && regex.isPresent()) {

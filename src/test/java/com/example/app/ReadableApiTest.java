@@ -9,7 +9,11 @@ import org.slf4j.MDC;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 
+import java.math.BigDecimal;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import static de.dm.infrastructure.logcapture.ExpectedException.exception;
+import static de.dm.infrastructure.logcapture.ExpectedKeyValue.keyValue;
 import static de.dm.infrastructure.logcapture.ExpectedLoggerName.logger;
 import static de.dm.infrastructure.logcapture.ExpectedMarker.marker;
 import static de.dm.infrastructure.logcapture.ExpectedMdcEntry.mdc;
@@ -21,6 +25,7 @@ import static de.dm.infrastructure.logcapture.LogExpectation.trace;
 import static de.dm.infrastructure.logcapture.LogExpectation.warn;
 import static java.lang.System.lineSeparator;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Slf4j
@@ -208,7 +213,7 @@ class ReadableApiTest {
 
             assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected marker name: Level: INFO, Regex: \"hello with marker\"" +
                     lineSeparator() + "  expected marker name: \"expected\"" +
-                    lineSeparator() + "  actual marker names: \"unexpected\"" +
+                    lineSeparator() + "  actual marker names: \"[unexpected]\"" +
                     lineSeparator());
         }
 
@@ -229,7 +234,7 @@ class ReadableApiTest {
         }
 
         @Test
-        void markerFailsBecauseMultipleOtherMarkersArePresent() {
+        void markerFailsWhileNestedMarkersArePresent() {
             Marker marker = MarkerFactory.getMarker("unexpected_top");
             marker.add(MarkerFactory.getMarker("unexpected_nested"));
             log.info(marker, "hello with marker");
@@ -242,7 +247,27 @@ class ReadableApiTest {
 
             assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected marker name: Level: INFO, Regex: \"hello with marker\"" +
                     lineSeparator() + "  expected marker name: \"expected\"" +
-                    lineSeparator() + "  actual marker names: \"unexpected_top [ unexpected_nested ]\"" +
+                    lineSeparator() + "  actual marker names: \"[unexpected_top [ unexpected_nested ]]\"" +
+                    lineSeparator());
+        }
+
+        @Test
+        void markerFailsWhileMultipleMarkersArePresent() {
+            log.atInfo()
+                    .setMessage("hello with markers")
+                    .addMarker(MarkerFactory.getMarker("unexpected1"))
+                    .addMarker(MarkerFactory.getMarker("unexpected2"))
+                    .log();
+
+            AssertionError assertionError = assertThrows(AssertionError.class,
+                    () -> logCapture.assertLogged(
+                            info("hello with markers",
+                                    marker("expected"))
+                    ));
+
+            assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected marker name: Level: INFO, Regex: \"hello with markers\"" +
+                    lineSeparator() + "  expected marker name: \"expected\"" +
+                    lineSeparator() + "  actual marker names: \"[unexpected1, unexpected2]\"" +
                     lineSeparator());
         }
 
@@ -697,5 +722,138 @@ class ReadableApiTest {
                 lineSeparator() + "  expected exception: message (regex): \"an exception that was not logged\"" +
                 lineSeparator() + "  actual exception: message: \"an exception that was logged\", type: java.lang.RuntimeException" +
                 lineSeparator());
+    }
+
+    @Nested
+    class ExpectedKeyValues {
+        @Test
+        void failsWithDetailsNotMatchingExistingKeyValues() {
+            log.atInfo().setMessage("hello")
+                    .addKeyValue("key1", 1)
+                    .addKeyValue("key2", "value2")
+                    .log();
+
+            var assertionError = assertThrows(AssertionError.class, () ->
+                    logCapture.assertLogged(info("hello", keyValue("key", "a value")))
+            );
+            assertThat(assertionError).hasMessage("""
+                    Expected log message has occurred, but never with the expected key-value pair: Level: INFO, Regex: "hello"
+                      expected key-value pair (key, a value)
+                      actual pairs: [(key1, 1), (key2, value2)]
+                    """);
+        }
+
+        @Test
+        void failsWithDetailsWithNoExistingKeyValues() {
+            log.atInfo().setMessage("hello")
+                    .log();
+
+            var assertionError = assertThrows(AssertionError.class, () ->
+                    logCapture.assertLogged(info("hello", keyValue("key", "a value")))
+            );
+            assertThat(assertionError).hasMessage("""
+                    Expected log message has occurred, but never with the expected key-value pair: Level: INFO, Regex: "hello"
+                      expected key-value pair (key, a value)
+                      actual pairs: []
+                    """);
+        }
+
+        @Test
+        void requiresKey() {
+            var assertionError = assertThrows(IllegalArgumentException.class, () ->
+                    logCapture.assertLogged(info("hello", keyValue(null, "a value")))
+            );
+            assertThat(assertionError).hasMessage("key and value are required for key-value log assertion");
+        }
+
+        @Test
+        void requiresValue() {
+            var assertionError = assertThrows(IllegalArgumentException.class, () ->
+                    logCapture.assertLogged(info("hello", keyValue("a_key", null)))
+            );
+            assertThat(assertionError).hasMessage("key and value are required for key-value log assertion");
+        }
+
+        @Test
+        void succeedsWithString() {
+            log.atInfo().setMessage("hello")
+                    .addKeyValue("name", "Frederick")
+                    .log();
+
+            assertDoesNotThrow(() ->
+                    logCapture.assertLogged(info("hello", keyValue("name", "Frederick")))
+            );
+        }
+
+        @Test
+        void succeedsWithLong() {
+            log.atInfo().setMessage("hello")
+                    .addKeyValue("meaning", 42L)
+                    .log();
+
+            assertDoesNotThrow(() ->
+                    logCapture.assertLogged(info("hello", keyValue("meaning", 42L)))
+            );
+        }
+
+        @Test
+        void succeedsWithLongAndInt() {
+            log.atInfo().setMessage("hello")
+                    .addKeyValue("meaning", 42)
+                    .log();
+
+            assertDoesNotThrow(() ->
+                    logCapture.assertLogged(info("hello", keyValue("meaning", 42L)))
+            );
+        }
+
+        @Test
+        void succeedsWithIntAndLong() {
+            log.atInfo().setMessage("hello")
+                    .addKeyValue("meaning", 42L)
+                    .log();
+
+            assertDoesNotThrow(() ->
+                    logCapture.assertLogged(info("hello", keyValue("meaning", 42)))
+            );
+        }
+
+        @Test
+        void succeedsWithIntAndAtomicInt() {
+            log.atInfo().setMessage("hello")
+                    .addKeyValue("meaning", new AtomicInteger(42))
+                    .log();
+
+            assertDoesNotThrow(() ->
+                    logCapture.assertLogged(info("hello", keyValue("meaning", 42)))
+            );
+        }
+
+        @Test
+        void failsWithBigDecimalAndPrecisionAndInt() {
+            log.atInfo().setMessage("hello")
+                    .addKeyValue("meaning", new BigDecimal("42.00"))
+                    .log();
+
+            var assertionError = assertThrows(AssertionError.class, () ->
+                    logCapture.assertLogged(info("hello", keyValue("meaning", 42)))
+            );
+            assertThat(assertionError).hasMessage("""
+                    Expected log message has occurred, but never with the expected key-value pair: Level: INFO, Regex: "hello"
+                      expected key-value pair (meaning, 42)
+                      actual pairs: [(meaning, 42.00)]
+                    """);
+        }
+
+        @Test
+        void succeedsWithBigDecimalAndInt() {
+            log.atInfo().setMessage("hello")
+                    .addKeyValue("meaning", new BigDecimal("42"))
+                    .log();
+
+            assertDoesNotThrow(() ->
+                    logCapture.assertLogged(info("hello", keyValue("meaning", 42)))
+            );
+        }
     }
 }

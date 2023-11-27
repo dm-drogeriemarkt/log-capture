@@ -29,27 +29,26 @@
     </developers>
 
     <properties>
-        <project.version>3.6.2-SNAPSHOT</project.version>
+        <project.version>4.0.0-SNAPSHOT</project.version>
 
-        <java.version>1.8</java.version>
-        <lombok.version>1.18.22</lombok.version>
-        <logback.version>1.2.11</logback.version>
-        <junit.version>5.8.2</junit.version>
+        <java.version>17</java.version>
+        <lombok.version>1.18.30</lombok.version>
+        <logback.version>1.4.11</logback.version>
+        <junit.version>5.10.1</junit.version>
         <encoding>UTF-8</encoding>
 
-        <archunit.version>0.23.1</archunit.version>
-        <assertj-core.version>3.22.0</assertj-core.version>
-        <checkstyle.version>8.45.1</checkstyle.version>
-        <jacoco.version>0.8.7</jacoco.version>
-        <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
-        <maven-checkstyle-plugin.version>3.1.1</maven-checkstyle-plugin.version>
-        <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
-        <maven-javadoc-plugin.version>3.3.1</maven-javadoc-plugin.version>
-        <maven-compiler-plugin.version>3.9.0</maven-compiler-plugin.version>
-        <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
-        <maven-gpg-plugin.version>3.0.1</maven-gpg-plugin.version>
-        <mockito.version>4.4.0</mockito.version>
-        <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
+        <archunit.version>1.2.0</archunit.version>
+        <assertj-core.version>3.24.2</assertj-core.version>
+        <checkstyle.version>10.12.5</checkstyle.version>
+        <jacoco.version>0.8.11</jacoco.version>
+        <maven-surefire-plugin.version>3.2.2</maven-surefire-plugin.version>
+        <maven-checkstyle-plugin.version>3.3.1</maven-checkstyle-plugin.version>
+        <maven-source-plugin.version>3.3.0</maven-source-plugin.version>
+        <maven-javadoc-plugin.version>3.6.2</maven-javadoc-plugin.version>
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+        <maven-gpg-plugin.version>3.1.0</maven-gpg-plugin.version>
+        <mockito.version>5.7.0</mockito.version>
+        <nexus-staging-maven-plugin.version>1.6.13</nexus-staging-maven-plugin.version>
     </properties>
 
     <dependencies>
@@ -90,6 +89,12 @@
             <version>${archunit.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -104,14 +109,6 @@
                     <encoding>${encoding}</encoding>
                     <showDeprecation>true</showDeprecation>
                     <showWarnings>true</showWarnings>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>${maven-release-plugin.version}</version>
-                <configuration>
-                    <tagNameFormat>v@{project.version}-${project.artifactId}</tagNameFormat>
                 </configuration>
             </plugin>
             <plugin>
