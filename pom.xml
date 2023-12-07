@@ -33,7 +33,7 @@
 
         <java.version>17</java.version>
         <lombok.version>1.18.30</lombok.version>
-        <logback.version>1.4.12</logback.version>
+        <logback.version>1.4.14</logback.version>
         <junit.version>5.10.1</junit.version>
         <encoding>UTF-8</encoding>
 
