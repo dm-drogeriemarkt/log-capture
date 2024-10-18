@@ -7,7 +7,8 @@
 
 Simple assertions for log messages. See [Examples](#examples).
 
-**Note that** log-capture asserts evaluated log statements. That means it depends on a logging implementation (*logback*), but works with any logging facade (*slf4j* and others)
+> [!NOTE]
+> log-capture asserts evaluated log statements. That means it depends on a logging implementation (*logback*), but works with any logging facade (*slf4j* and others)
 
 ```java
 var name="world";
