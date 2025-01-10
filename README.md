@@ -51,6 +51,7 @@ logCapture.assertLoggedInOrder(
   * [Cucumber example](#cucumber-example)
     * [Cucumber feature file](#cucumber-feature-file)
 * [Changes](#changes)
+  * [4.0.1](#401)
   * [4.0.0](#400)
   * [3.6.2](#362)
   * [3.6.1](#361)
@@ -77,7 +78,7 @@ Add log-capture as a test dependency to your project. If you use Maven, add this
 <dependency>
     <groupId>de.dm.infrastructure</groupId>
     <artifactId>log-capture</artifactId>
-    <version>4.0.0</version>
+    <version>4.0.1</version>
     <scope>test</scope>
 </dependency>
 ```
@@ -324,6 +325,10 @@ And with MDC logging context
 ```
 
 ## Changes
+
+### 4.0.1
+
+* dependencies updated due to logback vulnerability
 
 ### 4.0.0
 
