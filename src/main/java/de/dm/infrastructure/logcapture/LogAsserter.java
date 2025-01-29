@@ -76,6 +76,7 @@ public class LogAsserter {
      * assert a message has been logged the given times
      *
      * @param logExpectation descriptions of expected log message
+     * @param times number of times the message should have been logged
      *
      * @return asserter that can be used to check if anything else has been logged
      *
