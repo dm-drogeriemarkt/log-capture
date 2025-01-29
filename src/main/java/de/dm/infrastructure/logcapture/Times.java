@@ -36,15 +36,23 @@ public class Times {
      * @param times number of times to be asserted
      *
      * @return Times object which asserts with exactly the given times
-     *
-     * @throws IllegalArgumentException if times is less than 2 (use atLeast, atMost or remove times as argument)
      */
     public static Times times(int times) {
 
         if (times < 2) {
-            throw new IllegalArgumentException("Times must be greater than 1. If you want to test a single log entry, remove times as argument.");
+            throw new IllegalArgumentException("Times must be greater than 1.\nIf you want to test a single log entry use once() instead.\nIf you want to test no entry at all, use assertNotLogged() instead.");
         }
         return new Times(times, EQUAL);
+    }
+
+    /**
+     * Asserts that the log entry is logged exactly once.
+     *
+     * @return Times object which asserts with exactly once
+     */
+    public static Times once() {
+
+        return new Times(1, EQUAL);
     }
 
     /**
@@ -68,6 +76,9 @@ public class Times {
      */
     public static Times atMost(int times) {
 
+        if (times < 1) {
+            throw new IllegalArgumentException("Times must be greater than 0.\nIf you want to test no entry at all, use assertNotLogged() instead.");
+        }
         return new Times(times, AT_MOST);
     }
 }

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import static de.dm.infrastructure.logcapture.LogExpectation.info;
 import static de.dm.infrastructure.logcapture.Times.atLeast;
 import static de.dm.infrastructure.logcapture.Times.atMost;
+import static de.dm.infrastructure.logcapture.Times.once;
 import static de.dm.infrastructure.logcapture.Times.times;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -40,6 +41,40 @@ class AssertedTimesUnitTest {
         log.info("hello world");
 
         assertThrows(AssertionError.class, () -> logCapture.assertLogged(info("hello world"), times(3)));
+    }
+
+    @Test
+    void times_lowerThan2_throwsIllegalArgumentException() {
+
+        assertThrows(IllegalArgumentException.class, () -> times(1));
+        assertThrows(IllegalArgumentException.class, () -> times(0));
+    }
+
+    @Test
+    void atMost_lowerThan1_throwsIllegalArgumentException() {
+
+        assertThrows(IllegalArgumentException.class, () -> atMost(0));
+    }
+
+    @Test
+    void assertLoggedWithTimesOnce_succeeds() {
+        log.info("hello world");
+
+        assertDoesNotThrow(() -> logCapture.assertLogged(info("hello world"), once()));
+    }
+
+    @Test
+    void assertLoggedWithTimesOnce_loggedTooOften_assertionFails() {
+        log.info("hello world");
+        log.info("hello world");
+
+        assertThrows(AssertionError.class, () -> logCapture.assertLogged(info("hello world"), once()));
+    }
+
+    @Test
+    void assertLoggedWithTimesOnce_loggedTooLess_assertionFails() {
+
+        assertThrows(AssertionError.class, () -> logCapture.assertLogged(info("hello world"), once()));
     }
 
     @Test
