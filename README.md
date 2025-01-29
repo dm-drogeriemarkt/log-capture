@@ -160,7 +160,7 @@ log.info("did something");
 logCapture.assertLogged(info("did something", logger("com.acme.foo")));
 ```
 
-### Expect a specifiq ammount of times
+### Expect a specific amount of times
 
 It is possible to match a LogExpectation multiple times. This can be done by using the `Times` class.
 
