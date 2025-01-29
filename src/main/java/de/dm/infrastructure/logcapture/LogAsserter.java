@@ -2,7 +2,6 @@ package de.dm.infrastructure.logcapture;
 
 import ch.qos.logback.classic.Level;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -19,7 +18,6 @@ import static lombok.AccessLevel.PACKAGE;
 /**
  * class doing the actual assertions of log messages
  */
-@Slf4j
 @RequiredArgsConstructor(access = PACKAGE)
 public class LogAsserter {
     private final CapturingAppender capturingAppender;
