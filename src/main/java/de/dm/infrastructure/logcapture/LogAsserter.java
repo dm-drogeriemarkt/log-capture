@@ -2,6 +2,7 @@ package de.dm.infrastructure.logcapture;
 
 import ch.qos.logback.classic.Level;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -18,6 +19,7 @@ import static lombok.AccessLevel.PACKAGE;
 /**
  * class doing the actual assertions of log messages
  */
+@Slf4j
 @RequiredArgsConstructor(access = PACKAGE)
 public class LogAsserter {
     private final CapturingAppender capturingAppender;
@@ -72,6 +74,34 @@ public class LogAsserter {
         return new NothingElseLoggedAsserter(1);
     }
 
+    /**
+     * assert a message has been logged the given times
+     *
+     * @param logExpectation descriptions of expected log message
+     *
+     * @return asserter that can be used to check if anything else has been logged
+     *
+     * @throws AssertionError if the expected log message has not been logged
+     */
+    public NothingElseLoggedAsserter assertLogged(LogExpectation logExpectation, Times times) {
+
+        int matches = assertCapturedMultipleTimes(logExpectation.level, logExpectation.regex, logExpectation.logEventMatchers);
+
+        boolean failAssertion = switch (times.getOperator()) {
+            case EQUAL -> matches != times.getTimes();
+            case AT_LEAST -> matches < times.getTimes();
+            case AT_MOST -> matches > times.getTimes();
+        };
+        if (failAssertion) {
+            throw new AssertionError("""
+                    Log message has not occurred as expected:
+                        Message: %s
+                        Expected: %s
+                        Actual: %s
+                    """.formatted(logExpectation.regex, times, matches));
+        }
+        return new NothingElseLoggedAsserter(1);
+    }
 
     /**
      * assert that multiple log messages have been logged in an expected order
@@ -192,6 +222,19 @@ public class LogAsserter {
                 throw new AssertionError(format("Found a log message that should not be logged: %s", getDescriptionForUnwantedLogMessage(level, regex, logEventMatchers)));
             }
         }
+    }
+
+    private int assertCapturedMultipleTimes(Optional<Level> level, Optional<String> regex, List<LogEventMatcher> logEventMatchers) {
+        Pattern pattern = Pattern.compile(".*" + regex.orElse("") + ".*", Pattern.DOTALL + Pattern.MULTILINE);
+
+        int matches = 0;
+        for (int i = 0; i < capturingAppender.loggedEvents.size(); i++) {
+            LoggedEvent event = capturingAppender.loggedEvents.get(i);
+            if (eventMatchesWithoutAdditionalMatchers(event, level, pattern) && isMatchedByAll(event, logEventMatchers)) {
+                matches++;
+            }
+        }
+        return matches;
     }
 
     private boolean eventMatchesWithoutAdditionalMatchers(LoggedEvent event, Optional<Level> level, Pattern pattern) {

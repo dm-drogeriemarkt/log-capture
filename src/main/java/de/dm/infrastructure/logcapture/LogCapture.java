@@ -114,7 +114,7 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
         rootLogger.detachAppender(capturingAppender);
         resetLogLevel();
     }
-    
+
     /**
      * assert that a certain expected message has been logged.
      *
@@ -132,6 +132,11 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
     public LogAsserter.NothingElseLoggedAsserter assertLogged(LogExpectation logExpectation) {
         return new LogAsserter(capturingAppender, new LinkedList<>())
                 .assertLogged(logExpectation);
+    }
+
+    public LogAsserter.NothingElseLoggedAsserter assertLogged(LogExpectation logExpectation, Times times) {
+        return new LogAsserter(capturingAppender, new LinkedList<>())
+                .assertLogged(logExpectation, times);
     }
 
     /**
