@@ -92,11 +92,11 @@ public class LogAsserter {
         };
         if (failAssertion) {
             throw new AssertionError("""
-                    Log message has not occurred as expected:
+                    Log message has not occurred as often as expected:
                         Message: %s
                         Expected: %s
                         Actual: %s
-                    """.formatted(logExpectation.regex, times, matches));
+                    """.formatted(logExpectation.regex.get(), times, matches));
         }
         return new NothingElseLoggedAsserter(1);
     }
