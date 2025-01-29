@@ -79,7 +79,7 @@ public class LogAsserter {
      *
      * @return asserter that can be used to check if anything else has been logged
      *
-     * @throws AssertionError if the expected log message has not been logged
+     * @throws AssertionError if the expected log message has not been logged as often as expected
      */
     public NothingElseLoggedAsserter assertLogged(LogExpectation logExpectation, Times times) {
 
