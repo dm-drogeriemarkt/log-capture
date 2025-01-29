@@ -50,7 +50,8 @@ logCapture.assertLoggedInOrder(
 * [Usage outside of JUnit 5 (Cucumber example)](#usage-outside-of-junit-5-cucumber-example)
   * [Cucumber example](#cucumber-example)
     * [Cucumber feature file](#cucumber-feature-file)
-* [Changes](#changes)
+* [Changes](#changes) 
+  * [4.1.0](#410)
   * [4.0.1](#401)
   * [4.0.0](#400)
   * [3.6.2](#362)
@@ -78,7 +79,7 @@ Add log-capture as a test dependency to your project. If you use Maven, add this
 <dependency>
     <groupId>de.dm.infrastructure</groupId>
     <artifactId>log-capture</artifactId>
-    <version>4.0.1</version>
+    <version>4.1.0</version>
     <scope>test</scope>
 </dependency>
 ```
@@ -158,6 +159,30 @@ log.info("did something");
 
 logCapture.assertLogged(info("did something", logger("com.acme.foo")));
 ```
+
+### Expect a specifiq ammount of times
+
+It is possible to match a LogExpectation multiple times. This can be done by using the `Times` class.
+
+```java
+import static de.dm.infrastructure.logcapture.ExpectedLoggerName.logger;
+
+...
+
+log.info("did something");
+log.info("did something");
+
+logCapture.assertLogged(info("did something"), times(2));
+```
+
+There are also more options for checking the amount of times a log message is logged a little more or less specific.
+
+```java
+logCapture.assertLogged(info("did something"), atLeast(1)); // not important if more than once, but at least once
+logCapture.assertLogged(info("did something"), atMost(2)); // not important if less than e.g. twice, but at most twice
+logCapture.assertLogged(info("did something"), once()); // exactly once
+```
+   
 
 ### Examples
 
@@ -325,6 +350,10 @@ And with MDC logging context
 ```
 
 ## Changes
+
+### 4.1.0
+
+* added Times class which allows matching a LogExpectation multiple times
 
 ### 4.0.1
 

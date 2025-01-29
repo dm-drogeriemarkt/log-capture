@@ -140,7 +140,6 @@ public class LogAsserter {
             throw new IllegalArgumentException("at least one LogExpectation is required for assertNotLogged(). Found none");
         }
 
-
         for (LogExpectation assertion : logExpectations) {
             assertNotCaptured(assertion.level, assertion.regex, assertion.logEventMatchers);
         }
