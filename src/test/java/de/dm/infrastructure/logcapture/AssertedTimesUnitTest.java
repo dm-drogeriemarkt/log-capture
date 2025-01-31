@@ -37,6 +37,7 @@ class AssertedTimesUnitTest {
 
         var assertionError = assertThrows(AssertionError.class, () -> logCapture.assertLogged(times(2), info("hello world", mdc("foo", "bar"), ExpectedException.exception().expectedMessageRegex("noooo!").build())));
 
+        // TODO: assert all assertion messages in this test files
         assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected marker name: Level: INFO, Regex: \"hello without marker\"" +
                 lineSeparator() + "  expected marker name: \"expected\"" +
                 lineSeparator() + "  but no marker was found" +
