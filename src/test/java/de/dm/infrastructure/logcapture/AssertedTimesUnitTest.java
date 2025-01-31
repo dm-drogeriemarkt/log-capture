@@ -4,11 +4,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+import static de.dm.infrastructure.logcapture.ExpectedMdcEntry.mdc;
+import static de.dm.infrastructure.logcapture.ExpectedTimes.atLeast;
+import static de.dm.infrastructure.logcapture.ExpectedTimes.atMost;
+import static de.dm.infrastructure.logcapture.ExpectedTimes.once;
+import static de.dm.infrastructure.logcapture.ExpectedTimes.times;
 import static de.dm.infrastructure.logcapture.LogExpectation.info;
-import static de.dm.infrastructure.logcapture.Times.atLeast;
-import static de.dm.infrastructure.logcapture.Times.atMost;
-import static de.dm.infrastructure.logcapture.Times.once;
-import static de.dm.infrastructure.logcapture.Times.times;
+import static java.lang.System.lineSeparator;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -23,7 +26,7 @@ class AssertedTimesUnitTest {
         log.info("hello world");
         log.info("hello world");
 
-        assertDoesNotThrow(() -> logCapture.assertLogged(info("hello world"), times(3)));
+        assertDoesNotThrow(() -> logCapture.assertLogged(times(3), info("hello world")));
     }
 
     @Test
@@ -32,7 +35,12 @@ class AssertedTimesUnitTest {
         log.info("hello world");
         log.info("hello world");
 
-        assertThrows(AssertionError.class, () -> logCapture.assertLogged(info("hello world"), times(2)));
+        var assertionError = assertThrows(AssertionError.class, () -> logCapture.assertLogged(times(2), info("hello world", mdc("foo", "bar"), ExpectedException.exception().expectedMessageRegex("noooo!").build())));
+
+        assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected marker name: Level: INFO, Regex: \"hello without marker\"" +
+                lineSeparator() + "  expected marker name: \"expected\"" +
+                lineSeparator() + "  but no marker was found" +
+                lineSeparator());
     }
 
     @Test
@@ -40,7 +48,7 @@ class AssertedTimesUnitTest {
         log.info("hello world");
         log.info("hello world");
 
-        assertThrows(AssertionError.class, () -> logCapture.assertLogged(info("hello world"), times(3)));
+        assertThrows(AssertionError.class, () -> logCapture.assertLogged(times(3), info("hello world")));
     }
 
     @Test
@@ -60,7 +68,7 @@ class AssertedTimesUnitTest {
     void assertLoggedWithTimesOnce_succeeds() {
         log.info("hello world");
 
-        assertDoesNotThrow(() -> logCapture.assertLogged(info("hello world"), once()));
+        assertDoesNotThrow(() -> logCapture.assertLogged(once(), info("hello world")));
     }
 
     @Test
@@ -68,13 +76,13 @@ class AssertedTimesUnitTest {
         log.info("hello world");
         log.info("hello world");
 
-        assertThrows(AssertionError.class, () -> logCapture.assertLogged(info("hello world"), once()));
+        assertThrows(AssertionError.class, () -> logCapture.assertLogged(once(), info("hello world")));
     }
 
     @Test
     void assertLoggedWithTimesOnce_loggedTooLess_assertionFails() {
 
-        assertThrows(AssertionError.class, () -> logCapture.assertLogged(info("hello world"), once()));
+        assertThrows(AssertionError.class, () -> logCapture.assertLogged(once(), info("hello world")));
     }
 
     @Test
@@ -83,7 +91,7 @@ class AssertedTimesUnitTest {
         log.info("hello world");
         log.info("hello world");
 
-        assertDoesNotThrow(() -> logCapture.assertLogged(info("hello world"), atLeast(3)));
+        assertDoesNotThrow(() -> logCapture.assertLogged(atLeast(3), info("hello world")));
     }
 
     @Test
@@ -92,7 +100,7 @@ class AssertedTimesUnitTest {
         log.info("hello world");
         log.info("hello world");
 
-        assertDoesNotThrow(() -> logCapture.assertLogged(info("hello world"), atLeast(2)));
+        assertDoesNotThrow(() -> logCapture.assertLogged(atLeast(2), info("hello world")));
     }
 
     @Test
@@ -100,7 +108,7 @@ class AssertedTimesUnitTest {
         log.info("hello world");
         log.info("hello world");
 
-        assertThrows(AssertionError.class, () -> logCapture.assertLogged(info("hello world"), atLeast(3)));
+        assertThrows(AssertionError.class, () -> logCapture.assertLogged(atLeast(3), info("hello world")));
     }
 
     @Test
@@ -109,7 +117,7 @@ class AssertedTimesUnitTest {
         log.info("hello world");
         log.info("hello world");
 
-        assertDoesNotThrow(() -> logCapture.assertLogged(info("hello world"), atMost(3)));
+        assertDoesNotThrow(() -> logCapture.assertLogged(atMost(3), info("hello world")));
     }
 
     @Test
@@ -118,7 +126,7 @@ class AssertedTimesUnitTest {
         log.info("hello world");
         log.info("hello world");
 
-        assertThrows(AssertionError.class, () -> logCapture.assertLogged(info("hello world"), atMost(2)));
+        assertThrows(AssertionError.class, () -> logCapture.assertLogged(atMost(2), info("hello world")));
     }
 
     @Test
@@ -126,6 +134,6 @@ class AssertedTimesUnitTest {
         log.info("hello world");
         log.info("hello world");
 
-        assertDoesNotThrow(() -> logCapture.assertLogged(info("hello world"), atMost(3)));
+        assertDoesNotThrow(() -> logCapture.assertLogged(atMost(3), info("hello world")));
     }
 }

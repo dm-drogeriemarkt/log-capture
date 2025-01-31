@@ -49,8 +49,8 @@ public class LogAsserter {
                         "Imprecise matching: Two log expectations have matched the same message. " +
                                 "Use more precise matching or in-order matching. " +
                                 "(First match: %s | Second match: %s",
-                        getDescriptionForUnwantedLogMessage(previousMatch.level, previousMatch.regex, previousMatch.logEventMatchers),
-                        getDescriptionForUnwantedLogMessage(assertion.level, assertion.regex, assertion.logEventMatchers)));
+                        getDescriptionForExpectedMessageWithAdditionalMatchers(previousMatch.level, previousMatch.regex, previousMatch.logEventMatchers),
+                        getDescriptionForExpectedMessageWithAdditionalMatchers(assertion.level, assertion.regex, assertion.logEventMatchers)));
             }
             matches.put(lastCapturedLogEvent.lastAssertedLogMessageIndex, assertion);
         }
@@ -73,37 +73,45 @@ public class LogAsserter {
     }
 
     /**
-     * assert a message has been logged the given times
+     * assert a message has been logged as often as expected
      *
+     * @param expectedTimes definition of number of times the message should have been logged
      * @param logExpectation descriptions of expected log message
-     * @param times number of times the message should have been logged
      *
      * @return asserter that can be used to check if anything else has been logged
      *
      * @throws AssertionError if the expected log message has not been logged as often as expected
      */
-    public NothingElseLoggedAsserter assertLogged(LogExpectation logExpectation, Times times) {
+    public NothingElseLoggedAsserter assertLogged(ExpectedTimes expectedTimes, LogExpectation logExpectation) {
 
-        int matches = assertCapturedMultipleTimes(logExpectation.level, logExpectation.regex, logExpectation.logEventMatchers);
+        var matches = getNumberOfMatches(logExpectation.level, logExpectation.regex, logExpectation.logEventMatchers);
+        var comparisonStrategy = expectedTimes.getComparisonStrategy();
+        var referenceValue = expectedTimes.getReferenceValue();
 
-        boolean failAssertion = switch (times.getOperator()) {
-            case EQUAL -> matches != times.getTimes();
-            case AT_LEAST -> matches < times.getTimes();
-            case AT_MOST -> matches > times.getTimes();
+        boolean failAssertion = switch (comparisonStrategy) {
+            case EQUAL -> matches.completeMatches != referenceValue;
+            case AT_LEAST -> matches.completeMatches < referenceValue;
+            case AT_MOST -> matches.completeMatches > referenceValue;
         };
+
         if (failAssertion) {
+            var additionalMatchersHint = matches.matchesWithoutAdditionalMatchers == matches.completeMatches
+                    ? ""
+                    : "Occurrences without additional matchers: " + matches.matchesWithoutAdditionalMatchers + lineSeparator();
             throw new AssertionError("""
-                    Log message has not occurred as often as expected:
-                        Message: %s
-                        Expected: %s
-                        Actual: %s
-                    """.formatted(logExpectation.regex.get(), times, matches));
+                    Expected log message has not occurred %s %s time(s), but %s time(s)
+                    %s%s""".formatted(
+                    comparisonStrategy.strategyName,
+                    referenceValue,
+                    matches.completeMatches,
+                    additionalMatchersHint,
+                    getDescriptionForExpectedMessageWithAdditionalMatchers(logExpectation.level, logExpectation.regex, logExpectation.logEventMatchers)));
         }
         return new NothingElseLoggedAsserter(1);
     }
 
     /**
-     * assert that multiple log messages have been logged in an expected order
+     * assert that multiple log messages have been logged in the expected order
      *
      * @param logExpectations descriptions of expected log messages, in order
      *
@@ -212,27 +220,29 @@ public class LogAsserter {
     }
 
     void assertNotCaptured(Optional<Level> level, Optional<String> regex, List<LogEventMatcher> logEventMatchers) {
-        Pattern pattern = Pattern.compile(".*" + regex.orElse("") + ".*", Pattern.DOTALL + Pattern.MULTILINE);
-
-        for (int i = 0; i < capturingAppender.loggedEvents.size(); i++) {
-            LoggedEvent event = capturingAppender.loggedEvents.get(i);
-            if (eventMatchesWithoutAdditionalMatchers(event, level, pattern) && isMatchedByAll(event, logEventMatchers)) {
-                throw new AssertionError(format("Found a log message that should not be logged: %s", getDescriptionForUnwantedLogMessage(level, regex, logEventMatchers)));
-            }
+        if (getNumberOfMatches(level, regex, logEventMatchers).completeMatches > 0) {
+            throw new AssertionError(format("Found a log message that should not be logged: %s", getDescriptionForExpectedMessageWithAdditionalMatchers(level, regex, logEventMatchers)));
         }
     }
 
-    private int assertCapturedMultipleTimes(Optional<Level> level, Optional<String> regex, List<LogEventMatcher> logEventMatchers) {
+    private record Matches(int completeMatches, int matchesWithoutAdditionalMatchers) {}
+
+    private Matches getNumberOfMatches(Optional<Level> level, Optional<String> regex, List<LogEventMatcher> logEventMatchers) {
         Pattern pattern = Pattern.compile(".*" + regex.orElse("") + ".*", Pattern.DOTALL + Pattern.MULTILINE);
 
-        int matches = 0;
+        int completeMatches = 0;
+        int matchesWithoutAdditionalMatchers = 0;
+
         for (int i = 0; i < capturingAppender.loggedEvents.size(); i++) {
             LoggedEvent event = capturingAppender.loggedEvents.get(i);
-            if (eventMatchesWithoutAdditionalMatchers(event, level, pattern) && isMatchedByAll(event, logEventMatchers)) {
-                matches++;
+            if (eventMatchesWithoutAdditionalMatchers(event, level, pattern)) {
+                matchesWithoutAdditionalMatchers++;
+                if (isMatchedByAll(event, logEventMatchers)) {
+                    completeMatches++;
+                }
             }
         }
-        return matches;
+        return new Matches(completeMatches, matchesWithoutAdditionalMatchers);
     }
 
     private boolean eventMatchesWithoutAdditionalMatchers(LoggedEvent event, Optional<Level> level, Pattern pattern) {
@@ -278,26 +288,25 @@ public class LogAsserter {
             return "<Any log message>";
         }
         if (level.isPresent() && regex.isPresent()) {
-            return "Level: " + level.get() + ", Regex: \"" + regex.get() + "\"";
+            return "Expectation: " + lineSeparator() + "  " + level.get() + " - \"" + regex.get() + "\"";
         }
         return (level.map(value -> "Level: " + value).orElse("")) +
                 (regex.map(s -> "Regex: \"" + s + "\"").orElse(""));
     }
 
-    private static String getDescriptionForUnwantedLogMessage(Optional<Level> level, Optional<String> regex, List<LogEventMatcher> matchers) {
+    private static String getDescriptionForExpectedMessageWithAdditionalMatchers(Optional<Level> level, Optional<String> regex, List<LogEventMatcher> matchers) {
         String matchersText = "";
         if (matchers != null && !matchers.isEmpty()) {
-            matchersText = ", with matchers:" + lineSeparator() + "  " + matchers.stream().map(LogEventMatcher::getMatcherDetailDescription)
-                    .collect(Collectors.joining(lineSeparator() + "  "));
+            matchersText = lineSeparator() + "  with additional matchers:" + lineSeparator() + "  - " + matchers.stream().map(LogEventMatcher::getMatcherDetailDescription)
+                    .collect(Collectors.joining(lineSeparator() + "  - "));
         }
         if (level.isEmpty() && regex.isEmpty()) {
             return "<Any log message>" + matchersText;
         }
         if (level.isPresent() && regex.isPresent()) {
-            return "Level: " + level.get() + ", Regex: \"" + regex.get() + "\"" + matchersText;
+            return "Expectation: " + lineSeparator() + "  " + level.get() + " - \"" + regex.get() + "\"" + matchersText;
         }
         return (level.map(value -> "Level: " + value).orElse("")) +
                 (regex.map(s -> "Regex: \"" + s + "\"").orElse("")) + matchersText;
     }
 }
-

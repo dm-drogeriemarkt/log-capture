@@ -139,19 +139,19 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
      *
      * <p>Example:
      * <pre>{@code
-     * logCapture.assertLogged(info("hello world"), times(3)));
+     * logCapture.assertLogged(times(3), info("hello world")));
      * }</pre>
      *
-     * @param logExpectation description of the expected log message
      * @param times the number of times the message should have been logged
+     * @param logExpectation description of the expected log message
      *
      * @return asserter that can be used to check if anything else has been logged
      *
      * @throws AssertionError if the expected log message has not been logged
      */
-    public LogAsserter.NothingElseLoggedAsserter assertLogged(LogExpectation logExpectation, Times times) {
+    public LogAsserter.NothingElseLoggedAsserter assertLogged(ExpectedTimes times, LogExpectation logExpectation) {
         return new LogAsserter(capturingAppender, new LinkedList<>())
-                .assertLogged(logExpectation, times);
+                .assertLogged(times, logExpectation);
     }
 
     /**
