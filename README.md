@@ -323,7 +323,7 @@ message: INFO "information attached" (regex)
 
 #### More Examples
 
-See [ReadableApiTest.java](src/test/java/com/example/app/ReadableApiTest.java) for more usage examples.
+[See Tests](src/test/java/com/example/app) for more usage examples.
 
 ## Usage outside of JUnit 5 (Cucumber example)
 
