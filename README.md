@@ -11,71 +11,64 @@ Simple assertions for log messages. See [Examples](#examples).
 > log-capture asserts evaluated log statements. That means it depends on a logging implementation (*logback*), but works with any logging facade (*slf4j* and others)
 
 ```java
-var name = "world";
-log.
+var name="world";
+log.info("hello {}", name);
+log.warn("bye {}", name);
 
-info("hello {}",name);
-log.
-
-warn("bye {}",name);
-
-logCapture.
-
-assertLoggedInOrder(info("hello world"),
-
-warn("bye world")
+logCapture.assertLoggedInOrder(
+    info("hello world"),
+    warn("bye world")
 );
 ```
 
 It's even simple when there's more than just the message and level to assert:
 
 ```java
-logCapture.assertLoggedInOrder(info("hello world", logger("com.acme.helloworld.WorldGreeter"))
-
-warn("bye world",
-     exception().
-
-expectedType(WorldNotFoundException .class))
-        );
+logCapture.assertLoggedInOrder(
+    info("hello world",
+        logger("com.acme.helloworld.WorldGreeter"))
+    warn("bye world",
+        exception().expectedType(WorldNotFoundException.class))
+);
 ```
 
 **Table of Contents**
 
 * [Usage](#usage)
-    * [Maven](#maven)
-    * [Additional matchers](#additional-matchers)
-        * [MDC content](#mdc-content)
-        * [Exceptions](#exceptions)
-        * [Markers](#markers)
-        * [Key-Value](#key-value)
-        * [Logger name](#logger-name)
-        * [Amount of repetitions](#amount-of-repetitions)
-    * [Examples](#examples)
-        * [Unit Test Example:](#unit-test-example)
-        * [Integration Test Example:](#integration-test-example)
-        * [Example with additional MDC matcher](#example-with-additional-mdc-matcher)
-        * [More Examples](#more-examples)
+  * [Maven](#maven)
+  * [Additional matchers](#additional-matchers)
+    * [MDC content](#mdc-content)
+    * [Exceptions](#exceptions)
+    * [Markers](#markers)
+    * [Key-Value](#key-value)
+    * [Logger name](#logger-name)
+    * [Amount of repetitions](#amount-of-repetitions)
+  * [Examples](#examples)
+    * [Unit Test Example:](#unit-test-example)
+    * [Integration Test Example:](#integration-test-example)
+    * [Example with additional MDC matcher](#example-with-additional-mdc-matcher)
+    * [More Examples](#more-examples)
 * [Usage outside of JUnit 5 (Cucumber example)](#usage-outside-of-junit-5-cucumber-example)
-    * [Cucumber example](#cucumber-example)
-        * [Cucumber feature file](#cucumber-feature-file)
+  * [Cucumber example](#cucumber-example)
+    * [Cucumber feature file](#cucumber-feature-file)
 * [Changes](#changes)
-    * [4.1.0](#410)
-    * [4.0.1](#401)
-    * [4.0.0](#400)
-    * [3.6.2](#362)
-    * [3.6.1](#361)
-    * [3.6.0](#360)
-    * [3.5.0](#350)
-    * [3.4.1](#341)
-    * [3.4.0](#340)
-    * [3.3.0](#330)
-    * [3.2.1](#321)
-    * [3.2.0](#320)
-    * [3.1.0](#310)
-    * [3.0.0](#300)
-    * [2.0.1](#201)
-    * [Updating from Version 1.x.x to 2.x.x](#updating-from-version-1xx-to-2xx)
-    * [Updating from Version 3.2.x or lower to Version 3.3.x or higher](#updating-from-version-32x-or-lower-to-version-33x-or-higher)
+  * [4.1.0](#410)
+  * [4.0.1](#401)
+  * [4.0.0](#400)
+  * [3.6.2](#362)
+  * [3.6.1](#361)
+  * [3.6.0](#360)
+  * [3.5.0](#350)
+  * [3.4.1](#341)
+  * [3.4.0](#340)
+  * [3.3.0](#330)
+  * [3.2.1](#321)
+  * [3.2.0](#320)
+  * [3.1.0](#310)
+  * [3.0.0](#300)
+  * [2.0.1](#201)
+  * [Updating from Version 1.x.x to 2.x.x](#updating-from-version-1xx-to-2xx)
+  * [Updating from Version 3.2.x or lower to Version 3.3.x or higher](#updating-from-version-32x-or-lower-to-version-33x-or-higher)
 
 ## Usage
 
@@ -84,7 +77,6 @@ expectedType(WorldNotFoundException .class))
 Add log-capture as a test dependency to your project. If you use Maven, add this to your pom.xml:
 
 ```xml
-
 <dependency>
     <groupId>de.dm.infrastructure</groupId>
     <artifactId>log-capture</artifactId>
@@ -104,14 +96,10 @@ import static de.dm.infrastructure.logcapture.ExpectedMdcEntry.mdc;
 
 ...
 
-        MDC.put("key","value");
-log.
+MDC.put("key", "value");
+log.info("did something");
 
-info("did something");
-
-logCapture.
-
-assertLogged(info("did something", mdc("key", "value")));`
+logCapture.assertLogged(info("did something", mdc("key", "value")));`
 ```
 
 #### Exceptions
@@ -121,31 +109,19 @@ import static de.dm.infrastructure.logcapture.ExpectedException.exception;
 
 ...
 
-        log.warn("oh no!",
-                         new IllegalArgumentException("shame on you!",
+log.warn("oh no!",
+    new IllegalArgumentException("shame on you!",
         new NullPointerException("never use null")));
 
-        logCapture.
-
-assertLogged(warn("oh no!", exception()
-            .
-
-expectedType(IllegalArgumentException .class)
-            .
-
-expectedCause(exception()
-                .
-
-expectedType(NullPointerException .class)
-                .
-
-expectedMessageRegex("never use null")
-                .
-
-build())
-        .
-
-build()
+logCapture.assertLogged(
+    warn("oh no!",
+        exception()
+            .expectedType(IllegalArgumentException.class)
+            .expectedCause(exception()
+                .expectedType(NullPointerException.class)
+                .expectedMessageRegex("never use null")
+                .build())
+            .build()
     ));
 ```
 
@@ -156,11 +132,9 @@ import static de.dm.infrastructure.logcapture.ExpectedMarker.marker;
 
 ...
 
-        log.info(MarkerFactory.getMarker("my-marker"), "hello with marker");
+log.info(MarkerFactory.getMarker("my-marker"), "hello with marker");
 
-        logCapture.
-
-assertLogged(info("hello with marker", marker("my-marker")));
+logCapture.assertLogged(info("hello with marker", marker("my-marker")));
 ```
 
 #### Key-Value
@@ -170,17 +144,9 @@ import static de.dm.infrastructure.logcapture.ExpectedKeyValue.keyValue;
 
 ...
 
-        log.atInfo().
+log.atInfo().setMessage("hello").addKeyValue("meaning", 42).log();
 
-setMessage("hello").
-
-addKeyValue("meaning",42).
-
-log();
-
-logCapture.
-
-assertLogged(info("hello", keyValue("meaning", 42)))
+logCapture.assertLogged(info("hello", keyValue("meaning", 42)))
 ```
 
 #### Logger name
@@ -190,11 +156,9 @@ import static de.dm.infrastructure.logcapture.ExpectedLoggerName.logger;
 
 ...
 
-        log.info("did something");
+log.info("did something");
 
-logCapture.
-
-assertLogged(info("did something", logger("com.acme.foo")));
+logCapture.assertLogged(info("did something", logger("com.acme.foo")));
 ```
 
 #### Amount of repetitions
@@ -204,27 +168,15 @@ import static de.dm.infrastructure.logcapture.ExpectedLoggerName.logger;
 
 ...
 
-        log.info("did something");
-log.
+log.info("did something");
+log.info("did something");
 
-info("did something");
+logCapture.assertLogged(atLeast(1), info("did something"));
+logCapture.assertLogged(times(2),   info("did something"));
+logCapture.assertLogged(atMost(3),  info("did something"));
 
-logCapture.
-
-assertLogged(atLeast(1),info("did something"));
-        logCapture.
-
-assertLogged(times(2),info("did something"));
-        logCapture.
-
-assertLogged(atMost(3),info("did something"));
-
-        log.
-
-info("did nothing");
-logCapture.
-
-assertLogged(once(),info("did nothing"));
+log.info("did nothing");
+logCapture.assertLogged(once(), info("did nothing"));
 ```
 
 ### Examples
@@ -252,14 +204,23 @@ public class MyUnitTest {
 
         //assert that the messages have been logged
         //expected log message is a regular expression
-        logCapture.assertLogged(info("^something interesting$"), error("terrible"));
-
+        logCapture.assertLogged(
+            info("^something interesting$"),
+            error("terrible")
+        );
+        
         //is the same assertion, but also asserts the order of these log messages
-        logCapture.assertLoggedInOrder(info("^something interesting$"), error("terrible"));
+        logCapture.assertLoggedInOrder(
+            info("^something interesting$"),
+            error("terrible")
+        );
 
         //assert that no log message containing "something unwanted" with any log level exists 
         //and that no log message with level DEBUG exists
-        logCapture.assertNotLogged(any("something unwanted"), debug());
+        logCapture.assertNotLogged(
+            any("something unwanted"),
+            debug()
+        );
     }
 }
 ```
@@ -290,7 +251,10 @@ public class MyIntegrationTest {
         log.info("something interesting");
         log.error("something terrible");
 
-        logCapture.assertLogged(info("^something interesting$"), info("^start of info from utility.that.logs"), error("terrible"));
+        logCapture.assertLogged(
+            info("^something interesting$"),
+            info("^start of info from utility.that.logs"),
+            error("terrible"));
     }
 }
 ```
@@ -320,8 +284,12 @@ public class MyUnitTest {
         log.info("this message has some additional MDC information attached");
 
         // asserts my_mdc_key for both message and other_mdc_key for the second one
-        logCapture.with(mdc("my_mdc_key", "^this is the MDC value$"))
-                  .assertLoggedInOrder(info("information attached"), info("additional MDC information attached", mdc("other_mdc_key", "^this is the other MDC value$")));
+        logCapture
+            .with(mdc("my_mdc_key", "^this is the MDC value$"))
+            .assertLoggedInOrder(
+                info("information attached"),
+                info("additional MDC information attached",
+                    mdc("other_mdc_key", "^this is the other MDC value$")));
     }
 }
 ```
@@ -331,19 +299,13 @@ If assertLogged fails because the message is correct, but the MDC value is wrong
 This can be useful for debugging purposes. For example, this test code:
 
 ```java
-MDC.put("my_mdc_key","this is the wrong MDC value");
-MDC.
+MDC.put("my_mdc_key", "this is the wrong MDC value");
+MDC.put("other_mdc_key", "this is the other MDC value");
+log.info("this message has some MDC information attached");
 
-put("other_mdc_key","this is the other MDC value");
-log.
-
-info("this message has some MDC information attached");
-
-logCapture.
-
-assertLogged(info("information attached", mdc("my_mdc_key", "^something expected that never occurs$"),
-
-mdc("other_mdc_key","^this is the other MDC value$")));
+logCapture.assertLogged(info("information attached",
+        mdc("my_mdc_key", "^something expected that never occurs$"),
+        mdc("other_mdc_key", "^this is the other MDC value$")));
 ```
 
 will output:
@@ -361,12 +323,11 @@ message: INFO "information attached" (regex)
 
 #### More Examples
 
-[See Tests](src/test/java/com/example/app) for more usage examples.
+See [ReadableApiTest.java](src/test/java/com/example/app/ReadableApiTest.java) for more usage examples.
 
 ## Usage outside of JUnit 5 (Cucumber example)
 
-If you intend to use LogCapture outside of a JUnit test, you cannot rely on JUnit's `@RegisterExtension` annotation and must call LogCapture's
-`addAppenderAndSetLogLevelToTrace()` and `removeAppenderAndResetLogLevel()` methods manually.
+If you intend to use LogCapture outside of a JUnit test, you cannot rely on JUnit's `@RegisterExtension` annotation and must call LogCapture's `addAppenderAndSetLogLevelToTrace()` and `removeAppenderAndResetLogLevel()` methods manually.
 
 Be aware that this will still cause JUnit to be a dependency.
 
@@ -483,21 +444,15 @@ import static de.dm.infrastructure.logcapture.ExpectedMdcEntry.withMdc;
 
 ...
 
-        // plain assertion
-        logCapture.assertLogged(INFO, "Something happened.");
+// plain assertion
+logCapture.assertLogged(INFO, "Something happened.");
 // assertion with MDC
-logCapture.
-
-assertLogged(INFO, "Something with MDC content",
-             withMdc("bookingNumber", "1234"));
-        // in-order assertion
-        logCapture
-        .
-
-assertLogged(INFO, "Step 1")
-    .
-
-thenLogged(INFO, "Step 2");
+logCapture.assertLogged(INFO, "Something with MDC content", 
+    withMdc("bookingNumber", "1234"));
+// in-order assertion
+logCapture
+    .assertLogged(INFO, "Step 1")
+    .thenLogged(INFO, "Step 2");
 
 ```
 
@@ -511,18 +466,15 @@ import static de.dm.infrastructure.logcapture.LogExpectation.info;
 
 ...
 
-        // plain assertion
-        logCapture.assertLogged(info("Something happened."));
-        // assertion with MDC
-        logCapture.
-
-assertLogged(info("Something with MDC content", mdc("rabattUpdate", "CapturableHeadline")));
-        // in-order assertion
-        ogCapture.
-
-assertLoggedInOrder(info("Step 1")
-
-info("Step 2")
+// plain assertion
+logCapture.assertLogged(info("Something happened."));
+// assertion with MDC
+logCapture.assertLogged(info("Something with MDC content",
+    mdc("rabattUpdate", "CapturableHeadline")));
+// in-order assertion
+ogCapture.assertLoggedInOrder(
+    info("Step 1")
+    info("Step 2")
 );
 
 ```
