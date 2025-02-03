@@ -38,6 +38,8 @@ public class ExpectedTimes {
      * @param times exact number of expected log messages
      *
      * @return Times object which asserts with exactly the given times
+     *
+     * @throws IllegalArgumentException if expected occurrences are negative
      */
     public static ExpectedTimes times(int times) {
 
@@ -62,6 +64,8 @@ public class ExpectedTimes {
      * @param min minimum number of log message occurrences, must be at least 1
      *
      * @return Times object which asserts at least the given times
+     *
+     * @throws IllegalArgumentException if expected occurrences are negative
      */
     public static ExpectedTimes atLeast(int min) {
         if (min < 1) {
@@ -81,6 +85,8 @@ public class ExpectedTimes {
      * @param max maximum number of log message occurrences, must be positive
      *
      * @return Times object which asserts at most the given times
+     *
+     * @throws IllegalArgumentException if expected occurrences are negative
      */
     public static ExpectedTimes atMost(int max) {
         if (max < 0) {
