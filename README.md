@@ -299,21 +299,24 @@ If assertLogged fails because the message is correct, but the MDC value is wrong
 This can be useful for debugging purposes. For example, this test code:
 
 ```java
-    MDC.put("my_mdc_key","this is the wrong MDC value");
-    MDC.put("other_mdc_key","this is the other MDC value");
-    log.info("this message has some MDC information attached");
+MDC.put("my_mdc_key", "this is the wrong MDC value");
+MDC.put("other_mdc_key", "this is the other MDC value");
+log.info("this message has some MDC information attached");
 
-    logCapture.assertLogged().info("information attached",
-        mdc("my_mdc_key","^something expected that never occurs$"),
-        mdc("other_mdc_key","^this is the other MDC value$"));
+logCapture.assertLogged(info("information attached",
+        mdc("my_mdc_key", "^something expected that never occurs$"),
+        mdc("other_mdc_key", "^this is the other MDC value$")));
 ```
 
 will output:
 
 ```text
-java.lang.AssertionError: Expected log message has occurred, but never with the expected MDC value: Level: INFO, Regex: "information attached"
-  Captured message: "this message has some MDC information attached"
-  Captured MDC values:
+java.lang.AssertionError: Expected log message has occurred, but never with the expected MDC value:
+message: INFO "information attached" (regex)
+  captured message: "this message has some MDC information attached"
+  expected MDC key: my_mdc_key
+  expected MDC value: ".*^something expected that never occurs$.*"
+  captured MDC values:
     my_mdc_key: "this is the wrong MDC value"
     other_mdc_key: "this is the other MDC value"
 ```
