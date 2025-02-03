@@ -19,6 +19,11 @@ logCapture.assertLoggedInOrder(
     info("hello world"),
     warn("bye world")
 );
+
+log.info("I did something", name);
+log.info("I did something", name);
+
+logCapture.assertLogged(atLeast(2), info("I did something"));
 ```
 
 It's even simple when there's more than just the message and level to assert:
@@ -353,7 +358,8 @@ And with MDC logging context
 
 ### 4.1.0
 
-* added Times class which allows matching a LogExpectation multiple times
+* **Feature**: Added method to test number of log message repetitions via `times(...)`, `once()`, `atMost(...)` and `atLeast(...)`
+* **Improvement**: Better readability of assertion messages
 
 ### 4.0.1
 
