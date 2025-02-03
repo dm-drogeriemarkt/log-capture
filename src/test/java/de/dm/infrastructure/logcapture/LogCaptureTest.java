@@ -33,7 +33,10 @@ class LogCaptureTest {
 
         assertThat(logCaptureFromOtherPackage.capturedPackages).containsExactly(LogCaptureCreatorInOtherPackage.class.getPackage().getName());
         var thrown = assertThrows(AssertionError.class, () -> logCaptureFromOtherPackage.assertLogged(LogExpectation.info("hello from")));
-        assertThat(thrown).hasMessage("Expected log message has not occurred: Level: INFO, Regex: \"hello from\"");
+        assertThat(thrown).hasMessage("""
+                Expected log message has not occurred.
+                message: INFO "hello from" (regex)
+                """);
     }
 
     @Test

@@ -23,7 +23,6 @@ import static de.dm.infrastructure.logcapture.LogExpectation.error;
 import static de.dm.infrastructure.logcapture.LogExpectation.info;
 import static de.dm.infrastructure.logcapture.LogExpectation.trace;
 import static de.dm.infrastructure.logcapture.LogExpectation.warn;
-import static java.lang.System.lineSeparator;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -158,10 +157,12 @@ class ReadableApiTest {
                                             .build()
                             )));
 
-            assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected Exception: Level: WARN, Regex: \"oh no!\"" +
-                    lineSeparator() + "  expected exception: message (regex): \"a message never used\" type: java.lang.RuntimeException" +
-                    lineSeparator() + "  actual exception: message: \"this is illegal\", type: java.lang.IllegalArgumentException, cause: (message: \"never be null!\", type: java.lang.NullPointerException)" +
-                    lineSeparator());
+            assertThat(assertionError).hasMessage("""
+                    Expected log message has occurred, but never with the expected Exception:
+                    message: WARN "oh no!" (regex)
+                      expected exception: message (regex): "a message never used" type: java.lang.RuntimeException
+                      actual exception: message: "this is illegal", type: java.lang.IllegalArgumentException, cause: (message: "never be null!", type: java.lang.NullPointerException)
+                    """);
 
             AssertionError withoutExceptionAssertionError = assertThrows(AssertionError.class,
                     () -> logCapture.assertLogged(
@@ -172,10 +173,12 @@ class ReadableApiTest {
                                             .build()
                             )));
 
-            assertThat(withoutExceptionAssertionError).hasMessage("Expected log message has occurred, but never with the expected Exception: Level: INFO, Regex: \"without exception\"" +
-                    lineSeparator() + "  expected exception: message (regex): \"a message never used\" type: java.lang.RuntimeException" +
-                    lineSeparator() + "  actual exception: (null)" +
-                    lineSeparator());
+            assertThat(withoutExceptionAssertionError).hasMessage("""
+                    Expected log message has occurred, but never with the expected Exception:
+                    message: INFO "without exception" (regex)
+                      expected exception: message (regex): "a message never used" type: java.lang.RuntimeException
+                      actual exception: (null)
+                    """);
 
         }
 
@@ -184,16 +187,28 @@ class ReadableApiTest {
             log.info("testlogmessage");
 
             final AssertionError exceptionAny = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(any()));
-            assertThat(exceptionAny).hasMessage("Found a log message that should not be logged: <Any log message>");
+            assertThat(exceptionAny).hasMessage("""
+                    Found a log message that should not be logged.
+                    message: <Any log message>
+                    """);
 
             final AssertionError exceptionWithLevel = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(info()));
-            assertThat(exceptionWithLevel).hasMessage("Found a log message that should not be logged: Level: INFO");
+            assertThat(exceptionWithLevel).hasMessage("""
+                    Found a log message that should not be logged.
+                    message: INFO <any message>
+                    """);
 
             final AssertionError exceptionWithRegex = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(any("testlogmessage")));
-            assertThat(exceptionWithRegex).hasMessage("Found a log message that should not be logged: Regex: \"testlogmessage\"");
+            assertThat(exceptionWithRegex).hasMessage("""
+                    Found a log message that should not be logged.
+                    message: <any level> "testlogmessage" (regex)
+                    """);
 
             final AssertionError exceptionWithRegexAndLevel = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(info("testlogmessage")));
-            assertThat(exceptionWithRegexAndLevel).hasMessage("Found a log message that should not be logged: Level: INFO, Regex: \"testlogmessage\"");
+            assertThat(exceptionWithRegexAndLevel).hasMessage("""
+                    Found a log message that should not be logged.
+                    message: INFO "testlogmessage" (regex)
+                    """);
         }
 
     }
@@ -211,10 +226,12 @@ class ReadableApiTest {
                                     marker("expected"))
                     ));
 
-            assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected marker name: Level: INFO, Regex: \"hello with marker\"" +
-                    lineSeparator() + "  expected marker name: \"expected\"" +
-                    lineSeparator() + "  actual marker names: \"[unexpected]\"" +
-                    lineSeparator());
+            assertThat(assertionError).hasMessage("""
+                    Expected log message has occurred, but never with the expected marker name:
+                    message: INFO "hello with marker" (regex)
+                      expected marker name: "expected"
+                      actual marker names: "[unexpected]"
+                    """);
         }
 
         @Test
@@ -227,10 +244,12 @@ class ReadableApiTest {
                                     marker("expected"))
                     ));
 
-            assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected marker name: Level: INFO, Regex: \"hello without marker\"" +
-                    lineSeparator() + "  expected marker name: \"expected\"" +
-                    lineSeparator() + "  but no marker was found" +
-                    lineSeparator());
+            assertThat(assertionError).hasMessage("""
+                    Expected log message has occurred, but never with the expected marker name:
+                    message: INFO "hello without marker" (regex)
+                      expected marker name: "expected"
+                      but no marker was found
+                    """);
         }
 
         @Test
@@ -245,10 +264,12 @@ class ReadableApiTest {
                                     marker("expected"))
                     ));
 
-            assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected marker name: Level: INFO, Regex: \"hello with marker\"" +
-                    lineSeparator() + "  expected marker name: \"expected\"" +
-                    lineSeparator() + "  actual marker names: \"[unexpected_top [ unexpected_nested ]]\"" +
-                    lineSeparator());
+            assertThat(assertionError).hasMessage("""
+                    Expected log message has occurred, but never with the expected marker name:
+                    message: INFO "hello with marker" (regex)
+                      expected marker name: "expected"
+                      actual marker names: "[unexpected_top [ unexpected_nested ]]"
+                    """);
         }
 
         @Test
@@ -265,10 +286,12 @@ class ReadableApiTest {
                                     marker("expected"))
                     ));
 
-            assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected marker name: Level: INFO, Regex: \"hello with markers\"" +
-                    lineSeparator() + "  expected marker name: \"expected\"" +
-                    lineSeparator() + "  actual marker names: \"[unexpected1, unexpected2]\"" +
-                    lineSeparator());
+            assertThat(assertionError).hasMessage("""
+                    Expected log message has occurred, but never with the expected marker name:
+                    message: INFO "hello with markers" (regex)
+                      expected marker name: "expected"
+                      actual marker names: "[unexpected1, unexpected2]"
+                    """);
         }
 
         @Test
@@ -302,8 +325,12 @@ class ReadableApiTest {
             final AssertionError assertionError = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(
                     info("hello with marker",
                             marker("expected"))));
-            assertThat(assertionError).hasMessage("Found a log message that should not be logged: Level: INFO, Regex: \"hello with marker\", with matchers:" +
-                    lineSeparator() + "  marker name: \"expected\"");
+            assertThat(assertionError).hasMessage("""
+                    Found a log message that should not be logged.
+                    message: INFO "hello with marker" (regex)
+                      with additional matchers:
+                      - marker name: "expected"
+                    """);
         }
 
     }
@@ -347,10 +374,12 @@ class ReadableApiTest {
                                     logger("WrongLogger$"))
                     ));
 
-            assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected logger name: Level: WARN, Regex: \"bye world\"" +
-                    lineSeparator() + "  expected logger name (regex): \"WrongLogger$\"" +
-                    lineSeparator() + "  actual logger name: \"com.example.app.ReadableApiTest\"" +
-                    lineSeparator());
+            assertThat(assertionError).hasMessage("""
+                    Expected log message has occurred, but never with the expected logger name:
+                    message: WARN "bye world" (regex)
+                      expected logger name (regex): "WrongLogger$"
+                      actual logger name: "com.example.app.ReadableApiTest"
+                    """);
         }
 
         @Test
@@ -365,8 +394,12 @@ class ReadableApiTest {
                     info("hello on this logger",
                             logger("ReadableApiTest$"))));
             assertThat(assertionError)
-                    .hasMessage("Found a log message that should not be logged: Level: INFO, Regex: \"hello on this logger\", with matchers:" +
-                            lineSeparator() + "  logger name (regex): \"ReadableApiTest$\"");
+                    .hasMessage("""
+                            Found a log message that should not be logged.
+                            message: INFO "hello on this logger" (regex)
+                              with additional matchers:
+                              - logger name (regex): "ReadableApiTest$"
+                            """);
         }
     }
 
@@ -400,12 +433,14 @@ class ReadableApiTest {
                                     mdc("key", "value"))
                     ));
 
-            assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected MDC value: Level: WARN, Regex: \"bye world\"" +
-                    lineSeparator() + "  captured message: \"bye world\"" +
-                    lineSeparator() + "  expected MDC key: key" +
-                    lineSeparator() + "  expected MDC value: \".*value.*\"" +
-                    lineSeparator() + "  captured MDC values:" +
-                    lineSeparator());
+            assertThat(assertionError).hasMessage("""
+                    Expected log message has occurred, but never with the expected MDC value:
+                    message: WARN "bye world" (regex)
+                      captured message: "bye world"
+                      expected MDC key: key
+                      expected MDC value: ".*value.*"
+                      captured MDC values:
+                    """);
         }
 
         @Test
@@ -424,12 +459,14 @@ class ReadableApiTest {
                                     warn("bye world")
                             ));
 
-            assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected MDC value: Level: WARN, Regex: \"bye world\"" +
-                    lineSeparator() + "  captured message: \"bye world\"" +
-                    lineSeparator() + "  expected MDC key: key" +
-                    lineSeparator() + "  expected MDC value: \".*value.*\"" +
-                    lineSeparator() + "  captured MDC values:" +
-                    lineSeparator());
+            assertThat(assertionError).hasMessage("""
+                    Expected log message has occurred, but never with the expected MDC value:
+                    message: WARN "bye world" (regex)
+                      captured message: "bye world"
+                      expected MDC key: key
+                      expected MDC value: ".*value.*"
+                      captured MDC values:
+                    """);
         }
 
         @Test
@@ -466,13 +503,15 @@ class ReadableApiTest {
                                             mdc("another_key", "another_value"))
                             ));
 
-            assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected MDC value: Level: WARN, Regex: \"bye world\"" +
-                    lineSeparator() + "  captured message: \"bye world\"" +
-                    lineSeparator() + "  expected MDC key: another_key" +
-                    lineSeparator() + "  expected MDC value: \".*another_value.*\"" +
-                    lineSeparator() + "  captured MDC values:" +
-                    lineSeparator() + "    key: \"value\"" +
-                    lineSeparator());
+            assertThat(assertionError).hasMessage("""
+                    Expected log message has occurred, but never with the expected MDC value:
+                    message: WARN "bye world" (regex)
+                      captured message: "bye world"
+                      expected MDC key: another_key
+                      expected MDC value: ".*another_value.*"
+                      captured MDC values:
+                        key: "value"
+                    """);
         }
 
         @Test
@@ -508,12 +547,14 @@ class ReadableApiTest {
                                     mdc("key", mdcValue -> !mdcValue.equals("value"))
                             )));
 
-            assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected MDC value: Level: INFO, Regex: \"hello\"" +
-                    lineSeparator() + "  captured message: \"hello\"" +
-                    lineSeparator() + "  expected MDC key: key" +
-                    lineSeparator() + "  captured MDC values:" +
-                    lineSeparator() + "    key: \"value\"" +
-                    lineSeparator());
+            assertThat(assertionError).hasMessage("""
+                    Expected log message has occurred, but never with the expected MDC value:
+                    message: INFO "hello" (regex)
+                      captured message: "hello"
+                      expected MDC key: key
+                      captured MDC values:
+                        key: "value"
+                    """);
         }
 
         @Test
@@ -537,13 +578,21 @@ class ReadableApiTest {
             logCapture.assertNotLogged(info("helloWorld", mdc("thirdKey", "value")));
 
             final AssertionError oneKeyMatches = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(info("hello world", mdc("key", "value"))));
-            assertThat(oneKeyMatches).hasMessage("Found a log message that should not be logged: Level: INFO, Regex: \"hello world\", with matchers:" +
-                    lineSeparator() + "  MDCValue with key: \"key\"");
+            assertThat(oneKeyMatches).hasMessage("""
+                    Found a log message that should not be logged.
+                    message: INFO "hello world" (regex)
+                      with additional matchers:
+                      - MDCValue with key: "key"
+                    """);
 
             final AssertionError bothKeysMatches = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(info("hello world", mdc("key", "value"), mdc("another_key", "another_value"))));
-            assertThat(bothKeysMatches).hasMessage("Found a log message that should not be logged: Level: INFO, Regex: \"hello world\", with matchers:" +
-                    lineSeparator() + "  MDCValue with key: \"key\"" +
-                    lineSeparator() + "  MDCValue with key: \"another_key\"");
+            assertThat(bothKeysMatches).hasMessage("""
+                    Found a log message that should not be logged.
+                    message: INFO "hello world" (regex)
+                      with additional matchers:
+                      - MDCValue with key: "key"
+                      - MDCValue with key: "another_key"
+                    """);
         }
 
     }
@@ -575,7 +624,10 @@ class ReadableApiTest {
                             info("hello 2")
                     ));
 
-            assertThat(assertionError).hasMessage("Expected log message has not occurred: Level: INFO, Regex: \"hello 2\"");
+            assertThat(assertionError).hasMessage("""
+                    Expected log message has not occurred.
+                    message: INFO "hello 2" (regex)
+                    """);
         }
 
         @Test
@@ -592,9 +644,12 @@ class ReadableApiTest {
                             info("1")
                     ));
 
-            assertThat(assertionError).hasMessage("Imprecise matching: Two log expectations have matched the same message. " +
-                    "Use more precise matching or in-order matching. " +
-                    "(First match: Level: INFO, Regex: \"hello\" | Second match: Level: INFO, Regex: \"1\"");
+            assertThat(assertionError).hasMessage("""
+                    Imprecise matching: Two log expectations have matched the same message. Use more precise matching or in-order matching. (First match:\s
+                    message: INFO "hello" (regex)
+                     | Second match:\s
+                    message: INFO "1" (regex)
+                    """); // TODO: fix this
         }
 
         @Test
@@ -623,7 +678,10 @@ class ReadableApiTest {
                             info("hello 2")
                     ));
 
-            assertThat(assertionError).hasMessage("Expected log message has not occurred: Level: INFO, Regex: \"hello 2\"");
+            assertThat(assertionError).hasMessage("""
+                    Expected log message has not occurred.
+                    message: INFO "hello 2" (regex)
+                    """);
         }
 
         @Test
@@ -718,10 +776,12 @@ class ReadableApiTest {
                                 exception().expectedMessageRegex("an exception that was not logged").build())
                 ));
 
-        assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected Exception: Level: ERROR, Regex: \"some error\"" +
-                lineSeparator() + "  expected exception: message (regex): \"an exception that was not logged\"" +
-                lineSeparator() + "  actual exception: message: \"an exception that was logged\", type: java.lang.RuntimeException" +
-                lineSeparator());
+        assertThat(assertionError).hasMessage("""
+                Expected log message has occurred, but never with the expected Exception:
+                message: ERROR "some error" (regex)
+                  expected exception: message (regex): "an exception that was not logged"
+                  actual exception: message: "an exception that was logged", type: java.lang.RuntimeException
+                """);
     }
 
     @Nested
@@ -737,7 +797,8 @@ class ReadableApiTest {
                     logCapture.assertLogged(info("hello", keyValue("key", "a value")))
             );
             assertThat(assertionError).hasMessage("""
-                    Expected log message has occurred, but never with the expected key-value pair: Level: INFO, Regex: "hello"
+                    Expected log message has occurred, but never with the expected key-value pair:
+                    message: INFO "hello" (regex)
                       expected key-value pair (key, a value)
                       actual pairs: [(key1, 1), (key2, value2)]
                     """);
@@ -752,7 +813,8 @@ class ReadableApiTest {
                     logCapture.assertLogged(info("hello", keyValue("key", "a value")))
             );
             assertThat(assertionError).hasMessage("""
-                    Expected log message has occurred, but never with the expected key-value pair: Level: INFO, Regex: "hello"
+                    Expected log message has occurred, but never with the expected key-value pair:
+                    message: INFO "hello" (regex)
                       expected key-value pair (key, a value)
                       actual pairs: []
                     """);
@@ -839,7 +901,8 @@ class ReadableApiTest {
                     logCapture.assertLogged(info("hello", keyValue("meaning", 42)))
             );
             assertThat(assertionError).hasMessage("""
-                    Expected log message has occurred, but never with the expected key-value pair: Level: INFO, Regex: "hello"
+                    Expected log message has occurred, but never with the expected key-value pair:
+                    message: INFO "hello" (regex)
                       expected key-value pair (meaning, 42)
                       actual pairs: [(meaning, 42.00)]
                     """);

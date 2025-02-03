@@ -216,12 +216,12 @@ public class LogAsserter {
         if (eventMatchingWithoutAdditionalMatchers != null) {
             throwAssertionForPartiallyMatchingLoggedEvent(level, regex, eventMatchingWithoutAdditionalMatchers, logEventMatchers);
         }
-        throw new AssertionError(format("Expected log message has not occurred: %s", getDescriptionForExpectedMessage(level, regex)));
+        throw new AssertionError(format("Expected log message has not occurred.%s", getDescriptionForExpectedMessage(level, regex)));
     }
 
     void assertNotCaptured(Optional<Level> level, Optional<String> regex, List<LogEventMatcher> logEventMatchers) {
         if (getNumberOfMatches(level, regex, logEventMatchers).completeMatches > 0) {
-            throw new AssertionError(format("Found a log message that should not be logged: %s", getDescriptionForExpectedMessageWithAdditionalMatchers(level, regex, logEventMatchers)));
+            throw new AssertionError(format("Found a log message that should not be logged.%s", getDescriptionForExpectedMessageWithAdditionalMatchers(level, regex, logEventMatchers)));
         }
     }
 
@@ -254,9 +254,8 @@ public class LogAsserter {
 
         for (LogEventMatcher logEventMatcher : logEventMatchers) {
             if (!logEventMatcher.matches(partiallyMatchingLoggedEvent)) {
-                assertionMessage.append(format("Expected log message has occurred, but never with the expected %s: %s",
+                assertionMessage.append(format("Expected log message has occurred, but never with the expected %s:%s",
                         logEventMatcher.getMatcherTypeDescription(), getDescriptionForExpectedMessage(level, regex)));
-                assertionMessage.append(lineSeparator());
                 assertionMessage.append(logEventMatcher.getNonMatchingErrorMessage(partiallyMatchingLoggedEvent));
                 assertionMessage.append(lineSeparator());
             }
@@ -283,15 +282,7 @@ public class LogAsserter {
 
     @SuppressWarnings("squid:S1192") // a constant for "Level: " is not helpful
     private static String getDescriptionForExpectedMessage(Optional<Level> level, Optional<String> regex) {
-
-        if (level.isEmpty() && regex.isEmpty()) {
-            return "<Any log message>";
-        }
-        if (level.isPresent() && regex.isPresent()) {
-            return "Expectation: " + lineSeparator() + "  " + level.get() + " - \"" + regex.get() + "\"";
-        }
-        return (level.map(value -> "Level: " + value).orElse("")) +
-                (regex.map(s -> "Regex: \"" + s + "\"").orElse(""));
+        return getExpectedLogMessageText(level, regex) + lineSeparator();
     }
 
     private static String getDescriptionForExpectedMessageWithAdditionalMatchers(Optional<Level> level, Optional<String> regex, List<LogEventMatcher> matchers) {
@@ -300,13 +291,25 @@ public class LogAsserter {
             matchersText = lineSeparator() + "  with additional matchers:" + lineSeparator() + "  - " + matchers.stream().map(LogEventMatcher::getMatcherDetailDescription)
                     .collect(Collectors.joining(lineSeparator() + "  - "));
         }
+        return getExpectedLogMessageText(level, regex) + matchersText + lineSeparator();
+    }
+
+    private static String getExpectedLogMessageText(Optional<Level> level, Optional<String> regex) {
         if (level.isEmpty() && regex.isEmpty()) {
-            return "<Any log message>" + matchersText;
+            return lineSeparator() + "message: <Any log message>";
         }
-        if (level.isPresent() && regex.isPresent()) {
-            return "Expectation: " + lineSeparator() + "  " + level.get() + " - \"" + regex.get() + "\"" + matchersText;
-        }
-        return (level.map(value -> "Level: " + value).orElse("")) +
-                (regex.map(s -> "Regex: \"" + s + "\"").orElse("")) + matchersText;
+        return lineSeparator() + "message: " + getLevelText(level) + " " + getRegexText(regex);
+    }
+
+    private static String getRegexText(Optional<String> messageRegex) {
+        return messageRegex
+                .map("\"%s\" (regex)"::formatted)
+                .orElse("<any message>");
+    }
+
+    private static String getLevelText(Optional<Level> level) {
+        return level
+                .map(Level::toString)
+                .orElse("<any level>");
     }
 }
