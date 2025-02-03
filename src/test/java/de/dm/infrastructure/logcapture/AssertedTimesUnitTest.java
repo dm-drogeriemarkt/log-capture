@@ -10,11 +10,14 @@ import static de.dm.infrastructure.logcapture.ExpectedTimes.atMost;
 import static de.dm.infrastructure.logcapture.ExpectedTimes.once;
 import static de.dm.infrastructure.logcapture.ExpectedTimes.times;
 import static de.dm.infrastructure.logcapture.LogExpectation.info;
-import static java.lang.System.lineSeparator;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@SuppressWarnings({
+        "java:S5778", //this rule does not increase the clarity of these tests
+        "LoggingSimilarMessage" // not a sensible rule for a logging test
+})
 @Slf4j
 class AssertedTimesUnitTest {
     @RegisterExtension
@@ -37,32 +40,41 @@ class AssertedTimesUnitTest {
 
         var assertionError = assertThrows(AssertionError.class, () -> logCapture.assertLogged(times(2), info("hello world", mdc("foo", "bar"), ExpectedException.exception().expectedMessageRegex("noooo!").build())));
 
-        // TODO: assert all assertion messages in this test files and check tests for completeness
-        assertThat(assertionError).hasMessage("Expected log message has occurred, but never with the expected marker name: Level: INFO, Regex: \"hello without marker\"" +
-                lineSeparator() + "  expected marker name: \"expected\"" +
-                lineSeparator() + "  but no marker was found" +
-                lineSeparator());
+        assertThat(assertionError).hasMessage("""
+                Expected log message has not occurred exactly 2 time(s)
+                actual occurrences: 0 (3 without additional matchers)
+                message: INFO "hello world" (regex)
+                  with additional matchers:
+                  - MDCValue with key: "foo"
+                  - Exception: message (regex): "noooo!"
+                """);
     }
 
     @Test
-    void assertLoggedWithTimes_loggedTooLess_assertionFails() {
+    void assertLoggedWithTimes_loggedTooFewTimes_assertionFails() {
         log.info("hello world");
         log.info("hello world");
 
-        assertThrows(AssertionError.class, () -> logCapture.assertLogged(times(3), info("hello world")));
+        var assertionError = assertThrows(AssertionError.class, () -> logCapture.assertLogged(times(3), info("hello world")));
+
+        assertThat(assertionError).hasMessage("""
+                Expected log message has not occurred exactly 3 time(s)
+                actual occurrences: 2
+                message: INFO "hello world" (regex)
+                """);
     }
 
     @Test
-    void times_lowerThan2_throwsIllegalArgumentException() {
-
-        assertThrows(IllegalArgumentException.class, () -> times(1));
-        assertThrows(IllegalArgumentException.class, () -> times(0));
+    void times_lowerThanZero_throwsIllegalArgumentException() {
+        var assertionError = assertThrows(IllegalArgumentException.class, () -> times(-1));
+        assertThat(assertionError).hasMessage("Number of log message occurrences that are expected must be positive.");
     }
 
     @Test
-    void atMost_lowerThan1_throwsIllegalArgumentException() {
+    void atMost_lowerThanZero_throwsIllegalArgumentException() {
+        var assertionError = assertThrows(IllegalArgumentException.class, () -> atMost(-1));
+        assertThat(assertionError).hasMessage("Maximum number of log message occurrences that are expected must be greater than 0.");
 
-        assertThrows(IllegalArgumentException.class, () -> atMost(0));
     }
 
     @Test
@@ -77,13 +89,24 @@ class AssertedTimesUnitTest {
         log.info("hello world");
         log.info("hello world");
 
-        assertThrows(AssertionError.class, () -> logCapture.assertLogged(once(), info("hello world")));
+        var assertionError = assertThrows(AssertionError.class, () -> logCapture.assertLogged(once(), info("hello world")));
+        assertThat(assertionError).hasMessage("""
+                Expected log message has not occurred exactly 1 time(s)
+                actual occurrences: 2
+                message: INFO "hello world" (regex)
+                """);
+
     }
 
     @Test
-    void assertLoggedWithTimesOnce_loggedTooLess_assertionFails() {
+    void assertLoggedWithTimesOnce_loggedTooLittle_assertionFails() {
 
-        assertThrows(AssertionError.class, () -> logCapture.assertLogged(once(), info("hello world")));
+        var assertionError = assertThrows(AssertionError.class, () -> logCapture.assertLogged(once(), info("hello world")));
+        assertThat(assertionError).hasMessage("""
+                Expected log message has not occurred exactly 1 time(s)
+                actual occurrences: 0
+                message: INFO "hello world" (regex)
+                """);
     }
 
     @Test
@@ -105,11 +128,17 @@ class AssertedTimesUnitTest {
     }
 
     @Test
-    void assertLoggedWithAtLeast_loggedTooLess_assertionFails() {
+    void assertLoggedWithAtLeast_loggedTooLittle_assertionFails() {
         log.info("hello world");
         log.info("hello world");
 
-        assertThrows(AssertionError.class, () -> logCapture.assertLogged(atLeast(3), info("hello world")));
+        var assertionError = assertThrows(AssertionError.class, () -> logCapture.assertLogged(atLeast(3), info("hello world")));
+        assertThat(assertionError).hasMessage("""
+                Expected log message has not occurred at least 3 time(s)
+                actual occurrences: 2
+                message: INFO "hello world" (regex)
+                """);
+
     }
 
     @Test
@@ -127,7 +156,12 @@ class AssertedTimesUnitTest {
         log.info("hello world");
         log.info("hello world");
 
-        assertThrows(AssertionError.class, () -> logCapture.assertLogged(atMost(2), info("hello world")));
+        var assertionError = assertThrows(AssertionError.class, () -> logCapture.assertLogged(atMost(2), info("hello world")));
+        assertThat(assertionError).hasMessage("""
+                Expected log message has not occurred at most 2 time(s)
+                actual occurrences: 3
+                message: INFO "hello world" (regex)
+                """);
     }
 
     @Test

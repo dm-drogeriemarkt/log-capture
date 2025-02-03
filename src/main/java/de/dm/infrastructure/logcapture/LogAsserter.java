@@ -96,10 +96,10 @@ public class LogAsserter {
         if (failAssertion) {
             var additionalMatchersHint = matches.matchesWithoutAdditionalMatchers == matches.completeMatches
                     ? ""
-                    : "Occurrences without additional matchers: " + matches.matchesWithoutAdditionalMatchers + lineSeparator();
+                    : " (%s without additional matchers)".formatted(matches.matchesWithoutAdditionalMatchers);
             throw new AssertionError("""
-                    Expected log message has not occurred %s %s time(s), but %s time(s)
-                    %s%s""".formatted(
+                    Expected log message has not occurred %s %s time(s)
+                    actual occurrences: %s%s%s""".formatted(
                     comparisonStrategy.strategyName,
                     referenceValue,
                     matches.completeMatches,
