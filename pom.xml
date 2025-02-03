@@ -29,7 +29,7 @@
     </developers>
 
     <properties>
-        <project.version>4.0.0-SNAPSHOT</project.version>
+        <project.version>4.1.0-SNAPSHOT</project.version>
 
         <java.version>17</java.version>
         <encoding>UTF-8</encoding>
@@ -64,7 +64,7 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.27.2</version>
+            <version>3.27.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>

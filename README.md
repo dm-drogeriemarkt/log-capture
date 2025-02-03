@@ -42,6 +42,7 @@ logCapture.assertLoggedInOrder(
     * [Markers](#markers)
     * [Key-Value](#key-value)
     * [Logger name](#logger-name)
+    * [Amount of repetitions](#amount-of-repetitions)
   * [Examples](#examples)
     * [Unit Test Example:](#unit-test-example)
     * [Integration Test Example:](#integration-test-example)
@@ -51,6 +52,7 @@ logCapture.assertLoggedInOrder(
   * [Cucumber example](#cucumber-example)
     * [Cucumber feature file](#cucumber-feature-file)
 * [Changes](#changes)
+  * [4.1.0](#410)
   * [4.0.1](#401)
   * [4.0.0](#400)
   * [3.6.2](#362)
@@ -78,7 +80,7 @@ Add log-capture as a test dependency to your project. If you use Maven, add this
 <dependency>
     <groupId>de.dm.infrastructure</groupId>
     <artifactId>log-capture</artifactId>
-    <version>4.0.1</version>
+    <version>4.1.0</version>
     <scope>test</scope>
 </dependency>
 ```
@@ -157,6 +159,24 @@ import static de.dm.infrastructure.logcapture.ExpectedLoggerName.logger;
 log.info("did something");
 
 logCapture.assertLogged(info("did something", logger("com.acme.foo")));
+```
+
+#### Amount of repetitions
+
+```java
+import static de.dm.infrastructure.logcapture.ExpectedLoggerName.logger;
+
+...
+
+log.info("did something");
+log.info("did something");
+
+logCapture.assertLogged(atLeast(1), info("did something"));
+logCapture.assertLogged(times(2),   info("did something"));
+logCapture.assertLogged(atMost(3),  info("did something"));
+
+log.info("did nothing");
+logCapture.assertLogged(once(), info("did nothing"));
 ```
 
 ### Examples
@@ -325,6 +345,11 @@ And with MDC logging context
 ```
 
 ## Changes
+
+### 4.1.0
+
+* **Feature**: Added method to test number of log message repetitions via `times(...)`, `once()`, `atMost(...)` and `atLeast(...)`
+* **Improvement**: Better readability of assertion messages
 
 ### 4.0.1
 
