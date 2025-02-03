@@ -45,10 +45,9 @@ public class LogAsserter {
             LastCapturedLogEvent lastCapturedLogEvent = assertCapturedNext(assertion.level, assertion.regex, Optional.empty(), assertion.logEventMatchers);
             if (matches.containsKey(lastCapturedLogEvent.lastAssertedLogMessageIndex)) {
                 LogExpectation previousMatch = matches.get(lastCapturedLogEvent.lastAssertedLogMessageIndex);
-                throw new AssertionError(String.format(
-                        "Imprecise matching: Two log expectations have matched the same message. " +
-                                "Use more precise matching or in-order matching. " +
-                                "(First match: %s | Second match: %s",
+                throw new AssertionError(format("""
+                                Imprecise matching: Two log expectations have matched the same message. Use more precise matching or in-order matching.
+                                -- First match:%s-- Second match:%s""",
                         getDescriptionForExpectedMessageWithAdditionalMatchers(previousMatch.level, previousMatch.regex, previousMatch.logEventMatchers),
                         getDescriptionForExpectedMessageWithAdditionalMatchers(assertion.level, assertion.regex, assertion.logEventMatchers)));
             }

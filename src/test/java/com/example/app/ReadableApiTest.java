@@ -648,11 +648,12 @@ class ReadableApiTest {
                     ));
 
             assertThat(assertionError).hasMessage("""
-                    Imprecise matching: Two log expectations have matched the same message. Use more precise matching or in-order matching. (First match:\s
+                    Imprecise matching: Two log expectations have matched the same message. Use more precise matching or in-order matching.
+                    -- First match:
                     message: INFO "hello" (regex)
-                     | Second match:\s
+                    -- Second match:
                     message: INFO "1" (regex)
-                    """); // TODO: fix this
+                    """);
         }
 
         @Test
