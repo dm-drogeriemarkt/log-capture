@@ -28,7 +28,10 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Slf4j
-@SuppressWarnings("java:S5778") //this rule does not increase the clarity of these tests
+@SuppressWarnings({
+        "java:S5778", //this rule does not increase the clarity of these tests
+        "LoggingSimilarMessage" // not a sensible rule for a logging test
+})
 class ReadableApiTest {
     @RegisterExtension
     LogCapture logCapture = LogCapture.forCurrentPackage();
