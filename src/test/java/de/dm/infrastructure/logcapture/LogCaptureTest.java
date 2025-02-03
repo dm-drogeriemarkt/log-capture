@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import static ch.qos.logback.classic.Level.INFO;
 import static ch.qos.logback.classic.Level.TRACE;
+import static de.dm.infrastructure.logcapture.LogExpectation.info;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -32,7 +33,7 @@ class LogCaptureTest {
         logCaptureFromOtherPackage.removeAppenderAndResetLogLevel();
 
         assertThat(logCaptureFromOtherPackage.capturedPackages).containsExactly(LogCaptureCreatorInOtherPackage.class.getPackage().getName());
-        var thrown = assertThrows(AssertionError.class, () -> logCaptureFromOtherPackage.assertLogged(LogExpectation.info("hello from")));
+        var thrown = assertThrows(AssertionError.class, () -> logCaptureFromOtherPackage.assertLogged(info("hello from")));
         assertThat(thrown).hasMessage("""
                 Expected log message has not occurred.
                 message: INFO "hello from" (regex)
@@ -55,12 +56,12 @@ class LogCaptureTest {
 
         comExampleLogger.setLevel(originalLevel);
 
-        LogCapture logCapture = LogCapture.forPackages("com.example");
-        logCapture.addAppenderAndSetLogLevelToTrace();
+        LogCapture logCaptureComExample = LogCapture.forPackages("com.example");
+        logCaptureComExample.addAppenderAndSetLogLevelToTrace();
 
         assertThat(comExampleLogger.getLevel()).isEqualTo(TRACE);
 
-        logCapture.removeAppenderAndResetLogLevel();
+        logCaptureComExample.removeAppenderAndResetLogLevel();
 
         assertThat(comExampleLogger.getLevel()).isEqualTo(originalLevel);
     }

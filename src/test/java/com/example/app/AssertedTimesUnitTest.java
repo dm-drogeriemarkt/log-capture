@@ -1,12 +1,11 @@
 package com.example.app;
 
-import de.dm.infrastructure.logcapture.ExpectedException;
 import de.dm.infrastructure.logcapture.LogCapture;
-import de.dm.infrastructure.logcapture.LogExpectation;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+import static de.dm.infrastructure.logcapture.ExpectedException.exception;
 import static de.dm.infrastructure.logcapture.ExpectedMdcEntry.mdc;
 import static de.dm.infrastructure.logcapture.ExpectedTimes.atLeast;
 import static de.dm.infrastructure.logcapture.ExpectedTimes.atMost;
@@ -36,12 +35,18 @@ class AssertedTimesUnitTest {
     }
 
     @Test
-    void assertLoggedWithTimes_loggedTooOften_assertionFails() {
+    void assertLoggedWithTimes_loggedTooOftenWithAdditionalMatchers_assertionFails() {
         log.info("hello world");
         log.info("hello world");
         log.info("hello world");
 
-        var assertionError = assertThrows(AssertionError.class, () -> logCapture.assertLogged(times(2), LogExpectation.info("hello world", mdc("foo", "bar"), ExpectedException.exception().expectedMessageRegex("noooo!").build())));
+        var assertionError = assertThrows(AssertionError.class, () ->
+                logCapture.assertLogged(
+                        times(2),
+                        info("hello world",
+                                mdc("foo", "bar"),
+                                exception().expectedMessageRegex("noooo!").build())
+                ));
 
         assertThat(assertionError).hasMessage("""
                 Expected log message has not occurred exactly 2 time(s)
@@ -58,7 +63,10 @@ class AssertedTimesUnitTest {
         log.info("hello world");
         log.info("hello world");
 
-        var assertionError = assertThrows(AssertionError.class, () -> logCapture.assertLogged(times(3), info("hello world")));
+        var assertionError = assertThrows(AssertionError.class, () ->
+                logCapture.assertLogged(
+                        times(3),
+                        info("hello world")));
 
         assertThat(assertionError).hasMessage("""
                 Expected log message has not occurred exactly 3 time(s)
