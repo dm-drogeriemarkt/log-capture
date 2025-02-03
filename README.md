@@ -19,11 +19,6 @@ logCapture.assertLoggedInOrder(
     info("hello world"),
     warn("bye world")
 );
-
-log.info("I did something", name);
-log.info("I did something", name);
-
-logCapture.assertLogged(atLeast(2), info("I did something"));
 ```
 
 It's even simple when there's more than just the message and level to assert:
@@ -47,6 +42,7 @@ logCapture.assertLoggedInOrder(
     * [Markers](#markers)
     * [Key-Value](#key-value)
     * [Logger name](#logger-name)
+    * [Amount of repetitions](#amount-of-repetitions)
   * [Examples](#examples)
     * [Unit Test Example:](#unit-test-example)
     * [Integration Test Example:](#integration-test-example)
@@ -55,7 +51,7 @@ logCapture.assertLoggedInOrder(
 * [Usage outside of JUnit 5 (Cucumber example)](#usage-outside-of-junit-5-cucumber-example)
   * [Cucumber example](#cucumber-example)
     * [Cucumber feature file](#cucumber-feature-file)
-* [Changes](#changes) 
+* [Changes](#changes)
   * [4.1.0](#410)
   * [4.0.1](#401)
   * [4.0.0](#400)
@@ -165,9 +161,7 @@ log.info("did something");
 logCapture.assertLogged(info("did something", logger("com.acme.foo")));
 ```
 
-### Expect a specific amount of times
-
-It is possible to match a LogExpectation multiple times. This can be done by using the `Times` class.
+#### Amount of repetitions
 
 ```java
 import static de.dm.infrastructure.logcapture.ExpectedLoggerName.logger;
@@ -177,17 +171,13 @@ import static de.dm.infrastructure.logcapture.ExpectedLoggerName.logger;
 log.info("did something");
 log.info("did something");
 
-logCapture.assertLogged(info("did something"), times(2));
-```
+logCapture.assertLogged(atLeast(1), info("did something"));
+logCapture.assertLogged(times(2),   info("did something"));
+logCapture.assertLogged(atMost(3),  info("did something"));
 
-There are also more options for checking the amount of times a log message is logged a little more or less specific.
-
-```java
-logCapture.assertLogged(info("did something"), atLeast(1)); // not important if more than once, but at least once
-logCapture.assertLogged(info("did something"), atMost(2)); // not important if less than e.g. twice, but at most twice
-logCapture.assertLogged(info("did something"), once()); // exactly once
+log.info("did nothing");
+logCapture.assertLogged(once(), info("did nothing"));
 ```
-   
 
 ### Examples
 
