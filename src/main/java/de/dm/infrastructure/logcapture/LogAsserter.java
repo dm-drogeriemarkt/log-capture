@@ -58,7 +58,7 @@ public class LogAsserter {
     }
 
     /**
-     * assert a single multiple message has been logged
+     * assert a single message has been logged at least once
      *
      * @param logExpectation descriptions of expected log message
      *
