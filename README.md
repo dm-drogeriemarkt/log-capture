@@ -7,9 +7,6 @@
 
 Simple assertions for log messages. See [Examples](#examples).
 
-> [!NOTE]
-> log-capture asserts evaluated log statements. That means it depends on a logging implementation (*logback*), but works with any logging facade (*slf4j* and others)
-
 ```java
 var name="world";
 log.info("hello {}", name);
@@ -31,6 +28,12 @@ logCapture.assertLoggedInOrder(
         exception().expectedType(WorldNotFoundException.class))
 );
 ```
+
+> [!TIP]
+> **Advantages of log-capture:**
+>
+> * log-capture does not capture console output (unlinke [OutputCaptureExtension](https://docs.spring.io/spring-boot/api/java/org/springframework/boot/test/system/OutputCaptureExtension.html) for example). This is why it can assert logs independently from the configured log-appender.
+> * log-capture asserts evaluated log statements. That means it depends on a logging implementation (*logback*), but works with any logging facade (like *slf4j* and others).
 
 **Table of Contents**
 
