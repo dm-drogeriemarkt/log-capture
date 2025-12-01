@@ -8,3 +8,4 @@ set -o pipefail # fail if a pipe fails
 cd "$(dirname '${0}')"
 
 mvn versions:use-latest-releases
+mvn versions:display-plugin-updates
