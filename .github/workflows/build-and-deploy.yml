@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - '[0-9]+.[0-9]+.[0-9]+'
+      - '[0-9]+.[0-9]+.[0-9]+-SNAPSHOT'
+      - '[0-9]+.[0-9]+.[0-9]+-RC[0-9]+'
 
 jobs:
   build:
@@ -20,5 +22,5 @@ jobs:
       GPG_KEYNAME: ${{ secrets.GPG_KEYNAME }}
       GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
       GPG_KEY_BASE64: ${{ secrets.GPG_KEY_BASE64 }}
-      OSSRH_JIRA_PASSWORD: ${{ secrets.OSSRH_JIRA_PASSWORD }}
-      OSSRH_JIRA_USERNAME: ${{ secrets.OSSRH_JIRA_USERNAME}}
+      CENTRAL_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
+      CENTRAL_KEY: ${{ secrets.CENTRAL_KEY}}

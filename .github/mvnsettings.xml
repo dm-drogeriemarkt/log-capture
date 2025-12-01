@@ -5,15 +5,15 @@
 
     <servers>
         <server>
-            <id>ossrh</id>
-            <username>${env.OSSRH_JIRA_USERNAME}</username>
-            <password>${env.OSSRH_JIRA_PASSWORD}</password>
+            <id>central</id>
+            <username>${env.CENTRAL_USERNAME}</username>
+            <password>${env.CENTRAL_KEY}</password>
         </server>
     </servers>
 
     <profiles>
         <profile>
-            <id>ossrh</id>
+            <id>central</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>

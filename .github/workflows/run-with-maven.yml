@@ -17,9 +17,9 @@ on:
         required: false
       GPG_KEY_BASE64:
         required: false
-      OSSRH_JIRA_PASSWORD:
+      CENTRAL_USERNAME:
         required: false
-      OSSRH_JIRA_USERNAME:
+      CENTRAL_KEY:
         required: false
 
 jobs:
@@ -29,7 +29,7 @@ jobs:
     environment: ${{ inputs.ENVIRONMENT }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
 
       - name: Cache local Maven repository
         uses: actions/cache@v4
@@ -40,7 +40,7 @@ jobs:
             ${{ runner.os }}-maven-
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'adopt'
@@ -51,8 +51,8 @@ jobs:
           GPG_KEYNAME: ${{ secrets.GPG_KEYNAME }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
           GPG_KEY_BASE64: ${{ secrets.GPG_KEY_BASE64 }}
-          OSSRH_JIRA_PASSWORD: ${{ secrets.OSSRH_JIRA_PASSWORD }}
-          OSSRH_JIRA_USERNAME: ${{ secrets.OSSRH_JIRA_USERNAME}}
+          CENTRAL_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
+          CENTRAL_KEY: ${{ secrets.CENTRAL_KEY}}
           COMMAND: ${{ inputs.COMMAND }}
           REF_TYPE: ${{ github.ref_type }}
           REF_NAME: ${{ github.ref_name }}
