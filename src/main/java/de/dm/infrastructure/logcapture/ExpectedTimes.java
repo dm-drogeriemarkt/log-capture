@@ -6,17 +6,20 @@ import lombok.RequiredArgsConstructor;
 import static de.dm.infrastructure.logcapture.ExpectedTimes.ComparisonStrategy.AT_LEAST;
 import static de.dm.infrastructure.logcapture.ExpectedTimes.ComparisonStrategy.AT_MOST;
 import static de.dm.infrastructure.logcapture.ExpectedTimes.ComparisonStrategy.EQUAL;
-import static lombok.AccessLevel.PRIVATE;
 
 /**
  * define expected repetitions of log messages
  */
 @Getter
-@RequiredArgsConstructor(access = PRIVATE)
-public class ExpectedTimes {
+public final class ExpectedTimes {
 
     private final int referenceValue;
     private final ComparisonStrategy comparisonStrategy;
+
+    private ExpectedTimes(int referenceValue, ComparisonStrategy comparisonStrategy) {
+        this.referenceValue = referenceValue;
+        this.comparisonStrategy = comparisonStrategy;
+    }
 
     @RequiredArgsConstructor
     enum ComparisonStrategy {

@@ -1,22 +1,23 @@
 package de.dm.infrastructure.logcapture;
 
-import lombok.RequiredArgsConstructor;
-
 import java.util.Map;
 import java.util.regex.Pattern;
 
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
-import static lombok.AccessLevel.PRIVATE;
 
 /**
  * define expected MDC entries with this
  */
-@RequiredArgsConstructor(access = PRIVATE)
 public final class ExpectedMdcEntry implements LogEventMatcher {
 
     private final String key;
     private final MdcMatcher matcher;
+
+    private ExpectedMdcEntry(String key, MdcMatcher matcher) {
+        this.key = key;
+        this.matcher = matcher;
+    }
 
     /**
      * use this in a log expectation to verify that something has been logged with an MDC value

@@ -13,15 +13,18 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
-import static lombok.AccessLevel.PACKAGE;
 
 /**
  * class doing the actual assertions of log messages
  */
-@RequiredArgsConstructor(access = PACKAGE)
 public class LogAsserter {
     private final CapturingAppender capturingAppender;
     private final List<LogEventMatcher> globalLogEventMatchers;
+
+    LogAsserter(CapturingAppender capturingAppender, List<LogEventMatcher> globalLogEventMatchers) {
+        this.capturingAppender = capturingAppender;
+        this.globalLogEventMatchers = globalLogEventMatchers;
+    }
 
     /**
      * assert that multiple log messages have been logged in any order
