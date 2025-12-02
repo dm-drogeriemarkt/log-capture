@@ -29,7 +29,7 @@
     </developers>
 
     <properties>
-        <project.version>4.1.0-SNAPSHOT</project.version>
+        <project.version>4.1.1</project.version>
 
         <java.version>17</java.version>
         <encoding>UTF-8</encoding>

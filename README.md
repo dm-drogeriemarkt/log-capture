@@ -55,6 +55,7 @@ logCapture.assertLoggedInOrder(
   * [Cucumber example](#cucumber-example)
     * [Cucumber feature file](#cucumber-feature-file)
 * [Changes](#changes)
+  * [4.1.1](#411)
   * [4.1.0](#410)
   * [4.0.1](#401)
   * [4.0.0](#400)
@@ -351,6 +352,10 @@ And with MDC logging context
 ```
 
 ## Changes
+
+### 4.1.1
+
+* Dependency updates and update to new Maven Central release procedure
 
 ### 4.1.0
 
