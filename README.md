@@ -3,7 +3,7 @@
 [<img src="https://raw.githubusercontent.com/dm-drogeriemarkt/.github/refs/heads/main/assets/dmtech-open-source-badge.svg" height="20" width="130">](https://dmtech.de/)
 [![Apache License 2](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Build Status](https://github.com/dm-drogeriemarkt/log-capture/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/dm-drogeriemarkt/log-capture/actions?query=branch%3Amaster)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/de.dm.infrastructure/log-capture/badge.svg)](https://maven-badges.herokuapp.com/maven-central/de.dm.infrastructure/log-capture)
+[![Maven Central](https://maven-badges.sml.io/sonatype-central/de.dm.infrastructure/log-capture/badge.svg?subject=maven%20central)](https://central.sonatype.com/artifact/de.dm.infrastructure/log-capture)
 
 Simple assertions for log messages. See [Examples](#examples).
 
