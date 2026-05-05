@@ -44,8 +44,7 @@ public final class LogCaptureExtension implements BeforeEachCallback, AfterEachC
     @Override
     public void beforeEach(ExtensionContext context) {
         Class<?> testClass = context.getRequiredTestClass();
-        Set<String> packages = determinePackages(testClass);
-        LogCapture logCapture = LogCapture.forPackageSet(packages);
+        LogCapture logCapture = LogCapture.forPackageSet(getUserDefinedPackages(testClass));
         logCapture.addAppenderAndSetLogLevelToTrace();
         LogCapture.setCurrent(logCapture);
     }
@@ -57,9 +56,8 @@ public final class LogCaptureExtension implements BeforeEachCallback, AfterEachC
         logCapture.removeAppenderAndResetLogLevel();
     }
 
-    private static Set<String> determinePackages(Class<?> testClass) {
-        Optional<LogCapturePackages> annotation =
-                AnnotationSupport.findAnnotation(testClass, LogCapturePackages.class);
+    private static Set<String> getUserDefinedPackages(Class<?> testClass) {
+        Optional<LogCapturePackages> annotation = AnnotationSupport.findAnnotation(testClass, LogCapturePackages.class);
         if (annotation.isPresent()) {
             String[] values = annotation.get().value();
             if (values.length == 0) {
