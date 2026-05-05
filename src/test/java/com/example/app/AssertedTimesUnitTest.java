@@ -1,9 +1,9 @@
 package com.example.app;
 
-import de.dm.infrastructure.logcapture.LogCapture;
+import de.dm.infrastructure.logcapture.LogCaptureExtension;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import static de.dm.infrastructure.logcapture.ExpectedException.exception;
 import static de.dm.infrastructure.logcapture.ExpectedMdcEntry.mdc;
@@ -11,6 +11,7 @@ import static de.dm.infrastructure.logcapture.ExpectedTimes.atLeast;
 import static de.dm.infrastructure.logcapture.ExpectedTimes.atMost;
 import static de.dm.infrastructure.logcapture.ExpectedTimes.once;
 import static de.dm.infrastructure.logcapture.ExpectedTimes.times;
+import static de.dm.infrastructure.logcapture.LogCapture.logCapture;
 import static de.dm.infrastructure.logcapture.LogExpectation.info;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -21,9 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
         "LoggingSimilarMessage" // not a sensible rule for a logging test
 })
 @Slf4j
+@ExtendWith(LogCaptureExtension.class)
 class AssertedTimesUnitTest {
-    @RegisterExtension
-    LogCapture logCapture = LogCapture.forCurrentPackage();
 
     @Test
     void assertLoggedWithTimes_succeeds() {
@@ -31,7 +31,7 @@ class AssertedTimesUnitTest {
         log.info("hello world");
         log.info("hello world");
 
-        assertDoesNotThrow(() -> logCapture.assertLogged(times(3), info("hello world")));
+        assertDoesNotThrow(() -> logCapture().assertLogged(times(3), info("hello world")));
     }
 
     @Test
@@ -41,7 +41,7 @@ class AssertedTimesUnitTest {
         log.info("hello world");
 
         var assertionError = assertThrows(AssertionError.class, () ->
-                logCapture.assertLogged(
+                logCapture().assertLogged(
                         times(2),
                         info("hello world",
                                 mdc("foo", "bar"),
@@ -64,7 +64,7 @@ class AssertedTimesUnitTest {
         log.info("hello world");
 
         var assertionError = assertThrows(AssertionError.class, () ->
-                logCapture.assertLogged(
+                logCapture().assertLogged(
                         times(3),
                         info("hello world")));
 
@@ -92,7 +92,7 @@ class AssertedTimesUnitTest {
     void assertLoggedWithTimesOnce_succeeds() {
         log.info("hello world");
 
-        assertDoesNotThrow(() -> logCapture.assertLogged(once(), info("hello world")));
+        assertDoesNotThrow(() -> logCapture().assertLogged(once(), info("hello world")));
     }
 
     @Test
@@ -100,7 +100,7 @@ class AssertedTimesUnitTest {
         log.info("hello world");
         log.info("hello world");
 
-        var assertionError = assertThrows(AssertionError.class, () -> logCapture.assertLogged(once(), info("hello world")));
+        var assertionError = assertThrows(AssertionError.class, () -> logCapture().assertLogged(once(), info("hello world")));
         assertThat(assertionError).hasMessage("""
                 Expected log message has not occurred exactly 1 time(s)
                 actual occurrences: 2
@@ -112,7 +112,7 @@ class AssertedTimesUnitTest {
     @Test
     void assertLoggedWithTimesOnce_loggedTooLittle_assertionFails() {
 
-        var assertionError = assertThrows(AssertionError.class, () -> logCapture.assertLogged(once(), info("hello world")));
+        var assertionError = assertThrows(AssertionError.class, () -> logCapture().assertLogged(once(), info("hello world")));
         assertThat(assertionError).hasMessage("""
                 Expected log message has not occurred exactly 1 time(s)
                 actual occurrences: 0
@@ -126,7 +126,7 @@ class AssertedTimesUnitTest {
         log.info("hello world");
         log.info("hello world");
 
-        assertDoesNotThrow(() -> logCapture.assertLogged(atLeast(3), info("hello world")));
+        assertDoesNotThrow(() -> logCapture().assertLogged(atLeast(3), info("hello world")));
     }
 
     @Test
@@ -135,7 +135,7 @@ class AssertedTimesUnitTest {
         log.info("hello world");
         log.info("hello world");
 
-        assertDoesNotThrow(() -> logCapture.assertLogged(atLeast(2), info("hello world")));
+        assertDoesNotThrow(() -> logCapture().assertLogged(atLeast(2), info("hello world")));
     }
 
     @Test
@@ -143,7 +143,7 @@ class AssertedTimesUnitTest {
         log.info("hello world");
         log.info("hello world");
 
-        var assertionError = assertThrows(AssertionError.class, () -> logCapture.assertLogged(atLeast(3), info("hello world")));
+        var assertionError = assertThrows(AssertionError.class, () -> logCapture().assertLogged(atLeast(3), info("hello world")));
         assertThat(assertionError).hasMessage("""
                 Expected log message has not occurred at least 3 time(s)
                 actual occurrences: 2
@@ -158,7 +158,7 @@ class AssertedTimesUnitTest {
         log.info("hello world");
         log.info("hello world");
 
-        assertDoesNotThrow(() -> logCapture.assertLogged(atMost(3), info("hello world")));
+        assertDoesNotThrow(() -> logCapture().assertLogged(atMost(3), info("hello world")));
     }
 
     @Test
@@ -167,7 +167,7 @@ class AssertedTimesUnitTest {
         log.info("hello world");
         log.info("hello world");
 
-        var assertionError = assertThrows(AssertionError.class, () -> logCapture.assertLogged(atMost(2), info("hello world")));
+        var assertionError = assertThrows(AssertionError.class, () -> logCapture().assertLogged(atMost(2), info("hello world")));
         assertThat(assertionError).hasMessage("""
                 Expected log message has not occurred at most 2 time(s)
                 actual occurrences: 3
@@ -180,6 +180,6 @@ class AssertedTimesUnitTest {
         log.info("hello world");
         log.info("hello world");
 
-        assertDoesNotThrow(() -> logCapture.assertLogged(atMost(3), info("hello world")));
+        assertDoesNotThrow(() -> logCapture().assertLogged(atMost(3), info("hello world")));
     }
 }

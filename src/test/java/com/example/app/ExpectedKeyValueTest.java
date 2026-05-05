@@ -1,28 +1,27 @@
 package com.example.app;
 
-import de.dm.infrastructure.logcapture.LogCapture;
+import de.dm.infrastructure.logcapture.LogCaptureExtension;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.math.BigDecimal;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static de.dm.infrastructure.logcapture.ExpectedKeyValue.keyValue;
+import static de.dm.infrastructure.logcapture.LogCapture.logCapture;
 import static de.dm.infrastructure.logcapture.LogExpectation.info;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Slf4j
+@ExtendWith(LogCaptureExtension.class)
 @SuppressWarnings({
         "java:S5778", //this rule does not increase the clarity of these tests
         "LoggingSimilarMessage" // not a sensible rule for a logging test
 })
 class ExpectedKeyValueTest {
-    @RegisterExtension
-    LogCapture logCapture = LogCapture.forCurrentPackage();
-
 
     @Test
     void failsWithDetailsNotMatchingExistingKeyValues() {
@@ -32,7 +31,7 @@ class ExpectedKeyValueTest {
                 .log();
 
         var assertionError = assertThrows(AssertionError.class, () ->
-                logCapture.assertLogged(info("hello", keyValue("key", "a value")))
+                logCapture().assertLogged(info("hello", keyValue("key", "a value")))
         );
         assertThat(assertionError).hasMessage("""
                 Expected log message has occurred, but never with the expected key-value pair:
@@ -48,7 +47,7 @@ class ExpectedKeyValueTest {
                 .log();
 
         var assertionError = assertThrows(AssertionError.class, () ->
-                logCapture.assertLogged(info("hello", keyValue("key", "a value")))
+                logCapture().assertLogged(info("hello", keyValue("key", "a value")))
         );
         assertThat(assertionError).hasMessage("""
                 Expected log message has occurred, but never with the expected key-value pair:
@@ -61,7 +60,7 @@ class ExpectedKeyValueTest {
     @Test
     void requiresKey() {
         var assertionError = assertThrows(IllegalArgumentException.class, () ->
-                logCapture.assertLogged(info("hello", keyValue(null, "a value")))
+                logCapture().assertLogged(info("hello", keyValue(null, "a value")))
         );
         assertThat(assertionError).hasMessage("key and value are required for key-value log assertion");
     }
@@ -69,7 +68,7 @@ class ExpectedKeyValueTest {
     @Test
     void requiresValue() {
         var assertionError = assertThrows(IllegalArgumentException.class, () ->
-                logCapture.assertLogged(info("hello", keyValue("a_key", null)))
+                logCapture().assertLogged(info("hello", keyValue("a_key", null)))
         );
         assertThat(assertionError).hasMessage("key and value are required for key-value log assertion");
     }
@@ -81,7 +80,7 @@ class ExpectedKeyValueTest {
                 .log();
 
         Assertions.assertDoesNotThrow(() ->
-                logCapture.assertLogged(info("hello", keyValue("name", "Frederick")))
+                logCapture().assertLogged(info("hello", keyValue("name", "Frederick")))
         );
     }
 
@@ -92,7 +91,7 @@ class ExpectedKeyValueTest {
                 .log();
 
         Assertions.assertDoesNotThrow(() ->
-                logCapture.assertLogged(info("hello", keyValue("meaning", 42L)))
+                logCapture().assertLogged(info("hello", keyValue("meaning", 42L)))
         );
     }
 
@@ -103,7 +102,7 @@ class ExpectedKeyValueTest {
                 .log();
 
         Assertions.assertDoesNotThrow(() ->
-                logCapture.assertLogged(info("hello", keyValue("meaning", 42L)))
+                logCapture().assertLogged(info("hello", keyValue("meaning", 42L)))
         );
     }
 
@@ -114,7 +113,7 @@ class ExpectedKeyValueTest {
                 .log();
 
         Assertions.assertDoesNotThrow(() ->
-                logCapture.assertLogged(info("hello", keyValue("meaning", 42)))
+                logCapture().assertLogged(info("hello", keyValue("meaning", 42)))
         );
     }
 
@@ -125,7 +124,7 @@ class ExpectedKeyValueTest {
                 .log();
 
         Assertions.assertDoesNotThrow(() ->
-                logCapture.assertLogged(info("hello", keyValue("meaning", 42)))
+                logCapture().assertLogged(info("hello", keyValue("meaning", 42)))
         );
     }
 
@@ -136,7 +135,7 @@ class ExpectedKeyValueTest {
                 .log();
 
         var assertionError = assertThrows(AssertionError.class, () ->
-                logCapture.assertLogged(info("hello", keyValue("meaning", 42)))
+                logCapture().assertLogged(info("hello", keyValue("meaning", 42)))
         );
         assertThat(assertionError).hasMessage("""
                 Expected log message has occurred, but never with the expected key-value pair:
@@ -153,7 +152,7 @@ class ExpectedKeyValueTest {
                 .log();
 
         Assertions.assertDoesNotThrow(() ->
-                logCapture.assertLogged(info("hello", keyValue("meaning", 42)))
+                logCapture().assertLogged(info("hello", keyValue("meaning", 42)))
         );
     }
 }
