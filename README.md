@@ -57,6 +57,24 @@ logCapture().assertLoggedInOrder(
   * [Cucumber example](#cucumber-example)
     * [Cucumber feature file](#cucumber-feature-file)
 * [Changes](#changes)
+  * [4.1.1](#411)
+  * [4.1.0](#410)
+  * [4.0.1](#401)
+  * [4.0.0](#400)
+  * [3.6.2](#362)
+  * [3.6.1](#361)
+  * [3.6.0](#360)
+  * [3.5.0](#350)
+  * [3.4.1](#341)
+  * [3.4.0](#340)
+  * [3.3.0](#330)
+  * [3.2.1](#321)
+  * [3.2.0](#320)
+  * [3.1.0](#310)
+  * [3.0.0](#300)
+  * [2.0.1](#201)
+  * [Updating from Version 1.x.x to 2.x.x](#updating-from-version-1xx-to-2xx)
+  * [Updating from Version 3.2.x or lower to Version 3.3.x or higher](#updating-from-version-32x-or-lower-to-version-33x-or-higher)
 
 ## Usage
 
@@ -189,7 +207,7 @@ logCapture().assertLogged(info("did something", logger("com.acme.foo")));
 #### Amount of repetitions
 
 ```java
-import static de.dm.infrastructure.logcapture.ExpectedTimes.*;
+import static de.dm.infrastructure.logcapture.ExpectedTimes.logger;
 
 ...
 
@@ -259,8 +277,9 @@ import irrelevant.utility.Irrelevant;
 ...
 
 @ExtendWith(LogCaptureExtension.class)
-@LogCapturePackages({"my.company", "utility.that.logs"})
+@LogCapturePackages({"my.company", "utility.that.logs"}) // captures only logs from my.company and utility.that.logs and sub-packages
 public class MyIntegrationTest {
+    Logger logger = LoggerFactory.getLogger(MyIntegrationTest.class);
 
     @Test
     public void twoLogMessagesInOrder() {
@@ -290,7 +309,8 @@ import static de.dm.infrastructure.logcapture.LogExpectation.*;
 
 @ExtendWith(LogCaptureExtension.class)
 public class MyUnitTest {
-
+    Logger logger = LoggerFactory.getLogger(MyUnitTest.class);
+    
     @Test
     public void logMessageWithMdcInformation() {
         MDC.put("my_mdc_key", "this is the MDC value");
