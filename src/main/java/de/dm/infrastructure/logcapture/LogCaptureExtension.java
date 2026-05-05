@@ -34,6 +34,13 @@ import java.util.Set;
  */
 public final class LogCaptureExtension implements BeforeEachCallback, AfterEachCallback {
 
+    /**
+     * Creates a new LogCaptureExtension. Used by JUnit's {@code @ExtendWith} mechanism.
+     */
+    public LogCaptureExtension() {
+        // used by JUnit's @ExtendWith
+    }
+
     @Override
     public void beforeEach(ExtensionContext context) {
         Class<?> testClass = context.getRequiredTestClass();
