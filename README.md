@@ -39,6 +39,7 @@ logCapture.assertLoggedInOrder(
 
 * [Usage](#usage)
   * [Maven](#maven)
+  * [Using @ExtendWith](#using-extendwith)
   * [Additional matchers](#additional-matchers)
     * [MDC content](#mdc-content)
     * [Exceptions](#exceptions)
@@ -87,6 +88,44 @@ Add log-capture as a test dependency to your project. If you use Maven, add this
     <version>4.1.0</version>
     <scope>test</scope>
 </dependency>
+```
+
+### Using @ExtendWith
+
+As an alternative to `@RegisterExtension`, you can use `@ExtendWith` to register LogCapture at the class level.
+Use the static `logCapture()` method to access the active instance:
+
+```java
+import static de.dm.infrastructure.logcapture.LogCapture.logCapture;
+
+@ExtendWith(LogCaptureExtension.class)
+class MyTest {
+
+    @Test
+    void myTest() {
+        log.info("hello world");
+        logCapture().assertLogged(info("hello world"));
+    }
+}
+```
+
+By default, this captures logs from the test class's package (like `LogCapture.forCurrentPackage()`).
+
+To capture logs from specific packages, annotate the test class with `@LogCapturePackages`:
+
+```java
+import static de.dm.infrastructure.logcapture.LogCapture.logCapture;
+
+@ExtendWith(LogCaptureExtension.class)
+@LogCapturePackages({"my.company", "utility.that.logs"})
+class MyIntegrationTest {
+
+    @Test
+    void myTest() {
+        // captures logs from my.company and utility.that.logs (and sub-packages)
+        logCapture().assertLogged(info("something"));
+    }
+}
 ```
 
 ### Additional matchers
