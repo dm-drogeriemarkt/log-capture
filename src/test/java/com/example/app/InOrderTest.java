@@ -1,22 +1,22 @@
 package com.example.app;
 
-import de.dm.infrastructure.logcapture.LogCapture;
+import de.dm.infrastructure.logcapture.LogCaptureExtension;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+import static de.dm.infrastructure.logcapture.LogCapture.logCapture;
 import static de.dm.infrastructure.logcapture.LogExpectation.info;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Slf4j
+@ExtendWith(LogCaptureExtension.class)
 @SuppressWarnings({
         "java:S5778", //this rule does not increase the clarity of these tests
         "LoggingSimilarMessage" // not a sensible rule for a logging test
 })
 class InOrderTest {
-    @RegisterExtension
-    LogCapture logCapture = LogCapture.forCurrentPackage();
 
     @Test
     void assertionWithoutOrderSucceeds() {
@@ -24,7 +24,7 @@ class InOrderTest {
         log.info("hello 2");
         log.info("hello 3");
 
-        logCapture.assertLoggedInAnyOrder(
+        logCapture().assertLoggedInAnyOrder(
                 info("hello 3"),
                 info("hello 1"),
                 info("hello 2")
@@ -37,7 +37,7 @@ class InOrderTest {
         log.info("hello 3");
 
         AssertionError assertionError = assertThrows(AssertionError.class, () ->
-                logCapture.assertLoggedInAnyOrder(
+                logCapture().assertLoggedInAnyOrder(
                         info("hello 3"),
                         info("hello 1"),
                         info("hello 2")
@@ -58,7 +58,7 @@ class InOrderTest {
         log.info("hello 3");
 
         AssertionError assertionError = assertThrows(AssertionError.class, () ->
-                logCapture.assertLoggedInAnyOrder(
+                logCapture().assertLoggedInAnyOrder(
                         info("hello"),
                         info("1")
                 ));
@@ -78,7 +78,7 @@ class InOrderTest {
         log.info("hello 2");
         log.info("hello 3");
 
-        logCapture.assertLoggedInOrder(
+        logCapture().assertLoggedInOrder(
                 info("hello 1"),
                 info("hello 2"),
                 info("hello 3")
@@ -92,7 +92,7 @@ class InOrderTest {
         log.info("hello 3");
 
         AssertionError assertionError = assertThrows(AssertionError.class, () ->
-                logCapture.assertLoggedInOrder(
+                logCapture().assertLoggedInOrder(
                         info("hello 1"),
                         info("hello 3"),
                         info("hello 2")
@@ -109,7 +109,7 @@ class InOrderTest {
         log.info("hello world");
         log.info("hello universe");
 
-        logCapture
+        logCapture()
                 .assertLoggedInOrder(
                         info("hello world"),
                         info("hello universe"))
@@ -123,7 +123,7 @@ class InOrderTest {
         log.info("hello multiverse");
 
         AssertionError assertionError = assertThrows(AssertionError.class, () ->
-                logCapture
+                logCapture()
                         .assertLoggedInOrder(
                                 info("hello world"),
                                 info("hello universe"))
@@ -137,7 +137,7 @@ class InOrderTest {
         log.info("hello world");
         log.info("hello universe");
 
-        logCapture
+        logCapture()
                 .assertLoggedInAnyOrder(
                         info("hello universe"),
                         info("hello world"))
@@ -151,7 +151,7 @@ class InOrderTest {
         log.info("hello universe");
 
         AssertionError assertionError = assertThrows(AssertionError.class, () ->
-                logCapture
+                logCapture()
                         .assertLoggedInAnyOrder(
                                 info("hello universe"),
                                 info("hello world"))
@@ -164,7 +164,7 @@ class InOrderTest {
     void nothingElseLoggedSingleLogMessageSucceeds() {
         log.info("hello world");
 
-        logCapture
+        logCapture()
                 .assertLogged(info("hello world"))
                 .assertNothingElseLogged();
     }
@@ -175,7 +175,7 @@ class InOrderTest {
         log.info("hello universe");
 
         AssertionError assertionError = assertThrows(AssertionError.class, () ->
-                logCapture
+                logCapture()
                         .assertLogged(info("hello world"))
                         .assertNothingElseLogged());
 

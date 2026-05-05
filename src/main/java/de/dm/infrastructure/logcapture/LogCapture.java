@@ -20,6 +20,8 @@ import static org.slf4j.Logger.ROOT_LOGGER_NAME;
  */
 public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
 
+    private static final ThreadLocal<LogCapture> CURRENT = new ThreadLocal<>();
+
     final Set<String> capturedPackages;
     CapturingAppender capturingAppender;
     private final Logger rootLogger = (Logger) LoggerFactory.getLogger(ROOT_LOGGER_NAME);
@@ -54,6 +56,49 @@ public final class LogCapture implements BeforeEachCallback, AfterEachCallback {
         String className = caller.getClassName();
         String packageName = className.substring(0, className.lastIndexOf("."));
         return LogCapture.forPackages(packageName);
+    }
+
+    /**
+     * Returns the active LogCapture instance for the current thread, as set up by {@link LogCaptureExtension}.
+     * Intended for static import so that test code reads naturally.
+     *
+     * <p>Example:
+     * <pre>{@code
+     * import static de.dm.infrastructure.logcapture.LogCapture.logCapture;
+     *
+     * @ExtendWith(LogCaptureExtension.class)
+     * class MyTest {
+     *     @Test
+     *     void myTest() {
+     *         log.info("hello");
+     *         logCapture().assertLogged(info("hello"));
+     *     }
+     * }
+     * }</pre>
+     *
+     * @return the active LogCapture instance
+     *
+     * @throws IllegalStateException if no LogCapture is active (missing @ExtendWith)
+     */
+    public static LogCapture logCapture() {
+        LogCapture logCapture = CURRENT.get();
+        if (logCapture == null) {
+            throw new IllegalStateException(
+                    "No active LogCapture found. Use @ExtendWith(LogCaptureExtension.class) on your test class.");
+        }
+        return logCapture;
+    }
+
+    static void setCurrent(LogCapture logCapture) {
+        CURRENT.set(logCapture);
+    }
+
+    static void clearCurrent() {
+        CURRENT.remove();
+    }
+
+    static LogCapture forPackageSet(Set<String> packages) {
+        return new LogCapture(packages);
     }
 
     private LogCapture(Set<String> capturedPackages) {

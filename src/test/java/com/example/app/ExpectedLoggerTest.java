@@ -1,43 +1,43 @@
 package com.example.app;
 
-import de.dm.infrastructure.logcapture.LogCapture;
+import de.dm.infrastructure.logcapture.LogCaptureExtension;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import static de.dm.infrastructure.logcapture.ExpectedLoggerName.logger;
+import static de.dm.infrastructure.logcapture.LogCapture.logCapture;
 import static de.dm.infrastructure.logcapture.LogExpectation.info;
 import static de.dm.infrastructure.logcapture.LogExpectation.warn;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Slf4j
+@ExtendWith(LogCaptureExtension.class)
 @SuppressWarnings({
         "java:S5778", //this rule does not increase the clarity of these tests
         "LoggingSimilarMessage" // not a sensible rule for a logging test
 })
 class ExpectedLoggerTest {
-    @RegisterExtension
-    LogCapture logCapture = LogCapture.forCurrentPackage();
 
     @Test
     void expectedLoggerSucceeds() {
         log.info("hello world");
         log.warn("bye world");
 
-        logCapture.assertLogged(
+        logCapture().assertLogged(
                 warn("bye world",
                         logger("ExpectedLoggerTest"))
         );
 
-        logCapture.with(
+        logCapture().with(
                 logger("ExpectedLoggerTest")
         ).assertLoggedInAnyOrder(
                 warn("bye world"),
                 info("hello world")
         );
 
-        logCapture.with(
+        logCapture().with(
                 logger("^com.example.app.ExpectedLoggerTest")
         ).assertLoggedInAnyOrder(
                 info("hello world"),
@@ -51,7 +51,7 @@ class ExpectedLoggerTest {
         log.warn("bye world");
 
         AssertionError assertionError = assertThrows(AssertionError.class,
-                () -> logCapture.assertLoggedInOrder(
+                () -> logCapture().assertLoggedInOrder(
                         info("hello world"),
                         warn("bye world",
                                 logger("WrongLogger$"))
@@ -69,11 +69,11 @@ class ExpectedLoggerTest {
     void loggerWithAssertNotLogged() {
         log.info("hello on this logger");
 
-        logCapture.assertNotLogged(
+        logCapture().assertNotLogged(
                 info("hello on this logger",
                         logger("wrongLogger")));
 
-        final AssertionError assertionError = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(
+        final AssertionError assertionError = assertThrows(AssertionError.class, () -> logCapture().assertNotLogged(
                 info("hello on this logger",
                         logger("ExpectedLoggerTest$"))));
         assertThat(assertionError)

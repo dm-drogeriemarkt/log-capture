@@ -12,7 +12,7 @@ var name="world";
 log.info("hello {}", name);
 log.warn("bye {}", name);
 
-logCapture.assertLoggedInOrder(
+logCapture().assertLoggedInOrder(
     info("hello world"),
     warn("bye world")
 );
@@ -21,7 +21,7 @@ logCapture.assertLoggedInOrder(
 It's even simple when there's more than just the message and level to assert:
 
 ```java
-logCapture.assertLoggedInOrder(
+logCapture().assertLoggedInOrder(
     info("hello world",
         logger("com.acme.helloworld.WorldGreeter"))
     warn("bye world",
@@ -39,6 +39,7 @@ logCapture.assertLoggedInOrder(
 
 * [Usage](#usage)
   * [Maven](#maven)
+  * [Setup](#setup)
   * [Additional matchers](#additional-matchers)
     * [MDC content](#mdc-content)
     * [Exceptions](#exceptions)
@@ -51,10 +52,12 @@ logCapture.assertLoggedInOrder(
     * [Integration Test Example:](#integration-test-example)
     * [Example with additional MDC matcher](#example-with-additional-mdc-matcher)
     * [More Examples](#more-examples)
+  * [Alternative: Using @RegisterExtension](#alternative-using-registerextension)
 * [Usage outside of JUnit 5 (Cucumber example)](#usage-outside-of-junit-5-cucumber-example)
   * [Cucumber example](#cucumber-example)
     * [Cucumber feature file](#cucumber-feature-file)
 * [Changes](#changes)
+  * [4.2.0](#420)
   * [4.1.1](#411)
   * [4.1.0](#410)
   * [4.0.1](#401)
@@ -84,9 +87,46 @@ Add log-capture as a test dependency to your project. If you use Maven, add this
 <dependency>
     <groupId>de.dm.infrastructure</groupId>
     <artifactId>log-capture</artifactId>
-    <version>4.1.0</version>
+    <version>4.2.0</version>
     <scope>test</scope>
 </dependency>
+```
+
+### Setup
+
+Add `@ExtendWith(LogCaptureExtension.class)` to your test class and use the static `logCapture()` method to access the captured logs:
+
+```java
+import static de.dm.infrastructure.logcapture.LogCapture.logCapture;
+
+@ExtendWith(LogCaptureExtension.class)
+class MyTest {
+
+    @Test
+    void myTest() {
+        log.info("hello world");
+        logCapture().assertLogged(info("hello world"));
+    }
+}
+```
+
+By default, this captures logs from the test class's package (and sub-packages).
+
+To capture logs from specific packages, annotate the test class with `@LogCapturePackages`:
+
+```java
+import static de.dm.infrastructure.logcapture.LogCapture.logCapture;
+
+@ExtendWith(LogCaptureExtension.class)
+@LogCapturePackages({"my.company", "utility.that.logs"})
+class MyIntegrationTest {
+
+    @Test
+    void myTest() {
+        // captures logs from my.company and utility.that.logs (and sub-packages)
+        logCapture().assertLogged(info("something"));
+    }
+}
 ```
 
 ### Additional matchers
@@ -103,7 +143,7 @@ import static de.dm.infrastructure.logcapture.ExpectedMdcEntry.mdc;
 MDC.put("key", "value");
 log.info("did something");
 
-logCapture.assertLogged(info("did something", mdc("key", "value")));`
+logCapture().assertLogged(info("did something", mdc("key", "value")));
 ```
 
 #### Exceptions
@@ -117,7 +157,7 @@ log.warn("oh no!",
     new IllegalArgumentException("shame on you!",
         new NullPointerException("never use null")));
 
-logCapture.assertLogged(
+logCapture().assertLogged(
     warn("oh no!",
         exception()
             .expectedType(IllegalArgumentException.class)
@@ -138,7 +178,7 @@ import static de.dm.infrastructure.logcapture.ExpectedMarker.marker;
 
 log.info(MarkerFactory.getMarker("my-marker"), "hello with marker");
 
-logCapture.assertLogged(info("hello with marker", marker("my-marker")));
+logCapture().assertLogged(info("hello with marker", marker("my-marker")));
 ```
 
 #### Key-Value
@@ -150,7 +190,7 @@ import static de.dm.infrastructure.logcapture.ExpectedKeyValue.keyValue;
 
 log.atInfo().setMessage("hello").addKeyValue("meaning", 42).log();
 
-logCapture.assertLogged(info("hello", keyValue("meaning", 42)))
+logCapture().assertLogged(info("hello", keyValue("meaning", 42)))
 ```
 
 #### Logger name
@@ -162,25 +202,25 @@ import static de.dm.infrastructure.logcapture.ExpectedLoggerName.logger;
 
 log.info("did something");
 
-logCapture.assertLogged(info("did something", logger("com.acme.foo")));
+logCapture().assertLogged(info("did something", logger("com.acme.foo")));
 ```
 
 #### Amount of repetitions
 
 ```java
-import static de.dm.infrastructure.logcapture.ExpectedLoggerName.logger;
+import static de.dm.infrastructure.logcapture.ExpectedTimes.logger;
 
 ...
 
 log.info("did something");
 log.info("did something");
 
-logCapture.assertLogged(atLeast(1), info("did something"));
-logCapture.assertLogged(times(2),   info("did something"));
-logCapture.assertLogged(atMost(3),  info("did something"));
+logCapture().assertLogged(atLeast(1), info("did something"));
+logCapture().assertLogged(times(2),   info("did something"));
+logCapture().assertLogged(atMost(3),  info("did something"));
 
 log.info("did nothing");
-logCapture.assertLogged(once(), info("did nothing"));
+logCapture().assertLogged(once(), info("did nothing"));
 ```
 
 ### Examples
@@ -190,16 +230,12 @@ logCapture.assertLogged(once(), info("did nothing"));
 ```java
 package my.company.application;
 
-import de.dm.infrastructure.logcapture.LogCapture;
-import de.dm.infrastructure.logcapture.LogExpectation;
+import static de.dm.infrastructure.logcapture.LogCapture.logCapture;
+import static de.dm.infrastructure.logcapture.LogExpectation.*;
 ...
 
+@ExtendWith(LogCaptureExtension.class)
 public class MyUnitTest {
-
-    Logger logger = LoggerFactory.getLogger(MyUnitTest.class);
-
-    @RegisterExtension //use @Rule for LogCapture 2/JUnit 4
-    public LogCapture logCapture = LogCapture.forCurrentPackage();
 
     @Test
     public void twoLogMessagesInOrder() {
@@ -208,20 +244,20 @@ public class MyUnitTest {
 
         //assert that the messages have been logged
         //expected log message is a regular expression
-        logCapture.assertLogged(
+        logCapture().assertLogged(
             info("^something interesting$"),
             error("terrible")
         );
         
         //is the same assertion, but also asserts the order of these log messages
-        logCapture.assertLoggedInOrder(
+        logCapture().assertLoggedInOrder(
             info("^something interesting$"),
             error("terrible")
         );
 
         //assert that no log message containing "something unwanted" with any log level exists 
         //and that no log message with level DEBUG exists
-        logCapture.assertNotLogged(
+        logCapture().assertNotLogged(
             any("something unwanted"),
             debug()
         );
@@ -231,21 +267,20 @@ public class MyUnitTest {
 
 #### Integration Test Example:
 
-```Java
+```java
 package my.company.application;
+
+import static de.dm.infrastructure.logcapture.LogCapture.logCapture;
+import static de.dm.infrastructure.logcapture.LogExpectation.*;
 
 import utility.that.logs.Tool;
 import irrelevant.utility.Irrelevant;
-import de.dm.infrastructure.logcapture.LogCapture;
 ...
 
+@ExtendWith(LogCaptureExtension.class)
+@LogCapturePackages({"my.company", "utility.that.logs"}) // captures only logs from my.company and utility.that.logs and sub-packages
 public class MyIntegrationTest {
-
     Logger logger = LoggerFactory.getLogger(MyIntegrationTest.class);
-
-    // captures only logs from my.company and utility.that.logs and sub-packages
-    @RegisterExtension //use @Rule for LogCapture 2/JUnit 4
-    public LogCapture logCapture = LogCapture.forPackages("my.company", "utility.that.logs");
 
     @Test
     public void twoLogMessagesInOrder() {
@@ -255,7 +290,7 @@ public class MyIntegrationTest {
         log.info("something interesting");
         log.error("something terrible");
 
-        logCapture.assertLogged(
+        logCapture().assertLogged(
             info("^something interesting$"),
             info("^start of info from utility.that.logs"),
             error("terrible"));
@@ -265,21 +300,18 @@ public class MyIntegrationTest {
 
 #### Example with additional MDC matcher
 
-```Java
+```java
 package my.company.application;
 
+import static de.dm.infrastructure.logcapture.LogCapture.logCapture;
+import static de.dm.infrastructure.logcapture.ExpectedMdcEntry.mdc;
+import static de.dm.infrastructure.logcapture.LogExpectation.*;
 ...
 
-import static de.dm.prom.logcapture.ExpectedMdcEntry.withMdc;
-
-...
-
+@ExtendWith(LogCaptureExtension.class)
 public class MyUnitTest {
     Logger logger = LoggerFactory.getLogger(MyUnitTest.class);
-
-    @RegisterExtension
-    public LogCapture logCapture = LogCapture.forCurrentPackage();
-
+    
     @Test
     public void logMessageWithMdcInformation() {
         MDC.put("my_mdc_key", "this is the MDC value");
@@ -288,7 +320,7 @@ public class MyUnitTest {
         log.info("this message has some additional MDC information attached");
 
         // asserts my_mdc_key for both message and other_mdc_key for the second one
-        logCapture
+        logCapture()
             .with(mdc("my_mdc_key", "^this is the MDC value$"))
             .assertLoggedInOrder(
                 info("information attached"),
@@ -307,7 +339,7 @@ MDC.put("my_mdc_key", "this is the wrong MDC value");
 MDC.put("other_mdc_key", "this is the other MDC value");
 log.info("this message has some MDC information attached");
 
-logCapture.assertLogged(info("information attached",
+logCapture().assertLogged(info("information attached",
         mdc("my_mdc_key", "^something expected that never occurs$"),
         mdc("other_mdc_key", "^this is the other MDC value$")));
 ```
@@ -328,6 +360,26 @@ message: INFO "information attached" (regex)
 #### More Examples
 
 [See Tests](src/test/java/com/example/app) for more usage examples.
+
+### Alternative: Using @RegisterExtension
+
+You can also use `@RegisterExtension` to create a `LogCapture` instance directly. This is useful if you need more control over the instance or want to use it outside of `@ExtendWith`:
+
+```java
+public class MyTest {
+
+    @RegisterExtension
+    LogCapture logCapture = LogCapture.forCurrentPackage();
+
+    @Test
+    public void myTest() {
+        log.info("hello world");
+        logCapture.assertLogged(info("hello world"));
+    }
+}
+```
+
+Use `LogCapture.forPackages("my.company", "utility.that.logs")` to capture logs from specific packages.
 
 ## Usage outside of JUnit 5 (Cucumber example)
 
@@ -352,6 +404,11 @@ And with MDC logging context
 ```
 
 ## Changes
+
+### 4.2.0
+
+* **Feature**: Added `LogCaptureExtension` for declarative log capturing via `@ExtendWith(LogCaptureExtension.class)` as an alternative to `@RegisterExtension`
+* **Feature**: Added `@LogCapturePackages` annotation to specify which packages to capture when using `LogCaptureExtension`
 
 ### 4.1.1
 
@@ -475,12 +532,12 @@ import static de.dm.infrastructure.logcapture.LogExpectation.info;
 ...
 
 // plain assertion
-logCapture.assertLogged(info("Something happened."));
+logCapture().assertLogged(info("Something happened."));
 // assertion with MDC
-logCapture.assertLogged(info("Something with MDC content",
+logCapture().assertLogged(info("Something with MDC content",
     mdc("rabattUpdate", "CapturableHeadline")));
 // in-order assertion
-ogCapture.assertLoggedInOrder(
+logCapture().assertLoggedInOrder(
     info("Step 1")
     info("Step 2")
 );

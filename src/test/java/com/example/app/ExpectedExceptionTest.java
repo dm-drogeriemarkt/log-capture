@@ -1,11 +1,12 @@
 package com.example.app;
 
-import de.dm.infrastructure.logcapture.LogCapture;
+import de.dm.infrastructure.logcapture.LogCaptureExtension;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import static de.dm.infrastructure.logcapture.ExpectedException.exception;
+import static de.dm.infrastructure.logcapture.LogCapture.logCapture;
 import static de.dm.infrastructure.logcapture.LogExpectation.any;
 import static de.dm.infrastructure.logcapture.LogExpectation.debug;
 import static de.dm.infrastructure.logcapture.LogExpectation.error;
@@ -16,26 +17,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Slf4j
+@ExtendWith(LogCaptureExtension.class)
 @SuppressWarnings({
         "java:S5778", //this rule does not increase the clarity of these tests
         "LoggingSimilarMessage" // not a sensible rule for a logging test
 })
 class ExpectedExceptionTest {
-    @RegisterExtension
-    LogCapture logCapture = LogCapture.forCurrentPackage();
 
     @Test
     void expectedExceptionSucceeds() {
         log.warn("oh no!", new IllegalArgumentException("shame on you!", new NullPointerException("never use null")));
 
-        logCapture.assertLogged(
+        logCapture().assertLogged(
                 warn("oh no!",
                         exception()
                                 .expectedMessageRegex("shame on you!")
                                 .expectedType(RuntimeException.class)
                                 .build()
                 ));
-        logCapture.assertLogged(
+        logCapture().assertLogged(
                 warn("oh no!",
                         exception()
                                 .expectedType(IllegalArgumentException.class)
@@ -45,8 +45,8 @@ class ExpectedExceptionTest {
                                         .build())
                                 .build()
                 ));
-        logCapture.assertNotLogged(debug(), info(), trace(), error());
-        logCapture.assertLogged(warn());
+        logCapture().assertNotLogged(debug(), info(), trace(), error());
+        logCapture().assertLogged(warn());
     }
 
     @Test
@@ -55,7 +55,7 @@ class ExpectedExceptionTest {
         log.warn("oh no!", new IllegalArgumentException("this is illegal", new NullPointerException("never be null!")));
 
         AssertionError assertionError = assertThrows(AssertionError.class,
-                () -> logCapture.assertLogged(
+                () -> logCapture().assertLogged(
                         warn("oh no!",
                                 exception()
                                         .expectedMessageRegex("a message never used")
@@ -71,7 +71,7 @@ class ExpectedExceptionTest {
                 """);
 
         AssertionError withoutExceptionAssertionError = assertThrows(AssertionError.class,
-                () -> logCapture.assertLogged(
+                () -> logCapture().assertLogged(
                         info("without exception",
                                 exception()
                                         .expectedMessageRegex("a message never used")
@@ -92,25 +92,25 @@ class ExpectedExceptionTest {
     void assertNotLoggedFails() {
         log.info("testlogmessage");
 
-        final AssertionError exceptionAny = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(any()));
+        final AssertionError exceptionAny = assertThrows(AssertionError.class, () -> logCapture().assertNotLogged(any()));
         assertThat(exceptionAny).hasMessage("""
                 Found a log message that should not be logged.
                 message: <Any log message>
                 """);
 
-        final AssertionError exceptionWithLevel = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(info()));
+        final AssertionError exceptionWithLevel = assertThrows(AssertionError.class, () -> logCapture().assertNotLogged(info()));
         assertThat(exceptionWithLevel).hasMessage("""
                 Found a log message that should not be logged.
                 message: INFO <any message>
                 """);
 
-        final AssertionError exceptionWithRegex = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(any("testlogmessage")));
+        final AssertionError exceptionWithRegex = assertThrows(AssertionError.class, () -> logCapture().assertNotLogged(any("testlogmessage")));
         assertThat(exceptionWithRegex).hasMessage("""
                 Found a log message that should not be logged.
                 message: <any level> "testlogmessage" (regex)
                 """);
 
-        final AssertionError exceptionWithRegexAndLevel = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(info("testlogmessage")));
+        final AssertionError exceptionWithRegexAndLevel = assertThrows(AssertionError.class, () -> logCapture().assertNotLogged(info("testlogmessage")));
         assertThat(exceptionWithRegexAndLevel).hasMessage("""
                 Found a log message that should not be logged.
                 message: INFO "testlogmessage" (regex)

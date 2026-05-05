@@ -1,12 +1,13 @@
 package com.example.app;
 
-import de.dm.infrastructure.logcapture.LogCapture;
+import de.dm.infrastructure.logcapture.LogCaptureExtension;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.MDC;
 
 import static de.dm.infrastructure.logcapture.ExpectedMdcEntry.mdc;
+import static de.dm.infrastructure.logcapture.LogCapture.logCapture;
 import static de.dm.infrastructure.logcapture.LogExpectation.error;
 import static de.dm.infrastructure.logcapture.LogExpectation.info;
 import static de.dm.infrastructure.logcapture.LogExpectation.warn;
@@ -14,13 +15,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Slf4j
+@ExtendWith(LogCaptureExtension.class)
 @SuppressWarnings({
         "java:S5778", //this rule does not increase the clarity of these tests
         "LoggingSimilarMessage" // not a sensible rule for a logging test
 })
 class ExpectedMdcTest {
-    @RegisterExtension
-    LogCapture logCapture = LogCapture.forCurrentPackage();
 
     @Test
     void singleMdcSucceeds() {
@@ -29,7 +29,7 @@ class ExpectedMdcTest {
         log.warn("bye world");
         MDC.clear();
 
-        logCapture.assertLoggedInOrder(
+        logCapture().assertLoggedInOrder(
                 info("hello world"),
                 warn("bye world",
                         mdc("key", "value"))
@@ -44,7 +44,7 @@ class ExpectedMdcTest {
         log.warn("bye world");
 
         AssertionError assertionError = assertThrows(AssertionError.class, () ->
-                logCapture.assertLoggedInOrder(
+                logCapture().assertLoggedInOrder(
                         info("hello world"),
                         warn("bye world",
                                 mdc("key", "value"))
@@ -68,7 +68,7 @@ class ExpectedMdcTest {
         log.warn("bye world");
 
         AssertionError assertionError = assertThrows(AssertionError.class, () ->
-                logCapture
+                logCapture()
                         .with(
                                 mdc("key", "value"))
                         .assertLoggedInAnyOrder(
@@ -93,7 +93,7 @@ class ExpectedMdcTest {
         log.warn("bye world");
         MDC.clear();
 
-        logCapture
+        logCapture()
                 .with(
                         mdc("key", "value"))
                 .assertLoggedInAnyOrder(
@@ -111,7 +111,7 @@ class ExpectedMdcTest {
         MDC.clear();
 
         AssertionError assertionError = assertThrows(AssertionError.class, () ->
-                logCapture
+                logCapture()
                         .with(
                                 mdc("key", "value"))
                         .assertLoggedInAnyOrder(
@@ -141,7 +141,7 @@ class ExpectedMdcTest {
         log.error("hello again");
         MDC.clear();
 
-        logCapture
+        logCapture()
                 .with(
                         mdc("key", "value")
                 )
@@ -159,7 +159,7 @@ class ExpectedMdcTest {
         MDC.clear();
 
         AssertionError assertionError = assertThrows(AssertionError.class,
-                () -> logCapture.assertLogged(
+                () -> logCapture().assertLogged(
                         info("hello",
                                 mdc("key", mdcValue -> !mdcValue.equals("value"))
                         )));
@@ -180,7 +180,7 @@ class ExpectedMdcTest {
         log.info("hello");
         MDC.clear();
 
-        logCapture.assertLogged(
+        logCapture().assertLogged(
                 info("hello",
                         mdc("key", mdcValue -> mdcValue.equals("value"))));
     }
@@ -192,9 +192,9 @@ class ExpectedMdcTest {
         log.info("hello world");
         MDC.clear();
 
-        logCapture.assertNotLogged(info("helloWorld", mdc("thirdKey", "value")));
+        logCapture().assertNotLogged(info("helloWorld", mdc("thirdKey", "value")));
 
-        final AssertionError oneKeyMatches = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(info("hello world", mdc("key", "value"))));
+        final AssertionError oneKeyMatches = assertThrows(AssertionError.class, () -> logCapture().assertNotLogged(info("hello world", mdc("key", "value"))));
         assertThat(oneKeyMatches).hasMessage("""
                 Found a log message that should not be logged.
                 message: INFO "hello world" (regex)
@@ -202,7 +202,7 @@ class ExpectedMdcTest {
                   - MDCValue with key: "key"
                 """);
 
-        final AssertionError bothKeysMatches = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(info("hello world", mdc("key", "value"), mdc("another_key", "another_value"))));
+        final AssertionError bothKeysMatches = assertThrows(AssertionError.class, () -> logCapture().assertNotLogged(info("hello world", mdc("key", "value"), mdc("another_key", "another_value"))));
         assertThat(bothKeysMatches).hasMessage("""
                 Found a log message that should not be logged.
                 message: INFO "hello world" (regex)

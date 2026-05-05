@@ -1,32 +1,32 @@
 package com.example.app;
 
-import de.dm.infrastructure.logcapture.LogCapture;
+import de.dm.infrastructure.logcapture.LogCaptureExtension;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 
 import static de.dm.infrastructure.logcapture.ExpectedMarker.marker;
+import static de.dm.infrastructure.logcapture.LogCapture.logCapture;
 import static de.dm.infrastructure.logcapture.LogExpectation.info;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Slf4j
+@ExtendWith(LogCaptureExtension.class)
 @SuppressWarnings({
         "java:S5778", //this rule does not increase the clarity of these tests
         "LoggingSimilarMessage" // not a sensible rule for a logging test
 })
 class ExpectedMarkerTest {
-    @RegisterExtension
-    LogCapture logCapture = LogCapture.forCurrentPackage();
 
     @Test
     void markerFailsBecauseOtherMarkerIsPresent() {
         log.info(MarkerFactory.getMarker("unexpected"), "hello with marker");
 
         AssertionError assertionError = assertThrows(AssertionError.class,
-                () -> logCapture.assertLogged(
+                () -> logCapture().assertLogged(
                         info("hello with marker",
                                 marker("expected"))
                 ));
@@ -44,7 +44,7 @@ class ExpectedMarkerTest {
         log.info("hello without marker");
 
         AssertionError assertionError = assertThrows(AssertionError.class,
-                () -> logCapture.assertLogged(
+                () -> logCapture().assertLogged(
                         info("hello without marker",
                                 marker("expected"))
                 ));
@@ -64,7 +64,7 @@ class ExpectedMarkerTest {
         log.info(marker, "hello with marker");
 
         AssertionError assertionError = assertThrows(AssertionError.class,
-                () -> logCapture.assertLogged(
+                () -> logCapture().assertLogged(
                         info("hello with marker",
                                 marker("expected"))
                 ));
@@ -86,7 +86,7 @@ class ExpectedMarkerTest {
                 .log();
 
         AssertionError assertionError = assertThrows(AssertionError.class,
-                () -> logCapture.assertLogged(
+                () -> logCapture().assertLogged(
                         info("hello with markers",
                                 marker("expected"))
                 ));
@@ -105,7 +105,7 @@ class ExpectedMarkerTest {
         marker.add(MarkerFactory.getMarker("expected_nested"));
         log.info(marker, "hello with marker");
 
-        logCapture.assertLogged(
+        logCapture().assertLogged(
                 info("hello with marker",
                         marker("expected_nested")));
     }
@@ -114,7 +114,7 @@ class ExpectedMarkerTest {
     void markerSucceeds() {
         log.info(MarkerFactory.getMarker("expected"), "hello with marker");
 
-        logCapture.assertLogged(
+        logCapture().assertLogged(
                 info("hello with marker",
                         marker("expected")));
     }
@@ -123,11 +123,11 @@ class ExpectedMarkerTest {
     void markerWithAssertNotLogged() {
         log.info(MarkerFactory.getMarker("expected"), "hello with marker");
 
-        logCapture.assertNotLogged(
+        logCapture().assertNotLogged(
                 info("hello with marker",
                         marker("not expected")));
 
-        final AssertionError assertionError = assertThrows(AssertionError.class, () -> logCapture.assertNotLogged(
+        final AssertionError assertionError = assertThrows(AssertionError.class, () -> logCapture().assertNotLogged(
                 info("hello with marker",
                         marker("expected"))));
         assertThat(assertionError).hasMessage("""

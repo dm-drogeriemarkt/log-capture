@@ -1,13 +1,14 @@
 package com.example.app;
 
-import de.dm.infrastructure.logcapture.LogCapture;
+import de.dm.infrastructure.logcapture.LogCaptureExtension;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.MDC;
 
 import static de.dm.infrastructure.logcapture.ExpectedException.exception;
 import static de.dm.infrastructure.logcapture.ExpectedMdcEntry.mdc;
+import static de.dm.infrastructure.logcapture.LogCapture.logCapture;
 import static de.dm.infrastructure.logcapture.LogExpectation.any;
 import static de.dm.infrastructure.logcapture.LogExpectation.debug;
 import static de.dm.infrastructure.logcapture.LogExpectation.error;
@@ -18,50 +19,49 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Slf4j
+@ExtendWith(LogCaptureExtension.class)
 @SuppressWarnings({
         "java:S5778", //this rule does not increase the clarity of these tests
         "LoggingSimilarMessage" // not a sensible rule for a logging test
 })
 class BasicReadableApiTest {
-    @RegisterExtension
-    LogCapture logCapture = LogCapture.forCurrentPackage();
 
     @Test
     void basicReadableApiSucceeds() {
         log.info("hello world", new IllegalArgumentException("shame on you", new NullPointerException("bah!")));
 
-        logCapture.assertLogged(info("hello world"));
+        logCapture().assertLogged(info("hello world"));
     }
 
     @Test
     void varargsAssertionsRequireLogExpectations() {
         assertThat(
                 assertThrows(IllegalArgumentException.class, () ->
-                        logCapture.assertLoggedInAnyOrder()
+                        logCapture().assertLoggedInAnyOrder()
                 ))
                 .hasMessage("at least 2 LogExpectations are required for assertLoggedInAnyOrder(). Found none");
 
         assertThat(
                 assertThrows(IllegalArgumentException.class, () ->
-                        logCapture.assertLoggedInAnyOrder(info("Hello world"))
+                        logCapture().assertLoggedInAnyOrder(info("Hello world"))
                 ))
                 .hasMessageMatching("at least 2 LogExpectations are required for assertLoggedInAnyOrder\\(\\)\\. Found .*Hello world.*");
 
         assertThat(
                 assertThrows(IllegalArgumentException.class, () ->
-                        logCapture.assertLoggedInOrder()
+                        logCapture().assertLoggedInOrder()
                 ))
                 .hasMessage("at least 2 LogExpectations are required for assertLoggedInOrder(). Found none");
 
         assertThat(
                 assertThrows(IllegalArgumentException.class, () ->
-                        logCapture.assertLoggedInOrder(info("Hello world"))
+                        logCapture().assertLoggedInOrder(info("Hello world"))
                 ))
                 .hasMessageMatching("at least 2 LogExpectations are required for assertLoggedInOrder\\(\\)\\. Found .*Hello world.*");
 
         assertThat(
                 assertThrows(IllegalArgumentException.class, () ->
-                        logCapture.assertNotLogged()
+                        logCapture().assertNotLogged()
                 ))
                 .hasMessageMatching("at least one LogExpectation is required for assertNotLogged\\(\\)\\. Found none");
     }
@@ -70,7 +70,7 @@ class BasicReadableApiTest {
     void withRequiresAtLeastOneMatcher() {
         assertThat(
                 assertThrows(IllegalArgumentException.class, () ->
-                        logCapture
+                        logCapture()
                                 .with()
                                 .assertLogged(info("Hello world"))
                 ))
@@ -90,23 +90,23 @@ class BasicReadableApiTest {
         log.trace("first trace");
         log.trace("second trace");
 
-        logCapture.assertLoggedInOrder(
+        logCapture().assertLoggedInOrder(
                 error("first error"),
                 error("second error"));
-        logCapture.assertLoggedInOrder(
+        logCapture().assertLoggedInOrder(
                 warn("first warn"),
                 warn("second warn"));
-        logCapture.assertLoggedInOrder(
+        logCapture().assertLoggedInOrder(
                 info("first info"),
                 info("second info"));
-        logCapture.assertLoggedInOrder(
+        logCapture().assertLoggedInOrder(
                 debug("first debug"),
                 debug("second debug"));
-        logCapture.assertLoggedInOrder(
+        logCapture().assertLoggedInOrder(
                 trace("first trace"),
                 trace("second trace"));
-        logCapture.assertNotLogged(warn("first error"));
-        logCapture.assertNotLogged(any("notlogged error"));
+        logCapture().assertNotLogged(warn("first error"));
+        logCapture().assertNotLogged(any("notlogged error"));
     }
 
 
@@ -117,7 +117,7 @@ class BasicReadableApiTest {
         MDC.clear();
 
         AssertionError assertionError = assertThrows(AssertionError.class, () ->
-                logCapture.assertLogged(
+                logCapture().assertLogged(
                         error("some error",
                                 mdc("key", "a value"),
                                 exception().expectedMessageRegex("an exception that was not logged").build())
