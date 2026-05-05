@@ -57,6 +57,7 @@ logCapture().assertLoggedInOrder(
   * [Cucumber example](#cucumber-example)
     * [Cucumber feature file](#cucumber-feature-file)
 * [Changes](#changes)
+  * [4.2.0](#420)
   * [4.1.1](#411)
   * [4.1.0](#410)
   * [4.0.1](#401)
@@ -86,7 +87,7 @@ Add log-capture as a test dependency to your project. If you use Maven, add this
 <dependency>
     <groupId>de.dm.infrastructure</groupId>
     <artifactId>log-capture</artifactId>
-    <version>4.1.0</version>
+    <version>4.2.0</version>
     <scope>test</scope>
 </dependency>
 ```
@@ -403,6 +404,11 @@ And with MDC logging context
 ```
 
 ## Changes
+
+### 4.2.0
+
+* **Feature**: Added `LogCaptureExtension` for declarative log capturing via `@ExtendWith(LogCaptureExtension.class)` as an alternative to `@RegisterExtension`
+* **Feature**: Added `@LogCapturePackages` annotation to specify which packages to capture when using `LogCaptureExtension`
 
 ### 4.1.1
 
